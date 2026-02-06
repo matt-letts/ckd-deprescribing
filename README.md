@@ -9,6 +9,12 @@ This repository may reflect an incomplete or incorrect analysis with no further 
 The content has ONLY been made public to support the OpenSAFELY [open science and transparency principles](https://www.opensafely.org/about/#contributing-to-best-practice-around-open-science) and to support the sharing of re-usable code for other subsequent users.
 No clinical, policy or safety conclusions must be drawn from the contents of this repository.
 
+# How to navigate this repo
+
+- The study protocols can be found in the [`protocols`](./protocols/) folder
+
+- The [`codelists`](./codelists/) folder contains [`codelists/codelists.txt`](./codelists/codelists.txt) a list of all of the codelists used in this project. This folder also contains .csv files - one for each of the codelists.
+
 # About the OpenSAFELY framework
 
 The OpenSAFELY framework is a Trusted Research Environment (TRE) for electronic
