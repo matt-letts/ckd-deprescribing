@@ -3,7 +3,7 @@ from ehrql import (
     case
 )
 
-from ehrql.tables.core import (
+from ehrql.tables.tpp import (
     clinical_events,
     ethnicity_from_sus,
     addresses

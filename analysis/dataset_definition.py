@@ -1,7 +1,7 @@
 from ehrql import (
     create_dataset,
     codelist_from_csv,
-    months
+    months,
 )
 
 # listing all the possible tables that are available - can bin ones not being used later
@@ -30,7 +30,7 @@ from ehrql.tables.tpp import (
     # parents, # do not think that this will be useful
     patients, # yes: date_of_birth; sex; date_of_death - other bits age_on, is_alive_on, is_dead_on
     practice_registrations, # yes: start_date; end_date; practice_pseudo_id / stp / nuts1_region_name; 
-        # practice_systmone_go_live_date; for_patinet_on; exitsts_for_patent_onm; spanning
+    # practice_systmone_go_live_date; for_patinet_on; exitsts_for_patent_onm; spanning
     # sgss_covid_all_tests, # unlikely to use
     # ukrr, # unliekly to use - needs application/approval at project development stage
     # vaccinations, # no
@@ -45,14 +45,16 @@ from variable_helper_functions import (
     get_latest_ethnicity
 )
 
+dataset = create_dataset()
+
 study_start_date = "2022-03-01"
 study_end_date = "2026-02-09" # need to come back to this 
 #patient_address = addresses.for_patient_on("2022-03-01")
-dataset = create_dataset()
-dataset.configure_dummy_data(population_size=1000)
+
+dataset.configure_dummy_data(population_size=10000)
 
 # registered >12 months prior to start date, and registered through until end date of study
-registrations = (
+registered = (
     practice_registrations.where(
         practice_registrations.start_date.is_on_or_before(study_start_date - months(12))
     )
@@ -60,20 +62,20 @@ registrations = (
         practice_registrations.end_date.is_on_or_before(study_end_date) # decide if having an end date
     )
 )
-
+dataset.define_population(registered.exists_for_patient())
 
 # patient's practice STP
 dataset.stp = practice_registrations.for_patient_on(study_start_date).practice_stp
 
 # age
 dataset.age = patients.age_on(study_start_date)
-dataset.define_population(patients.exists_for_patient())
+
 
 # death dates/causes from ONS
 dataset.date_of_death = ons_deaths.date
 dataset.underlying_cause_of_death = ons_deaths.underlying_cause_of_death
 dataset.cause_of_death = ons_deaths.cause_of_death_01
-dataset.define_population(patients.exists_for_patient())
+
 
 
 # eFI
@@ -86,3 +88,15 @@ latest_efi_record = (
 )
 dataset.latest_efi = latest_efi_record.numeric_value
 dataset.latest_efi_date = latest_efi_record.calculation_date
+
+
+### opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition.py --output \output\dummy_1.csv
+
+#### define new variables
+# latest_efi_record = (...)
+
+#### define variables wanted in dataset
+# dataset.X = ...
+
+#### define population inex criteria
+# dataset.define_population(...)
