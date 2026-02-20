@@ -1,4 +1,4 @@
-from ehrql.tables.core import (
+from ehrql.tables.tpp import (
     patients,
     practice_registrations,
     clinical_events,
