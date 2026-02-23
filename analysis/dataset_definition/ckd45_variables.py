@@ -12,12 +12,16 @@ creatinine_values = (
 )
 
 # then filter the most recent creatinine value
-most_recent_creatinine_value = creatinine_values.sort_by(clinical_events.date).last_for_patient()
+most_recent_creatinine_value = (
+    creatinine_values
+    .sort_by(clinical_events.date)
+    .last_for_patient()
+)
 
 # then the next most recent, that is >= 90 days prior to the most recent
 qualifying_cutoff = most_recent_creatinine_value.date - 90
 
-most_recent_creatinine_value_90plus_days_earlier = (
+second_most_recent_creatinine_value_90plusdays = (
     creatinine_values
     .where(clinical_events.date <= qualifying_cutoff)
     .sort_by(clinical_events.date)
@@ -49,89 +53,48 @@ def egfr_ckdepi2009(creat_umol, age):
         * female_multiplier
     )
 
-most_recent_egfr = calc_egfr(
-    most_recent.numeric_value,
-    patients.age_on(most_recent.date)
+most_recent_egfr = egfr_ckdepi2009(
+    most_recent_creatinine_value.numeric_value,
+    patients.age_on(most_recent_creatinine_value.date)
 )
 
-second_most_recentegfr_second = calc_egfr(
-    second_most_recent.numeric_value,
-    patients.age_on(second_most_recent.date)
+second_most_recent_egfr_90plusdays = egfr_ckdepi2009(
+    second_most_recent_creatinine_value_90plusdays.numeric_value,
+    patients.age_on(second_most_recent_creatinine_value_90plusdays.date)
 )
 
 
-# Convert to mg/dL
-creat_mgdl_recent = most_recent.numeric_value / 88.4
-creat_mgdl_second = second_most_recent.numeric_value / 88.4
-
-# Age at test
-age_recent = patients.age_on(most_recent.date)
-age_second = patients.age_on(second_most_recent.date)
-
-sex = patients.sex
-
-# 2021 CKD-EPI constants
-kappa_recent = sex.if_else("female", 0.7, 0.9)
-alpha_recent = sex.if_else("female", -0.241, -0.302)
-female_multiplier = sex.if_else("female", 1.012, 1)
-
-kappa_second = kappa_recent
-alpha_second = alpha_recent
-
-# eGFR calculation (2021 equation)
-egfr_recent = (
-    142
-    * (math.minimum(creat_mgdl_recent / kappa_recent, 1) ** alpha_recent)
-    * (math.maximum(creat_mgdl_recent / kappa_recent, 1) ** -1.200)
-    * (0.9938 ** age_recent)
-    * female_multiplier
+# Require both measurements to actually exist in order to generate a CKD flag
+both_exist = (
+    most_recent_creatinine_value.date.is_not_null()
+    & second_most_recent_creatinine_value_90plusdays.date.is_not_null()
 )
 
-egfr_second = (
-    142
-    * (math.minimum(creat_mgdl_second / kappa_second, 1) ** alpha_second)
-    * (math.maximum(creat_mgdl_second / kappa_second, 1) ** -1.200)
-    * (0.9938 ** age_second)
-    * female_multiplier
-)
-
-# -------------------------------------------------------------------
-# Step 4: Require ≥90 days between measurements
-# -------------------------------------------------------------------
-
-days_between = most_recent.date - second_most_recent.date
-
-valid_spacing = days_between >= 90
-
-
-# -------------------------------------------------------------------
-# Step 5: Define CKD Stage 4 and 5
-# -------------------------------------------------------------------
-
-# Stage 5: both eGFR ≤15 and spaced ≥90 days
+## classify into CKD stages
+# Stage 5 CKD both eGFR ≤15, ≥90 days apart
 ckd5 = (
-    valid_spacing
-    & (egfr_recent <= 15)
-    & (egfr_second <= 15)
+    both_exist
+    & (most_recent_egfr <= 15)
+    & (second_most_recent_egfr_90plusdays <= 15)
 )
 
-# Stage 4: both eGFR 16–30 and spaced ≥90 days
+# Stage 4 CKD both eGFR 16–30, ≥90 days apart
 ckd4 = (
-    valid_spacing
-    & (egfr_recent >= 16)
-    & (egfr_recent <= 30)
-    & (egfr_second >= 16)
-    & (egfr_second <= 30)
+    both_exist
+    & (most_recent_egfr >= 16) & (most_recent_egfr <= 30)
+    & (second_most_recent_egfr_90plusdays >= 16) & (second_most_recent_egfr_90plusdays <= 30)
 )
 
+### what to do about someone with first eGFR 16 then second eGFR 15 - need to think about this edge case
 
-# -------------------------------------------------------------------
-# Step 6: Add outputs to dataset
-# -------------------------------------------------------------------
+## add all the relevant CKD related variables to the dataset
+dataset.creatinine_date_1 = most_recent_creatinine_value.date
+dataset.creatinine_value_1 = most_recent_creatinine_value.numeric_value
+dataset.egfr_1 = most_recent_egfr
 
-dataset.latest_creatinine_value = most_recent.numeric_value
-dataset.latest_creatinine_date = most_recent.date
-dataset.latest_egfr = egfr_recent
+dataset.creatinine_date_2 = second_most_recent_creatinine_value_90plusdays.date
+dataset.creatinine_value_2 = second_most_recent_creatinine_value_90plusdays.numeric_value
+dataset.egfr_2 = second_most_recent_egfr_90plusdays
 
 dataset.ckd4 = ckd4
 dataset.ckd5 = ckd5
