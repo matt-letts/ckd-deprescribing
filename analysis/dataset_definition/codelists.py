@@ -2,12 +2,27 @@
 
 from ehrql import codelist, codelist_from_csv, combine_codelists
 
-### kidney replacement therapy codelists same methods as in this paper: https://bmjmedicine.bmj.com/content/3/1/e000807
+#### CKD CODELISTS ####
 
+# primary care ckd codes
+primary_care_ckd45_codes = codelist_from_csv(
+    "codelists/user-mletts92-chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy.csv",
+    system="snomed",
+    column="code"
+)
+
+# primary care creatinine values
+creatinine_codes = codelist_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-cre_cod.csv",
+    system="snomed",
+    column="code"
+)
+
+#### KRT CODELISTS ####
+# Same methods as in this paper: https://bmjmedicine.bmj.com/content/3/1/e000807
 
 ## primary care codes
-
-# primary care ctv3 codes - dialysis, ktx then all krt
+# separate primary care ctv3 codelists - dialysis, ktx then all krt
 
 primary_care_dialysis_codes = codelist_from_csv(
     "codelists/opensafely-dialysis.csv",
@@ -35,7 +50,8 @@ primary_care_krt_codes_all = combine_codelists(
     primary_care_krt_codes
 )
 
-# secondary care icd10 codes - dialysis, ktx then all krt
+## secondary care codes
+# secondary care icd10 codelists - dialysis, ktx then all krt
 
 secondary_care_dialysis_codes_icd10 = codelist_from_csv(
     "codelists/ukrr-dialysis-icd10.csv",
@@ -49,10 +65,10 @@ secondary_care_krt_codes_icd10 = combine_codelists(
     secondary_care_dialysis_codes_icd10,
     secondary_care_ktx_codes_icd10,
     codelist(["T861"], system="icd10") 
-    # T861 = transplant failure; kidney failure but unknown treatment modality
+    # T861 = "complications of kidney transplant"; may refer to transplant failure hence unknown treatment modality
 )
 
-# secondary care opcs4 codes - dialysis, ktx then all krt
+# secondary care opcs4 codelists - dialysis, ktx then all krt
 
 secondary_care_dialysis_codes_opcs4 = codelist_from_csv(
     "codelists/ukrr-dialysis-opcs-4.csv",
@@ -77,7 +93,7 @@ secondary_care_krt_codes_opcs4 = combine_codelists(
     # X412 - removal of ambulatory peritoneal dialysis catheter
 )
 
-# not actually sure I will need all of these categorisations 
+# combine them together to get various combinations of secondary care codelists 
 
 secondary_care_dialysis_codes_all = combine_codelists(
     secondary_care_dialysis_codes_opcs4,
@@ -89,8 +105,8 @@ secondary_care_ktx_codes_all = combine_codelists(
     secondary_care_ktx_codes_icd10
 )
 
-# this last one contains all of the secondary care krt/dialysis/transplant codes
 seoncdary_care_krt_codes_all = combine_codelists(
+    # this last one contains all of the secondary care krt/dialysis/transplant codes
     secondary_care_krt_codes_opcs4,
     secondary_care_krt_codes_icd10
 )
