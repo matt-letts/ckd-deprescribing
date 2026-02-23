@@ -38,23 +38,16 @@ from ehrql.tables.tpp import (
     # wl_openpathways, # again no
 )
 
-from analysis.dataset_definition.add_variables import (
-    add_inex_variables
-)
-
+from add_variables import (add_inex_variables)
 from codelists import *
-
+from study_dates import *
 
 dataset = create_dataset()
-
-index_date = "2022-03-01"
-study_end_date = "2026-02-09" # need to come back to this 
 
 add_inex_variables(dataset, index_date)
 
 dataset.configure_dummy_data(population_size=10000)
 dataset.define_population(patients.date_of_birth.is_not_null())
-
 
 
 ### opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition.py --output \output\dummy_1.csv

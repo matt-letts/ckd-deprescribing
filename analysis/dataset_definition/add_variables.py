@@ -12,6 +12,8 @@ from variable_helper_functions import (
     get_latest_ethnicity
 )
 
+from codelists import *
+
 ### population inclusion/exclusion criteria ###
 def add_inex_variables(dataset, index_date):
 
@@ -37,10 +39,6 @@ def add_inex_variables(dataset, index_date):
             )
         )).exists_for_patient()
 
-    # .except_where(
-    #     practice_registrations.end_date.is_on_or_before(study_end_date) 
-    # ) this would exclude people who were deregistered before the end of the study date - don't want this.
-    
     # known sex
     inex_bin_sex = (
         (patients.sex == "male") |
@@ -54,7 +52,7 @@ def add_inex_variables(dataset, index_date):
         .practice_nuts1_region_name
         .is_not_null()
     )
-
+    
 
     inex_vars = {
         name: value
