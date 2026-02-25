@@ -1,7 +1,13 @@
 from ehrql.tables.tpp import clinical_events, patients
 from ehrql import days, minimum_of, maximum_of 
-from study_dates import index_date
 from codelists import creatinine_codes
+
+# define the project-relevant dates
+import json
+with open("output/study_dates.json") as f:
+    study_dates = json.load(f)
+index_date = study_dates["index_date"]
+end_date = study_dates["end_date"]
 
 def compute_ckd_variables(index_date) -> dict:
 

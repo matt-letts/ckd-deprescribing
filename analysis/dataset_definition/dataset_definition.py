@@ -12,23 +12,33 @@ from ehrql.tables.tpp import (
 
 from add_variables import (add_inex_variables)
 from codelists import *
-from study_dates import *
 from ckd_variables import (
     compute_ckd_variables,
     add_ckd_variables
 )
 
+# define the project-relevant dates
+import json
+with open("output/study_dates.json") as f:
+    study_dates = json.load(f)
+index_date = study_dates["index_date"]
+end_date = study_dates["end_date"]
+
+# initialise the dataset
 dataset = create_dataset()
-
-ckd = compute_ckd_variables(index_date)
-add_inex_variables(dataset, index_date, ckd)
-add_ckd_variables(dataset, ckd)
-
 dataset.configure_dummy_data(population_size=10000)
 dataset.define_population(patients.date_of_birth.is_not_null())
 
+# ckd = compute_ckd_variables(index_date)
+add_inex_variables(dataset, index_date)
+# add_ckd_variables(dataset, ckd)
 
-### opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition.py --output \output\dummy_1.csv
+## start from here tomorrow ## - this basic script works. I have  generated a 5 column dataset with boolean values from inex criteria like Rob has done.
+
+
+
+
+### opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition.py --output \output\dummy_1.csv
 
 #### define new variables
 # latest_efi_record = (...)

@@ -5,10 +5,10 @@ from variable_helper_functions import (
     get_latest_ethnicity
 )
 from codelists import *
-from ckd_variables import add_ckd_variables
+# from ckd_variables import add_ckd_variables
 
 ### population inclusion/exclusion criteria ###
-def add_inex_variables(dataset, index_date, ckd: dict):
+def add_inex_variables(dataset, index_date):
 
     # not dead prior to study start date
     inex_bin_alive = (
@@ -46,7 +46,7 @@ def add_inex_variables(dataset, index_date, ckd: dict):
         .is_not_null()
     )
 
-    inex_bin_ckd4or5 = ckd["ckd4or5"]    
+    # inex_bin_ckd4or5 = ckd["ckd4or5"]    
 
     inex_vars = {
         name: value
