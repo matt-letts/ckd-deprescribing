@@ -1,12 +1,18 @@
 version: '4.0'
 
 actions:
-  generate_dataset:
-    run: >
-        ehrql:v1 generate-dataset
-        analysis/dataset_definition.py
-        --test-data-file analysis/test_dataset_definition.py
-        --output outputs/dataset.arrow
+  study_dates:
+    run: r:v2 analysis/dataset_definition/study_dates.r
     outputs:
       highly_sensitive:
-        population: outputs/dataset.arrow
+        study_dates_json: output/study_dates.json
+
+  generate_dataset:
+    run: >
+        ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition.py
+        --output output/dataset.arrow
+    needs:
+    - study_dates
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset.arrow
