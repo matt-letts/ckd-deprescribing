@@ -101,3 +101,11 @@ seoncdary_care_krt_codes_all = (
     list(secondary_care_krt_codes_opcs4) +
     list(secondary_care_krt_codes_icd10)
 )
+
+#### other codelists ###
+
+ethnicity_snomed = codelist_from_csv(
+    "codelists/opensafely-ethnicity-snomed-0removed.csv",
+    column="code",
+    category_column="Grouping_6"
+)

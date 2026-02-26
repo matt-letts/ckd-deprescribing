@@ -2,18 +2,13 @@ from ehrql.tables.tpp import clinical_events, patients
 from ehrql import days, minimum_of, maximum_of 
 from codelists import creatinine_codes
 
-# define the project-relevant dates
-import json
-with open("output/study_dates.json") as f:
-    study_dates = json.load(f)
-index_date = study_dates["index_date"]
-end_date = study_dates["end_date"]
+
 
 def compute_ckd_variables(index_date) -> dict:
 
     # Extract all non-null creatinine_values for patients prior to index date
     creatinine_values = (
-        clinical_events
+        clinical_events # .numeric_value
         .where(clinical_events.snomedct_code.is_in(creatinine_codes))
         .where(clinical_events.numeric_value.is_not_null())
         .where(clinical_events.date < index_date)
