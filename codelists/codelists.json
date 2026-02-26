@@ -30,6 +30,12 @@
       "downloaded_at": "2026-02-20 15:27:39.603587Z",
       "sha": "08e003f1222fe26781288b2eeff22db99780f202"
     },
+    "opensafely-ethnicity-snomed-0removed.csv": {
+      "id": "opensafely/ethnicity-snomed-0removed/22911876",
+      "url": "https://www.opencodelists.org/codelist/opensafely/ethnicity-snomed-0removed/22911876/",
+      "downloaded_at": "2026-02-26 11:24:00.790709Z",
+      "sha": "d95a2f826299563aa57f6fa99009e6e13a65151b"
+    },
     "ukrr-dialysis-opcs-4.csv": {
       "id": "ukrr/dialysis-opcs-4/505bef04",
       "url": "https://www.opencodelists.org/codelist/ukrr/dialysis-opcs-4/505bef04/",

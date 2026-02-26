@@ -1,12 +1,15 @@
 from ehrql import (
     when,
-    case
+    case,
+    days,
 )
 
 from ehrql.tables.tpp import (
     clinical_events,
     ethnicity_from_sus,
-    addresses
+    addresses,
+    patients,
+    medications,
 )
 
 def get_latest_ethnicity(
@@ -83,7 +86,7 @@ def get_latest_ethnicity(
             when(
                 latest_ethnicity_from_codes.is_null() & ethnicity_sus.is_not_null()
             ).then(ethnicity_sus),
-            otherwise="Missing",
+            otherwise = None,
         )
 
         return ethnicity_combined
@@ -115,7 +118,7 @@ def get_imd(
 
     imd_grouped=case(
         *whens,
-        otherwise="unknown",
+        otherwise= None,
     )
 
     return imd_grouped
