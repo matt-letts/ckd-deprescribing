@@ -1,3 +1,4 @@
+from analysis.dataset_definition.codelists import primary_care_ckd45_codes
 from ehrql.tables.tpp import (patients, practice_registrations, clinical_events, ons_deaths)
 from ehrql import months, days
 from variable_helper_functions import (
@@ -46,20 +47,24 @@ def add_demographic_inex_variables(
     }
 
 
-#### add_creatinine_inex_variables() #### 
+#### add_ckd_inex_variables() #### 
 
-# generates 5 variables:
-# 1. A per-patient boolean (inex_bin_has_two_scr) indicating whether a patient has:
-        # One creatinine before index_date
-        # At least one more 90+ days before the first
-# 2. The numeric value of the most recent creatinine (inex_num_scr_value_1)
-# 3. The date of the most recent creatinine (inex_date_scr_date_1)
-# 4. The numeric value of the most recent creatinine, 90+ days prior to first (inex_num_scr_value_2)
-# 5. The date of the most recent creatinine, 90+ days prior to first (inex_date_scr_date_2)
+# generates 7 variables based on creatinine values/dates and CKD codes:
+# 1. inex_bin_has_two_scr - a boolean that is TRUE when a patient has:
+    # >=1 coded creatinine measurement with a non-null numeric value before index_date
+    # >=1 additional coded creatinine measurement with a non-null numeric value 90+ days before the first
+# 2. inex_num_scr_value_1 - the numeric value of the most recent creatinine 
+# 3. inex_date_scr_date_1 - the date of the most recent creatinine 
+# 4. inex_num_scr_value_2 - the numeric value of the most recent creatinine, 90+ days prior to first 
+# 5. inex_date_scr_date_2 - the date of the most recent creatinine, 90+ days prior to first 
+# 6. inex_bin_ckd45_codes - a boolean that is TRUE when a patient has a code for CKD 4 or 5 prior to index_date
+# 7. inex_date_most_recent_ckd45_code - the date of the most recent CKD 4 or 5 code
 
-def add_creatinine_inex_variables(
-    clinical_events, creatinine_codes, index_date
+def add_ckd_inex_variables(
+    clinical_events, creatinine_codes, primary_care_ckd45_codes, index_date
     ):
+
+    ## creatinine variables
 
     # All valid creatinine values before index date
     creatinine_values = (
@@ -87,25 +92,46 @@ def add_creatinine_inex_variables(
         .last_for_patient()
     )
 
-    # Binary flag: must have both
-    has_two = (
+    # Binary flag for whether 2 appropriate creatinine values exist
+    has_two_creatinines = (
         most_recent.exists_for_patient()
         & second_recent_90plus.exists_for_patient()
     )
 
+    ## CKD codes
+
+    # CKD stage 4/5 codes before index date
+    coded_ckd45 = (
+        clinical_events
+        .where(clinical_events.snomedct_code.is_in(primary_care_ckd45_codes))
+        .where(clinical_events.date < index_date)
+    )
+
+    # binary flag if a person has a CKD 4/5 code
+    has_coded_ckd45 = coded_ckd45.exists_for_patient()
+
+    # Most recent CKD 4/5 code
+    most_recent_coded_ckd45 = (
+        coded_ckd45
+        .sort_by(clinical_events.date)
+        .last_for_patient()
+    )
+
     return {
-        "inex_bin_has_two_scr": has_two,
+        # Creatinine variables
+        "inex_bin_has_two_scr": has_two_creatinines,
         "inex_num_scr_value_1": most_recent.numeric_value,
         "inex_date_scr_date_1": most_recent.date,
         "inex_num_scr_value_2": second_recent_90plus.numeric_value,
         "inex_date_scr_date_2": second_recent_90plus.date,
+        # CKD stage 4/5 code variables
+        "inex_bin_ckd45_codes": has_coded_ckd45,
+        "inex_date_most_recent_ckd45_code": most_recent_coded_ckd45.date
     }
 
-#### WHAT ABOUT CKD CODES ####
 #### AND EXCLUDING THOSE ON DIALYSIS ####
 
 #### add_qa_inex_variables() ####
-
 # generates booleans for each of the quality assurance criteria
 
 def add_qa_inex_variables(
@@ -160,9 +186,10 @@ def add_inex_variables(
     )
 
     columns.update(
-        add_creatinine_inex_variables(
+        add_ckd_inex_variables(
             clinical_events=clinical_events,
             creatinine_codes=creatinine_codes,
+            primary_care_ckd45_codes=primary_care_ckd45_codes,
             index_date=index_date
         )
     )
