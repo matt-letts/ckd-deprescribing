@@ -10,9 +10,9 @@ actions:
   generate_dataset:
     run: >
         ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition.py
-        --output output/dataset.arrow
+        --output output/dataset.csv.gz
     needs:
     - study_dates
     outputs:
       highly_sensitive:
-        dataset: output/dataset.arrow
+        dataset: output/dataset.csv.gz

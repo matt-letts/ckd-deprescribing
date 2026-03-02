@@ -1,3 +1,6 @@
+#### THIS SCRIPT NOT CURRENTLY BEING USED ####
+##### but is being kept for its useful eGFR equations
+
 from ehrql.tables.tpp import clinical_events, patients
 from ehrql import days, minimum_of, maximum_of 
 from codelists import creatinine_codes

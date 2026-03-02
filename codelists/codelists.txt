@@ -1,4 +1,7 @@
 user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2
+user/mletts92/chronic-kidney-disease-stage-4/3e8d63c4/
+user/mletts92/chronic-kidney-disease-stage-5-not-receiving-kidney-replacement-therapy/579cd6f9/
+user/mletts92/kidney-transplant-opcs4/1486bd3c/
 
 nhsd-primary-care-domain-refsets/cre_cod/20250912
 
@@ -9,5 +12,3 @@ opensafely/ethnicity-snomed-0removed/22911876
 
 ukrr/dialysis-opcs-4/505bef04
 ukrr/dialysis-icd10/2a5cf9a2
-
-user/viyaasan/kidney-transplant-opcs-4/18d788ae 
