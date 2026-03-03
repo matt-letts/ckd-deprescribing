@@ -1,5 +1,7 @@
 #####################################################################
-# THIS FILE 
+# This file defines all of the inclusion and exclusion variables 
+# and pulls them into a function add_inex_variables() that is then 
+# called into dataset.definition.py to create initial dataset
 #####################################################################
 
 #####################################################################
@@ -26,7 +28,7 @@ from codelists import *
 
 
 #####################################################################
-# ADD DEMOGRAPHIC INCLUSION/EXCLUSION VARIABLES 
+# DEMOGRAPHIC INCLUSION/EXCLUSION VARIABLES 
 #####################################################################
 
 # this function generates booleans for each of the demographic inclusion/exclusion criteria, and a column for the age and sex
@@ -69,7 +71,7 @@ def add_demographic_inex_variables(
 
 
 #####################################################################
-# ADD CKD INCLUSION/EXCLUSION VARIABLES - CODES AND CREATININE VALUES
+# CKD INCLUSION/EXCLUSION VARIABLES - CODES AND CREATININE VALUES
 #####################################################################
 # generates variables based on creatinine values/dates and CKD codes:
 
@@ -160,7 +162,7 @@ def add_ckd_inex_variables(
     }
 
 #####################################################################
-# ADD KRT VARIABLES (FOR EXCLUSION) - PRIMARY AND SECONDARY
+# KRT VARIABLES (FOR EXCLUSION) - PRIMARY AND SECONDARY CARE CODES
 #####################################################################
 
 # Plan to look just using primary care codes, then primary and secondary combined and see the numbers
@@ -236,8 +238,29 @@ def add_krt_inex_variables(
         .last_for_patient()
     )
 
-    # and then whether this is a dialysis or transplant code
+    # Then complex logic to decide whether this is a dialysis or transplant code
     secondary_care_krt_type = case(
+        # sort edge case first where BOTH dialysis AND transplant in same spell → unknown
+        when(
+            (
+                most_recent_secondary_care_krt_code.all_procedures.contains_any_of(
+                    secondary_care_dialysis_codes_opcs4
+                )
+                | most_recent_secondary_care_krt_code.all_diagnoses.contains_any_of(
+                    secondary_care_dialysis_codes_icd10
+                )
+            )
+            &
+            (
+                most_recent_secondary_care_krt_code.all_procedures.contains_any_of(
+                    secondary_care_ktx_codes_opcs4
+                )
+                | most_recent_secondary_care_krt_code.all_diagnoses.contains_any_of(
+                    secondary_care_ktx_codes_icd10
+                )
+            )
+        ).then("unknown"),
+        # Dialysis only
         when(
             most_recent_secondary_care_krt_code.all_procedures.contains_any_of(
                 secondary_care_dialysis_codes_opcs4
@@ -246,6 +269,7 @@ def add_krt_inex_variables(
                 secondary_care_dialysis_codes_icd10
             )
         ).then("dialysis"),
+        # Transplant only
         when(
             most_recent_secondary_care_krt_code.all_procedures.contains_any_of(
                 secondary_care_ktx_codes_opcs4
@@ -254,11 +278,13 @@ def add_krt_inex_variables(
                 secondary_care_ktx_codes_icd10
             )
         ).then("transplant"),
-        when(most_recent_secondary_care_krt_code.apcs_ident.is_not_null()
+        # Any other KRT-related spell
+        when(
+            most_recent_secondary_care_krt_code.apcs_ident.is_not_null()
         ).then("unknown"),
+
         otherwise=None,
     )
-
     
     ### Combined primary and secondary KRT codes ###
     
@@ -355,7 +381,7 @@ def add_krt_inex_variables(
 
 
 #####################################################################
-# ADD QA VARIABLES
+# QA VARIABLES
 #####################################################################
 # generates booleans for each of the quality assurance criteria
 
@@ -395,8 +421,9 @@ def add_qa_inex_variables(
 
 
 
-#### add_inex_variables() ####
-
+#####################################################################
+# COMBINE ALL ABOVE VARIABLES INTO ONE FUNCTION TO ADD TO DATASET
+#####################################################################
 def add_inex_variables(dataset, index_date):
 
     columns = {
