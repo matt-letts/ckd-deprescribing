@@ -1,19 +1,36 @@
 version: '4.0'
 
 actions:
+
   study_dates:
     run: r:v2 analysis/dataset_definition/study_dates.r
     outputs:
       highly_sensitive:
         study_dates_json: output/study_dates.json
 
+
   generate_dataset:
     run: >
         ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition.py
         --test-data-file analysis/dataset_definition/test_dataset_definition.py
-        --output output/dataset.csv.gz
+        --output output/dataset.arrow
     needs:
     - study_dates
     outputs:
       highly_sensitive:
-        dataset: output/dataset.csv.gz
+        dataset: output/dataset.arrow
+
+
+  clean_dataset_prematch:
+    run: r:v2 analysis/dataset_clean/dataset_clean.r
+    needs: 
+    - generate_dataset
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_clean/input_clean_prematch.csv
+      moderately_sensitive:
+        flow_prematch: output/dataset_clean/flow_prematch.csv
+        describe_inex_prematch: output/describe/inex-prematch.txt
+        describe_preprocessed_prematch: output/describe/preprocessed-prematch.txt
+        describe_qa_prematch: output/describe/qa-prematch.txt
+        describe_ref_prematch: output/describe/ref-prematch.txt
