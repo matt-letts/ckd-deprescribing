@@ -10,6 +10,7 @@ actions:
   generate_dataset:
     run: >
         ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition.py
+        --test-data-file analysis/dataset_definition/test_dataset_definition.py
         --output output/dataset.csv.gz
     needs:
     - study_dates
