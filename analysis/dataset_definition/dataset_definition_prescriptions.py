@@ -1,3 +1,6 @@
+# this dataset definition is not being used yet, but can be tested using test_dataset_definition_prescriptions.py
+# It creates a dataset containing wide-form prescription codes and dates using the add_prescription_columns() function
+
 from ehrql import create_dataset
 from ehrql.tables.tpp import (
     addresses,
@@ -10,7 +13,6 @@ from ehrql.tables.tpp import (
     practice_registrations,
 )
 
-from inex_variables import add_inex_variables
 from variable_helper_functions import add_prescription_columns
 
 # define the project-relevant dates
@@ -22,13 +24,9 @@ end_date = study_dates["end_date"]
 
 # initialise the dataset
 dataset = create_dataset()
-dataset.configure_dummy_data(population_size=10)
+dataset.configure_dummy_data(population_size=1000)
 dataset.define_population(patients.date_of_birth.is_not_null())
 
+add_prescription_columns(dataset, index_date, max_meds=15)
 
-add_inex_variables(dataset, index_date)
-
-# add_prescription_columns(dataset, index_date, max_meds=3) - hidden for now
-# ckd = compute_ckd_variables(index_date) - hidden for now
-
-# opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition.py --dummy-tables dummy_tables --output output/dummy_dataset.arrow
+# opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_prescriptions.py --dummy-tables dummy_tables --output output/dataset_1.csv.gz

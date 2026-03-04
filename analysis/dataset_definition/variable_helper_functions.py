@@ -12,6 +12,79 @@ from ehrql.tables.tpp import (
     medications,
 )
 
+#########################################################################################
+# this function returns a dictionary of patient-level columns representing the most recent
+# prescriptions in the 90 days prior to (and including) index_date, working
+# backwards in time up to max_meds prescriptions. 
+# Columns are named med_1_code, med_1_date, med_2_code, med_2_date, etc. 
+# where med_1 is the most recent prescription. 
+# Same-day prescriptions are ordered lexicographically by dmd_code string 
+# (not numerically), which is arbitrary but consistent. Rows with identical 
+# date and dmd_code are treated as duplicates and collapsed to one entry. 
+# Iteratively peels off the most recent row using last_for_patient() on an ascending sort, 
+# then excludes that date+code combination from subsequent iterations.
+##########################################################################################
+
+def add_recent_prescriptions(index_date, max_meds=10):
+
+    # restrict to precriptions within 90 days before (and including) index_date
+    # sort -> last_for_patient() returns the most recent / lexicographically last row
+    base = medications.where(
+        medications.date.is_on_or_before(index_date) &
+        medications.date.is_on_or_after(index_date - days(90))
+    ).sort_by(
+        medications.date,
+        medications.dmd_code,
+    )
+
+    output = {}
+
+    # Python lists tracking which date+code combinations have already been
+    # selected in previous iterations, used to exclude them from remaining.
+    prev_dates = []
+    prev_codes = []
+
+    for i in range(1, max_meds + 1):
+
+        # start from full base frame and progressively exclude all
+        # previously selected date + code combinations
+        remaining = base
+        for prev_date, prev_code in zip(prev_dates, prev_codes):
+            # keep only those that are:
+            # - strictly before the previous date OR
+            # - on the same date but a different dmd code
+            remaining = remaining.where(
+                medications.date.is_before(prev_date) |
+                (
+                    (medications.date == prev_date) &
+                    (medications.dmd_code != prev_code)
+                )
+            )
+
+        current = remaining.last_for_patient() # most recent still remaining
+
+        # store the current dates and codes
+        output[f"med_{i}_code"] = current.dmd_code
+        output[f"med_{i}_date"] = current.date
+
+        # update the lists to include the most recently used dates and codes
+        prev_dates = prev_dates + [current.date] 
+        prev_codes = prev_codes + [current.dmd_code]  
+
+    return output
+
+
+# calls add_recent_prescriptions() and adds resulting columns to dataset
+
+def add_prescription_columns(dataset, index_date, max_meds=10):
+    for name, expr in add_recent_prescriptions(index_date, max_meds).items():
+        dataset.add_column(name, expr)
+
+
+#########################################################################################
+# get_latest_ethnicity()
+##########################################################################################
+
 def get_latest_ethnicity(
         index_date, codelist, grouping=6
     ):
@@ -92,7 +165,9 @@ def get_latest_ethnicity(
         return ethnicity_combined
 
 
-# helper function to categorise IMD into groups (e.g. quintiles, deciles) based on the distribution of IMD in the dataset
+#########################################################################################
+# get_imd categorises IMD into groups (e.g. quintiles, deciles) based on the distribution of IMD in the dataset
+##########################################################################################
 
 def get_imd(
     index_date, groups=5, max_imd=32844
