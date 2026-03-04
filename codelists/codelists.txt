@@ -9,6 +9,7 @@ opensafely/kidney-transplant/21865860
 opensafely/dialysis/3ce108ac
 opensafely/renal-replacement-therapy/5b5ed963
 opensafely/ethnicity-snomed-0removed/22911876
+opensafely/statin-medication/2020-04-20
 
 ukrr/dialysis-opcs-4/505bef04
 ukrr/dialysis-icd10/2a5cf9a2

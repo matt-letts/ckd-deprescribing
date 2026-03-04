@@ -54,6 +54,12 @@
       "downloaded_at": "2026-02-26 11:24:00.790709Z",
       "sha": "d95a2f826299563aa57f6fa99009e6e13a65151b"
     },
+    "opensafely-statin-medication.csv": {
+      "id": "opensafely/statin-medication/2020-04-20",
+      "url": "https://www.opencodelists.org/codelist/opensafely/statin-medication/2020-04-20/",
+      "downloaded_at": "2026-03-04 14:29:59.257256Z",
+      "sha": "5451bfb2040bf2b589f2a59c1ebd61e2670f558b"
+    },
     "ukrr-dialysis-opcs-4.csv": {
       "id": "ukrr/dialysis-opcs-4/505bef04",
       "url": "https://www.opencodelists.org/codelist/ukrr/dialysis-opcs-4/505bef04/",

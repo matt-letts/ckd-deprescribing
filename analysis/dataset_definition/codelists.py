@@ -109,3 +109,9 @@ ethnicity_snomed = codelist_from_csv(
     column="code",
     category_column="Grouping_6"
 )
+
+# imported to test dmd_code codelists, not yet using.
+# statins = codelist_from_csv(
+#     "codelists/opensafely-statin-medication.csv",
+#     column="code"
+# )
