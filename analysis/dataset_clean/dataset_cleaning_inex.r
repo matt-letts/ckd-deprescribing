@@ -1,4 +1,6 @@
-print("Import libraries and functions")
+##### describe this script #####
+
+message("Import libraries and functions")
 library(fs)
 library(here)
 library(data.table)
@@ -7,21 +9,53 @@ library(dplyr)
 library(lubridate)
 source(here::here("analysis", "functions", "fn_transform_variables.r"))
 source(here::here("analysis", "functions", "fn_build_flow_counts.r"))
+source(here::here("analysis", "functions", "fn_describe_data.r"))
+source(here::here("analysis", "functions", "fn_describe_and_flow.r"))
+source(here::here("analysis", "functions", "fn_disclosure_control.r"))
+source(here::here("analysis", "functions", "fn_qa.r"))
 
 
-print("Create output folder")
-dir_create(here::here("output", "dataset_clean", "data"))
-dir_create(here::here("output", "dataset_clean", "data_description"))
 
-print("Import dates")
+message("Create output folder")
+dir_create(here::here("output", "data"))
+dir_create(here::here("output", "data_descriptions"))
+
+message("Import dates")
 source(here::here("analysis", "dataset_definition", "study_dates.r"))
 study_dates <- lapply(study_dates, function(x) as.Date(x))
 
-print("Process dataset lazily")
-input_filename <- "dataset.arrow"
-lazy_transformed_dataset <- fn_transform_variables(input_filename)
 
-flow_results <- fn_build_flow_counts(lazy_transformed_dataset)
+message("Process the dataset lazily")
+
+input_filename = "dataset.arrow"
+
+# Load dataset, keeping in arrow format for speed
+dataset_cleaning_1_input <- arrow::open_dataset(
+  here::here("output", input_filename),
+  format = "ipc"
+)
+
+# transform variables into desired classes
+dataset_cleaning_2_transformed <- fn_transform_variables(
+  arrow_data = dataset_cleaning_1_input,
+  collect_and_describe = FALSE
+)
+
+# apply qa criteria
+dataset_cleaning_3_qa_applied <- fn_qa(
+  arrow_data = dataset_cleaning_2_transformed,
+  rounding_threshold = 6,
+  collect_and_describe = FALSE
+)
+
+
+# write all datasets to .txt and flow dataframe
+flow <- describe_and_flow(
+  project_stage = "cleaning"
+)
+
+
+
 
 
 
@@ -57,14 +91,7 @@ roundmid_any <- function(x, to = 6) {
   ceiling(x / to) * to - (floor(to / 2) * (x != 0))
 }
 
-# Function for describing data ----
-describe_data <- function(df, name) {
-  fs::dir_create(here::here("output/describe/"))
-  sink(paste0("output/describe/", name, ".txt"))
-  print(skimr::skim(df))
-  sink()
-  message(paste0("output/describe/", name, ".txt written successfully."))
-}
+
 
 # never sorted out the _cat variables within the dataset - need to do this before the final bit
 fn_postcollect_types <- function(dt) {
