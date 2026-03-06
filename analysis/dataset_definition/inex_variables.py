@@ -22,7 +22,8 @@ from ehrql import (
 )
 from variable_helper_functions import (
     get_imd,
-    get_latest_ethnicity
+    get_latest_ethnicity,
+    count_recent_meds
 )
 from codelists import *
 
@@ -378,6 +379,37 @@ def add_krt_inex_variables(
 
     }
 
+#####################################################################
+# MEDICATION COUNTS
+#####################################################################
+
+# def add_medication_inex_variables(
+#     index_date
+# ):
+
+#     return {
+
+#         "inex_med_num_30": (
+#             count_recent_meds(index_date, daysbefore=30)
+#         ),   
+
+#         "inex_med_num_90": (
+#             count_recent_meds(index_date, daysbefore=90)
+#         ),
+
+#         "inex_med_num_180": (
+#             count_recent_meds(index_date, daysbefore=180)
+#         ),
+
+#         "inex_med_num_270": (
+#             count_recent_meds(index_date, daysbefore=270)
+#         ),
+
+#         "inex_med_num_365": (
+#             count_recent_meds(index_date, daysbefore=365)
+#         )
+
+#     }
 
 
 #####################################################################
@@ -424,6 +456,7 @@ def add_qa_inex_variables(
 #####################################################################
 # COMBINE ALL ABOVE VARIABLES INTO ONE FUNCTION TO ADD TO DATASET
 #####################################################################
+
 def add_inex_variables(dataset, index_date):
 
     columns = {
@@ -454,7 +487,10 @@ def add_inex_variables(dataset, index_date):
         ),
         **add_qa_inex_variables(
             index_date
-        )
+        ),
+        # **add_medication_inex_variables(
+        #     index_date
+        # )
     }
 
     for name, expr in columns.items():

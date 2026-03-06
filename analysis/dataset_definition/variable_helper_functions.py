@@ -81,6 +81,25 @@ def add_prescription_columns(dataset, index_date, max_meds=10):
         dataset.add_column(name, expr)
 
 
+######################################################################################
+# count_recent_meds()
+# this function returns the number of rows in the medications table for a given person
+# between the index date and a specified number of daysbefore the index date
+# if two rows contained the same date and the same dmd code (i.e. duplicates) then they
+# would be counted twice
+#######################################################################################
+
+def count_recent_meds(index_date, daysbefore=180):
+
+    wanted_medications = medications.where(
+        medications.date.is_on_or_before(index_date) &
+        medications.date.is_on_or_after(index_date - days(daysbefore))
+    )
+
+    count = wanted_medications.count_for_patient()
+
+    return count
+
 #########################################################################################
 # get_latest_ethnicity()
 ##########################################################################################
