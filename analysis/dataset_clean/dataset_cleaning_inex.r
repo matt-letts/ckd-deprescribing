@@ -13,7 +13,7 @@ source(here::here("analysis", "functions", "fn_describe_data.r"))
 source(here::here("analysis", "functions", "fn_describe_and_flow.r"))
 source(here::here("analysis", "functions", "fn_disclosure_control.r"))
 source(here::here("analysis", "functions", "fn_qa.r"))
-
+source(here::here("analysis", "functions", "fn_dem_inex_criteria.r"))
 
 
 message("Create output folder")
@@ -25,7 +25,7 @@ source(here::here("analysis", "dataset_definition", "study_dates.r"))
 study_dates <- lapply(study_dates, function(x) as.Date(x))
 
 
-message("Process the dataset lazily")
+message("Process the dataset lazily \n")
 
 input_filename = "dataset.arrow"
 
@@ -48,6 +48,23 @@ dataset_cleaning_3_qa_applied <- fn_qa(
   collect_and_describe = FALSE
 )
 
+message("") # blank line to make console output easier to read
+
+# apply demographic inclusion and exclusion criteria
+dataset_cleaning_4_demographic_inex_applied <- fn_dem_inex_criteria(
+  arrow_data = dataset_cleaning_3_qa_applied,
+  rounding_threshold = 6,
+  collect_and_describe = FALSE
+)
+
+message("") # blank line to make console output easier to read
+
+
+##### START HERE NEXT TIME #####
+# find those with CKD 4/5 based on SCr and codes and include them
+
+# process CKD inclusion and exclusion criteria
+dataset_cleaning_5_ckd_inex_applied <- fn_ckd
 
 # write all datasets to .txt and flow dataframe
 flow <- describe_and_flow(
