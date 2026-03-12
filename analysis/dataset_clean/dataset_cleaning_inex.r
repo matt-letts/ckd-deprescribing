@@ -14,6 +14,7 @@ source(here::here("analysis", "functions", "fn_describe_and_flow.r"))
 source(here::here("analysis", "functions", "fn_disclosure_control.r"))
 source(here::here("analysis", "functions", "fn_qa.r"))
 source(here::here("analysis", "functions", "fn_dem_inex_criteria.r"))
+source(here::here("analysis", "functions", "fn_ckd_inex_criteria.r"))
 
 
 message("Create output folder")
@@ -59,62 +60,28 @@ dataset_cleaning_4_demographic_inex_applied <- fn_dem_inex_criteria(
 
 message("") # blank line to make console output easier to read
 
+# apply CKD inclusion criteria
 
-##### START HERE NEXT TIME #####
-# find those with CKD 4/5 based on SCr and codes and include them
-
-# process CKD inclusion and exclusion criteria
-dataset_cleaning_5_ckd_inex_applied <- fn_ckd
+dataset_cleaning_5_ckd_inex_applied <- fn_ckd_inex_criteria(
+  arrow_data = dataset_cleaning_4_demographic_inex_applied,
+  rounding_threshold = 6,
+  collect_and_describe = FALSE,
+  index_date = study_dates$index_date
+)
 
 # write all datasets to .txt and flow dataframe
+
 flow <- describe_and_flow(
   project_stage = "cleaning"
 )
 
+# save the outputs
+message("Save cleaned dataset and flow")
 
+dataset_cleaning_5_ckd_inex_applied |>
+  arrow::write_dataset(
+    here::here("output", "data", "dataset_cleaned.arrow"),
+    format = "ipc"
+  )
 
-
-
-
-| Section           | Purpose                                |
-| ----------------- | -------------------------------------- |
-| Setup             | Load packages                          |
-| Import            | Read dataset                           |
-| Cleaning          | Fix types, dates, missing values       |
-| Flag definitions  | Explicit inclusion/exclusion variables |
-| Population flag   | Final analytic cohort                  |
-| Flow summary      | Audit trail                            |
-| Derived variables | Age bands, stage groups                |
-| Export            | Clean dataset + counts                 |
-
-
-
-fn_roundmid_any <- function(x, to = 6) {
-  stopifnot(is.numeric(x))
-  ceiling(x / to) * to - (floor(to / 2) * (x != 0))
-}
-
-fn_roundmid_any(df)
-
-df <- read.csv(
-  "C:/Users/yv22008/Git/matt-letts/ckd-deprescribing/output/dataset.csv.gz"
-)
-
-
-# Rounding function for redaction ----
-roundmid_any <- function(x, to = 6) {
-  # centers on (integer) midpoint of the rounding points
-  x <- as.numeric(x)
-  ceiling(x / to) * to - (floor(to / 2) * (x != 0))
-}
-
-
-
-# never sorted out the _cat variables within the dataset - need to do this before the final bit
-fn_postcollect_types <- function(dt) {
-  dt[, (grep("_cat", names(dt), value = TRUE)) :=
-       lapply(.SD, as.factor),
-     .SDcols = grep("_cat", names(dt), value = TRUE)]
-
-  return(dt)
-}
+data.table::fwrite(flow, here::here("output", "data", "data_cleaning_flow.csv"))
