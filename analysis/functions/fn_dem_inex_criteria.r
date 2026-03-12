@@ -21,6 +21,10 @@ fn_dem_inex_criteria <- function(
   # Print exclusion counts rounded for disclosure control
   message("Demographic exclusions:")
   message(
+    "n before demographic exclusions: ",
+    fn_roundmid_any(counts$n_before, to = rounding_threshold)
+  )
+  message(
     "Not alive at index date: ",
     fn_roundmid_any(counts$n_not_alive, to = rounding_threshold)
   )

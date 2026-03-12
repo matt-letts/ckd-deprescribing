@@ -22,19 +22,23 @@ fn_qa <- function(
   # Print exclusion counts rounded for disclosure control
   message("QA exclusions:")
   message(
-    "Missing sex:",
+    "n before QA exclusions: ",
+    fn_roundmid_any(counts$n_before, to = rounding_threshold)
+  )
+  message(
+    "Missing sex: ",
     fn_roundmid_any(counts$n_missing_sex, to = rounding_threshold)
   )
   message(
-    "Missing region:",
+    "Missing region: ",
     fn_roundmid_any(counts$n_missing_region, to = rounding_threshold)
   )
   message(
-    "Missing ethnicity:",
+    "Missing ethnicity: ",
     fn_roundmid_any(counts$n_missing_ethnicity, to = rounding_threshold)
   )
   message(
-    "Missing deprivation level:",
+    "Missing deprivation level: ",
     fn_roundmid_any(counts$n_missing_imd, to = rounding_threshold)
   )
 
