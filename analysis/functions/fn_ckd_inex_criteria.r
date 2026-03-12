@@ -132,7 +132,7 @@ fn_ckd_inex_criteria <- function(
     ) |>
     collect()
 
-  message("CKD 4/5 inclusion criteria:")
+  message("\nCKD 4/5 inclusion criteria:")
   message(
     "n before CKD filters: ",
     fn_roundmid_any(counts$n_before, to = rounding_threshold)

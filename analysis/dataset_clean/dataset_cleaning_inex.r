@@ -1,6 +1,6 @@
 ##### describe this script #####
 
-message("Import libraries and functions")
+message("Import libraries and functions \n")
 library(fs)
 library(here)
 library(data.table)
@@ -17,11 +17,11 @@ source(here::here("analysis", "functions", "fn_dem_inex_criteria.r"))
 source(here::here("analysis", "functions", "fn_ckd_inex_criteria.r"))
 
 
-message("Create output folder")
+message("Create output folder \n")
 dir_create(here::here("output", "data"))
 dir_create(here::here("output", "data_descriptions"))
 
-message("Import dates")
+message("Import dates \n")
 source(here::here("analysis", "dataset_definition", "study_dates.r"))
 study_dates <- lapply(study_dates, function(x) as.Date(x))
 
@@ -49,8 +49,6 @@ dataset_cleaning_3_qa_applied <- fn_qa(
   collect_and_describe = FALSE
 )
 
-message("") # blank line to make console output easier to read
-
 # apply demographic inclusion and exclusion criteria
 dataset_cleaning_4_demographic_inex_applied <- fn_dem_inex_criteria(
   arrow_data = dataset_cleaning_3_qa_applied,
@@ -58,10 +56,7 @@ dataset_cleaning_4_demographic_inex_applied <- fn_dem_inex_criteria(
   collect_and_describe = FALSE
 )
 
-message("") # blank line to make console output easier to read
-
 # apply CKD inclusion criteria
-
 dataset_cleaning_5_ckd_inex_applied <- fn_ckd_inex_criteria(
   arrow_data = dataset_cleaning_4_demographic_inex_applied,
   rounding_threshold = 6,
@@ -70,13 +65,12 @@ dataset_cleaning_5_ckd_inex_applied <- fn_ckd_inex_criteria(
 )
 
 # write all datasets to .txt and flow dataframe
-
 flow <- describe_and_flow(
   project_stage = "cleaning"
 )
 
 # save the outputs
-message("Save cleaned dataset and flow")
+message("\nSave cleaned dataset and flow")
 
 dataset_cleaning_5_ckd_inex_applied |>
   arrow::write_dataset(

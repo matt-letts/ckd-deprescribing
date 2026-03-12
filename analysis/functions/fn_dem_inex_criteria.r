@@ -19,7 +19,7 @@ fn_dem_inex_criteria <- function(
     collect()
 
   # Print exclusion counts rounded for disclosure control
-  message("Demographic exclusions:")
+  message("\nDemographic exclusions:")
   message(
     "n before demographic exclusions: ",
     fn_roundmid_any(counts$n_before, to = rounding_threshold)
