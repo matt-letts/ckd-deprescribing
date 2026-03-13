@@ -1,9 +1,13 @@
 #########################################################################################
-# CKD helper functions - egfr_ckdepi2009() and fn_ckd_inex_criteria()
+# This script defines three functions used to apply ckd/krt inex rules
+# fn_egfr_ckdepi2009(), fn_ckd_inex_criteria(), fn_krt_inex_criteria()
 #########################################################################################
 
-##### fn_egfr_ckdepi2009 #####
-# this function calculates the eGFR based on a person's serum creatinine (measured in umol/L)
+#########################################################################################
+# fn_egfr_ckdepi2009()
+#########################################################################################
+
+# this function calculates the eGFR based on a person's serum creatinine (measured in umol/L),
 # their age and their sex. It uses the CKD-EPI 2009 eGFR equation, with no race coefficient,
 # as recommended by UKKA/NICE), see below for formula:
 # https://www.niddk.nih.gov/research-funding/research-programs/kidney-clinical-research-epidemiology/laboratory/glomerular-filtration-rate-equations/adults/previous
@@ -21,39 +25,38 @@ fn_egfr_ckdepi2009 <- function(
   # ratio used for the piecewise formula
   ratio <- creat_umol / kappa
 
-  round(
-    141 *
-      pmin(ratio, 1)^alpha *
-      pmax(ratio, 1)^-1.209 *
-      (0.993^age) *
-      female_multiplier
-  )
+  141 *
+    pmin(ratio, 1)^alpha *
+    pmax(ratio, 1)^-1.209 *
+    (0.993^age) *
+    female_multiplier
 }
 
+#########################################################################################
+# fn_ckd_inex_criteria()
+#########################################################################################
 
-##### fn_ckd_inex_criteria #####
+# this multi-step function applies CKD inc/exc criteria and creates ckd-relevant variables
 
-# this 7 step custom function applies CKD inc/exc criteria.
-
-# 1. Calculate eGFR for just those with 2+ SCr measurements
-# --- Calculate the most recent eGFR (egfr_1), and
-# --- Calculate the second most recent eGFR (egfr_2), 90+ days prior to egfr_1
+# 1. Calculate eGFR within people with 2+ SCr measurements and group into CKD G4, G5, or G4/G5
+# --- Calculate the most recent eGFR (num_egfr_1), and
+# --- Calculate the second most recent eGFR (num_egfr_2), 90+ days prior to num_egfr_1
 # (of note eGFR calculations are made using the age of the individual at the time of the
 # creatinine measurement, by calculating their age compared to their age at index_date)
 
-# 2. Define those with CKD 4/5 based on eGFR
-# --- store as boolean variable 'has_ckd45_by_scr'
+# 2. Join new variables back to the full dataset, and fill with:
+# --- bin_has_ckd45_by_scr == FALSE
+# --- cat_ckd_stage_by_scr == "not G4/G5"
 
-# 3. Join the new variables back to the full dataset
-# --- has_ckd45_by_scr == FALSE added to all rows where has_ckd45_by_scr != TRUE
+# 3. Apply the inclusion criteria
 
-# 4. Flag those with either CKD4/5 codes or CKD4/5 eGFRs
+# 4. Re-calculate eGFR for all included individuals
+# --- Done again post-filtering for efficiency. Needs doing to capture eGFR for those
+# --- included via CKD codes who may only have one SCr measurement.
 
-# 5. Count and print rounded totals for people included/excluded by CKD criteria
+# 5. Count and print totals before filter and excluded by filter
 
-# 6. Apply the inclusion criteria
-
-# 7. (optionally) Collect the resulting arrow data into an R data.table for manipulation
+# 6. (optionally) Collect the resulting arrow data into an R data.table for manipulation
 
 fn_ckd_inex_criteria <- function(
   arrow_data,
@@ -65,101 +68,111 @@ fn_ckd_inex_criteria <- function(
 ) {
   require(arrow)
   require(dplyr)
-  require(lubridate)
 
-  # 1. Calculate eGFR
+  # 1. Calculate eGFR and group into CKD stages
 
-  ckd_scr <- arrow_data |>
+  ckd_flags <- arrow_data |>
     filter(inex_ckd_bin_has_two_scr) |>
     mutate(
-      # Age at each SCr measurement
-      age_at_scr_1 = inex_dem_num_age +
-        (as.integer(inex_ckd_date_scr_date_1) - as.integer(index_date)) /
-          365.25,
-      age_at_scr_2 = inex_dem_num_age +
-        (as.integer(inex_ckd_date_scr_date_2) - as.integer(index_date)) /
-          365.25,
-
-      # eGFR at each measurement
-      egfr_1 = fn_egfr_ckdepi2009(
+      num_egfr_1 = fn_egfr_ckdepi2009(
         creat_umol = inex_ckd_num_scr_value_1,
-        age = age_at_scr_1,
+        age = inex_dem_num_age +
+          (as.integer(inex_ckd_date_scr_date_1) - as.integer(index_date)) /
+            365.25,
         sex = inex_dem_cat_sex
       ),
-      egfr_2 = fn_egfr_ckdepi2009(
+      num_egfr_2 = fn_egfr_ckdepi2009(
         creat_umol = inex_ckd_num_scr_value_2,
-        age = age_at_scr_2,
+        age = inex_dem_num_age +
+          (as.integer(inex_ckd_date_scr_date_2) - as.integer(index_date)) /
+            365.25,
         sex = inex_dem_cat_sex
       ),
+      cat_ckd_stage_by_scr = case_when(
+        (num_egfr_1 < 15) & (num_egfr_2 < 15) ~ "G5",
+        (num_egfr_1 >= 15) &
+          (num_egfr_1 < 30) &
+          (num_egfr_2 >= 15) &
+          (num_egfr_2 < 30) ~ "G4",
+        (num_egfr_1 >= 15) & (num_egfr_1 < 30) & (num_egfr_2 < 15) ~ "G4/G5",
+        (num_egfr_1 < 15) & (num_egfr_2 >= 15) & (num_egfr_2 < 30) ~ "G4/G5",
+        TRUE ~ "not G4/G5"
+      ),
+      # and flag CKD 4/5
+      bin_has_ckd45_by_scr = cat_ckd_stage_by_scr != "not G4/G5"
+    ) |>
+    select(patient_id, bin_has_ckd45_by_scr, cat_ckd_stage_by_scr)
 
-      # 2. Define those with CKD 4/5 based on eGFR
-      # THIS ? NEEDS IMPROVEMENT AND ADDING IN EXTRA COLUMNS FOR CKD 4 AND CKD 5
-
-      has_ckd45_by_scr = (egfr_1 < 30) & (egfr_2 < 30)
-    )
-
-  # 3. Join the new variables back to the full dataset
+  # 2. Join the new variables back to the full dataset
 
   arrow_data <- arrow_data |>
-    left_join(
-      ckd_scr |> select(patient_id, has_ckd45_by_scr, egfr_1, egfr_2),
-      by = "patient_id"
-    ) |>
+    left_join(ckd_flags, by = "patient_id") |>
     mutate(
-      has_ckd45_by_scr = ifelse(
-        is.na(has_ckd45_by_scr), # FALSE flag added to all those who were not in the filtered set for 1.
+      bin_has_ckd45_by_scr = ifelse(
+        is.na(bin_has_ckd45_by_scr),
         FALSE,
-        has_ckd45_by_scr
+        bin_has_ckd45_by_scr
+      ),
+      cat_ckd_stage_by_scr = ifelse(
+        is.na(cat_ckd_stage_by_scr),
+        "not G4/G5",
+        cat_ckd_stage_by_scr
+      ),
+      # change cat_ column from string to dictionary to be in line with others
+      # (num_egfr1/2 and bin_has_ckd45_by_scr are correct types already numeric/logical)
+      cat_ckd_stage_by_scr = arrow::cast(
+        cat_ckd_stage_by_scr,
+        arrow::dictionary()
       )
     )
 
-  # 4. Flag those with either CKD4/5 codes or CKD4/5 eGFRs
-
-  arrow_data <- arrow_data |>
-    mutate(
-      include_ckd45 = inex_ckd_bin_has_ckd45_code | has_ckd45_by_scr
-    )
-
-  # 5. Count and print rounded totals for people included/excluded by CKD criteria
-
-  counts <- arrow_data |>
-    summarise(
-      n_before = n(),
-      n_has_ckd45_code = sum(inex_ckd_bin_has_ckd45_code, na.rm = TRUE),
-      n_ckd45_by_scr = sum(has_ckd45_by_scr, na.rm = TRUE),
-      n_ckd45_by_either = sum(include_ckd45, na.rm = TRUE),
-      n_excluded_no_ckd45 = sum(!include_ckd45, na.rm = TRUE)
-    ) |>
-    collect()
-
-  message("\nCKD 4/5 inclusion criteria:")
-  message(
-    "n before CKD filters: ",
-    fn_roundmid_any(counts$n_before, to = rounding_threshold)
-  )
-  message(
-    "Included via CKD 4/5 code: ",
-    fn_roundmid_any(counts$n_has_ckd45_code, to = rounding_threshold)
-  )
-  message(
-    "Included via SCr eGFR < 30 (both values): ",
-    fn_roundmid_any(counts$n_ckd45_by_scr, to = rounding_threshold)
-  )
-  message(
-    "Included via either criterion: ",
-    fn_roundmid_any(counts$n_ckd45_by_either, to = rounding_threshold)
-  )
-  message(
-    "EXCLUDED (no CKD 4/5 evidence): ",
-    fn_roundmid_any(counts$n_excluded_no_ckd45, to = rounding_threshold)
-  )
-
-  # 6. Apply the inclusion criteria
+  # 3. Apply the inclusion criteria
 
   arrow_data_ckd_inex_applied <- arrow_data |>
-    filter(include_ckd45)
+    filter(inex_ckd_bin_has_ckd45_code | bin_has_ckd45_by_scr) |>
 
-  # 7. (optionally) Collect the resulting arrow data into an R data.table for manipulation
+    # 4. Re-calculate eGFR for all included individuals
+
+    mutate(
+      num_egfr_1 = fn_egfr_ckdepi2009(
+        creat_umol = inex_ckd_num_scr_value_1,
+        age = inex_dem_num_age +
+          (as.integer(inex_ckd_date_scr_date_1) - as.integer(index_date)) /
+            365.25,
+        sex = inex_dem_cat_sex
+      ),
+      num_egfr_2 = fn_egfr_ckdepi2009(
+        creat_umol = inex_ckd_num_scr_value_2,
+        age = inex_dem_num_age +
+          (as.integer(inex_ckd_date_scr_date_2) - as.integer(index_date)) /
+            365.25,
+        sex = inex_dem_cat_sex
+      )
+    )
+
+  # 5. Count and print totals before filter and excluded by filter
+
+  n_before <- arrow_data |>
+    summarise(n = n()) |>
+    collect() |>
+    pull(n)
+
+  n_after <- arrow_data_ckd_inex_applied |>
+    summarise(n = n()) |>
+    collect() |>
+    pull(n)
+
+  message("\nCKD 4/5 inclusion criteria (rounded): ")
+  message(
+    "n before CKD filters: ",
+    fn_roundmid_any(n_before, to = rounding_threshold)
+  )
+  message(
+    "No evidence of CKD4/5 via codes/SCrs: ",
+    fn_roundmid_any(n_before - n_after, to = rounding_threshold)
+  )
+
+  # 6. (optionally) Collect the resulting arrow data into an R data.table for manipulation
 
   if (collect_and_describe) {
     arrow_data_ckd_inex_applied <- arrow_data_ckd_inex_applied |>
@@ -174,4 +187,71 @@ fn_ckd_inex_criteria <- function(
   }
 
   return(arrow_data_ckd_inex_applied)
+}
+
+
+#########################################################################################
+# fn_krt_inex_criteria()
+#########################################################################################
+# this function excludes individuals who have been in receipt of KRT prior to the index
+# date. It passes an argument krt_source which can test the primary care KRT codes or
+# the combined (primary and secondary) care KRT codes
+
+fn_krt_inex_criteria <- function(
+  arrow_data,
+  krt_source = c("primary", "combined"),
+  rounding_threshold = 6,
+  collect_and_describe = FALSE,
+  describe_name = "",
+  suffix = ""
+) {
+  require(arrow)
+  require(dplyr)
+
+  krt_source <- match.arg(krt_source) # breaks function if invalid krt_source passed
+
+  # apply krt filter using either primary or combined (primary+secondary) care codes
+
+  arrow_data_krt_inex_applied <- if (krt_source == "primary") {
+    arrow_data |> filter(!inex_krt_bin_has_primary_care_krt_code)
+  } else {
+    arrow_data |> filter(!inex_krt_bin_has_combined_krt_code)
+  }
+
+  # count and print totals before and after filter and n excluded
+
+  n_before <- arrow_data |>
+    summarise(n = n()) |>
+    collect() |>
+    pull(n)
+  n_after <- arrow_data_krt_inex_applied |>
+    summarise(n = n()) |>
+    collect() |>
+    pull(n)
+
+  message("\nKRT exclusion criteria - code source: ", krt_source, " (rounded):")
+  message(
+    "n before KRT filter: ",
+    fn_roundmid_any(n_before, to = rounding_threshold)
+  )
+  message(
+    "Excluded as evidence of prior KRT: ",
+    fn_roundmid_any(n_before - n_after, to = rounding_threshold)
+  )
+
+  # optionally collect and describe data
+
+  if (collect_and_describe) {
+    arrow_data_krt_inex_applied <- arrow_data_krt_inex_applied |>
+      collect() |>
+      data.table::as.data.table()
+
+    describe_data(
+      data = arrow_data_krt_inex_applied,
+      name = describe_name,
+      suffix = suffix
+    )
+  }
+
+  return(arrow_data_krt_inex_applied)
 }

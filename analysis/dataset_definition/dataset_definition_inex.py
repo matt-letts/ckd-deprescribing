@@ -1,6 +1,7 @@
 from ehrql import create_dataset
 from ehrql.tables.tpp import patients
 from inex_variables import add_inex_variables
+import numpy as np
 
 # define the project-relevant dates
 import json
@@ -9,7 +10,9 @@ with open("output/study_dates.json") as f:
 index_date = study_dates["index_date"]
 end_date = study_dates["end_date"]
 
+
 # initialise the dataset
+np.random.seed(123456)
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size=1000)
 dataset.define_population(patients.date_of_birth.is_not_null())
