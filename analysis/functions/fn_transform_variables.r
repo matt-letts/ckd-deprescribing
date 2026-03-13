@@ -20,10 +20,10 @@ fn_transform_variables <- function(
   # Apply transformations lazily
   arrow_data_transformed <- arrow_data %>%
     mutate(
-      across(contains("_date"), ~ as.Date(.)),
-      across(contains("_num"), ~ as.numeric(.)),
-      across(contains("_cat"), ~ arrow::cast(., arrow::dictionary())), # as.factor() not supported lazily in arrow format
-      across(contains("_bin"), ~ as.logical(.))
+      across(contains("date_"), ~ as.Date(.)),
+      across(contains("num_"), ~ as.numeric(.)),
+      across(contains("cat_"), ~ arrow::cast(., arrow::dictionary())), # as.factor() not supported lazily in arrow format
+      across(contains("bin_"), ~ as.logical(.))
     )
 
   # load dataset as R data.table object if collect_data = TRUE

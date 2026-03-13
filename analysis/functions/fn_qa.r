@@ -20,7 +20,7 @@ fn_qa <- function(
     collect()
 
   # Print exclusion counts rounded for disclosure control
-  message("\nQA exclusions:")
+  message("\nQA exclusions (rounded):")
   message(
     "n before QA exclusions: ",
     fn_roundmid_any(counts$n_before, to = rounding_threshold)

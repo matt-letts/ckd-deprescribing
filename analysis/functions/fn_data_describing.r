@@ -1,4 +1,29 @@
-############################################################################
+#############################################################################
+# describe_data()
+# prints a summary using the skim() function and places it into a file called
+# name.txt which is in a directory which is created if doesn't already exist:
+# output/data_descriptions/
+#############################################################################
+
+describe_data <- function(data, name, suffix = "") {
+  fs::dir_create(here::here("output", "data_descriptions"))
+  full_name <- paste0(name, if (nzchar(suffix)) paste0("-", suffix) else "")
+  sink(paste0(
+    "output/data_descriptions/",
+    full_name,
+    ".txt"
+  ))
+  on.exit(sink())
+  print(skimr::skim(data))
+  message(paste0(
+    "output/data_descriptions/",
+    full_name,
+    ".txt written successfully."
+  ))
+}
+
+
+#############################################################################
 # describe_and_flow() - allows flow of patients through the pipeline to be
 # tracked without holding all the datasets in memory simultaneously
 #
@@ -8,14 +33,10 @@
 
 # For each matching variable:
 #   1. Collects the Arrow dataset into memory
-#   2. Passes it to describe_data() which generates a skimr summary saved to
-#      output/describe/<project_stage>-<stage>.txt
+#   2. Passes it to describe_data() to create:
+#      output/data_descriptions/<project_stage>-<stage>.txt
 #   3. Records the stage name and row count in a flow dataframe
 #   4. Frees the collected data from memory before moving to the next dataset
-#
-# Usage:
-#   flow_cleaning <- describe_and_flow("cleaning")
-#   flow_modelling <- describe_and_flow("modelling")
 #############################################################################
 
 describe_and_flow <- function(project_stage) {
