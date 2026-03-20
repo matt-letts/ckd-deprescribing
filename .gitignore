@@ -1,5 +1,5 @@
 *~
-.vscode/settings.json
+.vscode/*
 model.log
 */input.csv
 __pycache__
