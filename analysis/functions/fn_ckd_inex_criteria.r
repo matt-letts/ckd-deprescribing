@@ -39,14 +39,14 @@ fn_egfr_ckdepi2009 <- function(
 # this multi-step function applies CKD inc/exc criteria and creates ckd-relevant variables
 
 # 1. Calculate eGFR within people with 2+ SCr measurements and group into CKD G4, G5, or G4/G5
-# --- Calculate the most recent eGFR (num_egfr_1), and
-# --- Calculate the second most recent eGFR (num_egfr_2), 90+ days prior to num_egfr_1
+# --- Calculate the most recent eGFR (inex_num_egfr_1), and
+# --- Calculate the second most recent eGFR (inex_num_egfr_2), 90+ days prior to inex_num_egfr_1
 # (of note eGFR calculations are made using the age of the individual at the time of the
 # creatinine measurement, by calculating their age compared to their age at index_date)
 
 # 2. Join new variables back to the full dataset, and fill with:
-# --- bin_has_ckd45_by_scr == FALSE
-# --- cat_ckd_stage_by_scr == "not G4/G5"
+# --- inex_bin_has_ckd45_by_scr == FALSE
+# --- inex_cat_ckd_stage_by_scr == "not G4/G5"
 
 # 3. Apply the inclusion criteria
 
@@ -70,58 +70,61 @@ fn_ckd_inex_criteria <- function(
   require(dplyr)
 
   # 1. Calculate eGFR and group into CKD stages
-
   ckd_flags <- arrow_data |>
     filter(inex_ckd_bin_has_two_scr) |>
     mutate(
-      num_egfr_1 = fn_egfr_ckdepi2009(
+      inex_num_egfr_1 = fn_egfr_ckdepi2009(
         creat_umol = inex_ckd_num_scr_value_1,
         age = inex_dem_num_age +
           (as.integer(inex_ckd_date_scr_date_1) - as.integer(index_date)) /
             365.25,
         sex = inex_dem_cat_sex
       ),
-      num_egfr_2 = fn_egfr_ckdepi2009(
+      inex_num_egfr_2 = fn_egfr_ckdepi2009(
         creat_umol = inex_ckd_num_scr_value_2,
         age = inex_dem_num_age +
           (as.integer(inex_ckd_date_scr_date_2) - as.integer(index_date)) /
             365.25,
         sex = inex_dem_cat_sex
       ),
-      cat_ckd_stage_by_scr = case_when(
-        (num_egfr_1 < 15) & (num_egfr_2 < 15) ~ "G5",
-        (num_egfr_1 >= 15) &
-          (num_egfr_1 < 30) &
-          (num_egfr_2 >= 15) &
-          (num_egfr_2 < 30) ~ "G4",
-        (num_egfr_1 >= 15) & (num_egfr_1 < 30) & (num_egfr_2 < 15) ~ "G4/G5",
-        (num_egfr_1 < 15) & (num_egfr_2 >= 15) & (num_egfr_2 < 30) ~ "G4/G5",
+      inex_cat_ckd_stage_by_scr = case_when(
+        (inex_num_egfr_1 < 15) & (inex_num_egfr_2 < 15) ~ "G5",
+        (inex_num_egfr_1 >= 15) &
+          (inex_num_egfr_1 < 30) &
+          (inex_num_egfr_2 >= 15) &
+          (inex_num_egfr_2 < 30) ~ "G4",
+        (inex_num_egfr_1 >= 15) &
+          (inex_num_egfr_1 < 30) &
+          (inex_num_egfr_2 < 15) ~ "G4/G5",
+        (inex_num_egfr_1 < 15) &
+          (inex_num_egfr_2 >= 15) &
+          (inex_num_egfr_2 < 30) ~ "G4/G5",
         TRUE ~ "not G4/G5"
       ),
       # and flag CKD 4/5
-      bin_has_ckd45_by_scr = cat_ckd_stage_by_scr != "not G4/G5"
+      inex_bin_has_ckd45_by_scr = inex_cat_ckd_stage_by_scr != "not G4/G5"
     ) |>
-    select(patient_id, bin_has_ckd45_by_scr, cat_ckd_stage_by_scr)
+    select(patient_id, inex_bin_has_ckd45_by_scr, inex_cat_ckd_stage_by_scr)
 
   # 2. Join the new variables back to the full dataset
 
   arrow_data <- arrow_data |>
     left_join(ckd_flags, by = "patient_id") |>
     mutate(
-      bin_has_ckd45_by_scr = ifelse(
-        is.na(bin_has_ckd45_by_scr),
+      inex_bin_has_ckd45_by_scr = ifelse(
+        is.na(inex_bin_has_ckd45_by_scr),
         FALSE,
-        bin_has_ckd45_by_scr
+        inex_bin_has_ckd45_by_scr
       ),
-      cat_ckd_stage_by_scr = ifelse(
-        is.na(cat_ckd_stage_by_scr),
+      inex_cat_ckd_stage_by_scr = ifelse(
+        is.na(inex_cat_ckd_stage_by_scr),
         "not G4/G5",
-        cat_ckd_stage_by_scr
+        inex_cat_ckd_stage_by_scr
       ),
       # change cat_ column from string to dictionary to be in line with others
-      # (num_egfr1/2 and bin_has_ckd45_by_scr are correct types already numeric/logical)
-      cat_ckd_stage_by_scr = arrow::cast(
-        cat_ckd_stage_by_scr,
+      # (num_egfr1/2 and inex_bin_has_ckd45_by_scr are correct types already numeric/logical)
+      inex_cat_ckd_stage_by_scr = arrow::cast(
+        inex_cat_ckd_stage_by_scr,
         arrow::dictionary()
       )
     )
@@ -129,19 +132,19 @@ fn_ckd_inex_criteria <- function(
   # 3. Apply the inclusion criteria
 
   arrow_data_ckd_inex_applied <- arrow_data |>
-    filter(inex_ckd_bin_has_ckd45_code | bin_has_ckd45_by_scr) |>
+    filter(inex_ckd_bin_has_ckd45_code | inex_bin_has_ckd45_by_scr) |>
 
     # 4. Re-calculate eGFR for all included individuals
 
     mutate(
-      num_egfr_1 = fn_egfr_ckdepi2009(
+      inex_num_egfr_1 = fn_egfr_ckdepi2009(
         creat_umol = inex_ckd_num_scr_value_1,
         age = inex_dem_num_age +
           (as.integer(inex_ckd_date_scr_date_1) - as.integer(index_date)) /
             365.25,
         sex = inex_dem_cat_sex
       ),
-      num_egfr_2 = fn_egfr_ckdepi2009(
+      inex_num_egfr_2 = fn_egfr_ckdepi2009(
         creat_umol = inex_ckd_num_scr_value_2,
         age = inex_dem_num_age +
           (as.integer(inex_ckd_date_scr_date_2) - as.integer(index_date)) /
