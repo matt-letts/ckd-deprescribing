@@ -14,7 +14,7 @@ end_date = study_dates["end_date"]
 # initialise the dataset
 np.random.seed(123456)
 dataset = create_dataset()
-dataset.configure_dummy_data(population_size=1000)
+dataset.configure_dummy_data(population_size=40000)
 dataset.define_population(patients.date_of_birth.is_not_null())
 
 add_inex_variables(dataset, index_date)
