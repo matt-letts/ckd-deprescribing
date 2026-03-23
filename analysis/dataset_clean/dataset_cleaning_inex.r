@@ -9,6 +9,8 @@ library(data.table)
 library(arrow)
 library(dplyr)
 library(lubridate)
+library(ggplot2)
+library(tidyr)
 source(here::here("analysis", "functions", "fn_preprocess.r"))
 source(here::here("analysis", "functions", "fn_modify_dummy_data.r"))
 source(here::here("analysis", "functions", "fn_data_describing.r"))
@@ -20,6 +22,7 @@ source(here::here("analysis", "functions", "fn_ckd_inex_criteria.r"))
 message("Create output folders")
 dir_create(here::here("output", "data"))
 dir_create(here::here("output", "data_descriptions"))
+dir.create(here::here("output", "figures"))
 
 message("Import dates")
 source(here::here("analysis", "dataset_definition", "study_dates.r"))
@@ -90,9 +93,52 @@ flow <- describe_and_flow(
 # rename cleaned dataset for clarity
 dataset_inex_cleaned <- dataset_cleaning_inex_6_krt_inex_applied
 
+# look at the medication counts
+message("\nTabulate the medication counts\n")
+dataset_inex_cleaned |>
+  summarise(
+    across(
+      c(inex_med_num_90, inex_med_num_180),
+      list(
+        mean = ~ mean(.x, na.rm = TRUE),
+        median = ~ median(.x, na.rm = TRUE),
+        p90 = ~ quantile(.x, 0.9, na.rm = TRUE),
+        p95 = ~ quantile(.x, 0.95, na.rm = TRUE),
+        max = ~ max(.x, na.rm = TRUE)
+      )
+    )
+  ) |>
+  collect() |>
+  t() |>
+  print()
+
+message("\nGraph the medication counts\n")
+plot_med_count_distribution <-
+  dataset_inex_cleaned |>
+  select(inex_med_num_90, inex_med_num_180) |>
+  collect() |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "time_window",
+    values_to = "n_prescriptions"
+  ) |>
+  mutate(
+    time_window = case_when(
+      time_window == "inex_med_num_90" ~ "90 days",
+      time_window == "inex_med_num_180" ~ "180 days"
+    )
+  ) |>
+  ggplot(aes(x = n_prescriptions, colour = time_window, fill = time_window)) +
+  geom_freqpoly(binwidth = 1, linewidth = 0.8) +
+  labs(
+    title = "Distribution of prescription counts before index date",
+    x = "Number of prescriptions",
+    y = "Number of patients",
+    colour = "Window"
+  )
+
 # save the outputs
 message("\nSave cleaned dataset to output/data/")
-
 dataset_inex_cleaned |>
   arrow::write_feather(
     here::here("output", "data", "dataset_inex_cleaned.arrow"),
@@ -104,4 +150,13 @@ data.table::fwrite(
   here::here("output", "data_descriptions", "cleaning_inex-data_flow.csv")
 )
 
+message("\nSave plot of medication count distributions")
+ggsave(
+  filename = here::here("output", "figures", "plot_med_count_distribution.png"),
+  plot = plot_med_count_distribution,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
 # need to remember to convert str variables to factors once collected
+# data <- dataset_inex_cleaned |> collect() # for local inspection

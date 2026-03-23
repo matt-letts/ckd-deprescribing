@@ -14,8 +14,8 @@ from ehrql.tables.tpp import (
 
 #########################################################################################
 # this function returns a dictionary of patient-level columns representing the most recent
-# prescriptions in the 90 days prior to (and including) index_date, working
-# backwards in time up to max_meds prescriptions. 
+# prescriptions in the 'days_before_index' number of days prior to (and including)
+# index_date, working backwards in time up to max_meds prescriptions. 
 # Columns are named med_1_code, med_1_date, med_2_code, med_2_date, etc. 
 # where med_1 is the most recent prescription. 
 # Same-day prescriptions are ordered lexicographically by dmd_code string 
@@ -25,13 +25,13 @@ from ehrql.tables.tpp import (
 # then excludes that date+code combination from subsequent iterations.
 ##########################################################################################
 
-def add_recent_prescriptions(index_date, max_meds=10):
+def add_recent_prescriptions(index_date, max_meds=10, days_before_index=90):
 
     # restrict to precriptions within 90 days before (and including) index_date
     # sort -> last_for_patient() returns the most recent / lexicographically last row
     base = medications.where(
         medications.date.is_on_or_before(index_date) &
-        medications.date.is_on_or_after(index_date - days(90))
+        medications.date.is_on_or_after(index_date - days(days_before_index))
     ).sort_by(
         medications.date,
         medications.dmd_code,
@@ -74,13 +74,6 @@ def add_recent_prescriptions(index_date, max_meds=10):
     return output
 
 
-# calls add_recent_prescriptions() and adds resulting columns to dataset
-
-def add_prescription_columns(dataset, index_date, max_meds=10):
-    for name, expr in add_recent_prescriptions(index_date, max_meds).items():
-        dataset.add_column(name, expr)
-
-
 ######################################################################################
 # count_recent_meds()
 # this function returns the number of rows in the medications table for a given person
@@ -89,16 +82,34 @@ def add_prescription_columns(dataset, index_date, max_meds=10):
 # would be counted twice
 #######################################################################################
 
-def count_recent_meds(index_date, daysbefore=180):
+def count_recent_meds(index_date, days_before_index=90):
 
     wanted_medications = medications.where(
         medications.date.is_on_or_before(index_date) &
-        medications.date.is_on_or_after(index_date - days(daysbefore))
+        medications.date.is_on_or_after(index_date - days(days_before_index))
     )
 
     count = wanted_medications.count_for_patient()
 
     return count
+
+
+# add_prescription_columns() 
+# adds medication columns to dataset
+
+def add_prescription_columns(dataset, index_date, max_meds=10, days_before_index=90):
+
+    for name, expr in add_recent_prescriptions(
+        index_date, 
+        max_meds=max_meds,
+        days_before_index=days_before_index
+        ).items():
+        dataset.add_column(name, expr)
+    
+    dataset.add_column("med_count", count_recent_meds(
+        index_date,
+        days_before_index=days_before_index)
+        )
 
 #########################################################################################
 # get_latest_ethnicity()

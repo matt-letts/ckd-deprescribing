@@ -380,37 +380,22 @@ def add_krt_inex_variables(
     }
 
 #####################################################################
-# MEDICATION COUNTS
+# SIMPLE PRE-INDEX DATE MEDICATION COUNTS
 #####################################################################
 
-# def add_medication_inex_variables(
-#     index_date
-# ):
+def add_medication_inex_variables(
+    index_date
+):
 
-#     return {
+    return {
+        "inex_med_num_90": (
+            count_recent_meds(index_date, days_before_index=90)
+        ),
 
-#         "inex_med_num_30": (
-#             count_recent_meds(index_date, daysbefore=30)
-#         ),   
-
-#         "inex_med_num_90": (
-#             count_recent_meds(index_date, daysbefore=90)
-#         ),
-
-#         "inex_med_num_180": (
-#             count_recent_meds(index_date, daysbefore=180)
-#         ),
-
-#         "inex_med_num_270": (
-#             count_recent_meds(index_date, daysbefore=270)
-#         ),
-
-#         "inex_med_num_365": (
-#             count_recent_meds(index_date, daysbefore=365)
-#         )
-
-#     }
-
+        "inex_med_num_180": (
+            count_recent_meds(index_date, days_before_index=180)
+        )
+    }
 
 #####################################################################
 # QA VARIABLES
@@ -488,9 +473,9 @@ def add_inex_variables(dataset, index_date):
         **add_qa_inex_variables(
             index_date
         ),
-        # **add_medication_inex_variables(
-        #     index_date
-        # )
+        **add_medication_inex_variables(
+            index_date
+        )
     }
 
     for name, expr in columns.items():

@@ -12,8 +12,9 @@ actions:
   generate_dataset_inex:
     run: >
         ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_inex.py
-        --test-data-file analysis/dataset_definition/test_dataset_definition_inex.py
+        --dummy-tables dummy_tables/
         --output output/dataset_inex.arrow
+      # --test-data-file analysis/dataset_definition/test_dataset_definition_inex.py
     needs:
     - study_dates
     outputs:
@@ -31,3 +32,18 @@ actions:
       moderately_sensitive:
         cleaning_outputs: output/data_descriptions/cleaning_inex-*.txt
         cleaning_inex_data_flow: output/data_descriptions/cleaning_inex-data_flow.csv
+        plot_med_count_distribution: output/figures/plot_med_count_distribution.png
+
+  
+  generate_dataset_inex_meds:
+    run: >
+      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_inex_meds.py
+      --dummy-tables dummy_tables/
+      --output output/dataset_inex_meds.arrow
+#     --test-data-file analysis/dataset_definition/test_dataset_definition_inex_meds.py
+    needs:
+    - study_dates
+    - dataset_cleaning_inex
+    outputs:
+      highly_sensitive:
+        dataset_inex_meds: output/dataset_inex_meds.arrow

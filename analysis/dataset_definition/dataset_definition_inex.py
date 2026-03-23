@@ -8,8 +8,6 @@ import json
 with open("output/study_dates.json") as f:
     study_dates = json.load(f)
 index_date = study_dates["index_date"]
-end_date = study_dates["end_date"]
-
 
 # initialise the dataset
 np.random.seed(123456)

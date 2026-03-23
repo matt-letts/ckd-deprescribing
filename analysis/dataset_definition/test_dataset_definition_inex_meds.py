@@ -1,8 +1,11 @@
-# test script to check the performance of get_recent_prescriptions() which is called via
-# get_prescription_columns() into the dataset_definition_prescriptions.py
+# test script to check the performance of the prescription helper functions from
+# variable_helper_functions
+# The issue with this is if the dataset_definition_inex_meds is set up with 
+# dataset_inex_cleaned.exists_for_patient() then it will only work if the id numbers
+# below are in this initial cleaned dataset. Ultimately won't know in the real data
 
 from datetime import date
-from dataset_definition_prescriptions import dataset
+from dataset_definition_inex_meds import dataset
 
 test_data = {
     
@@ -66,7 +69,7 @@ test_data = {
         },
     },
 
-    3: {    # multiple different prescriptions on the same day 
+    5: {    # multiple different prescriptions on the same day 
         
         "patients": { # one row per patient
             "date_of_birth": date(1910, 1, 1), # always first day of month, never NULL
@@ -100,7 +103,7 @@ test_data = {
 
 
 
-    4: {    # duplicated date and code
+    9: {    # duplicated date and code
         
         "patients": { # one row per patient
             "date_of_birth": date(1910, 1, 1), # always first day of month, never NULL
@@ -134,7 +137,7 @@ test_data = {
 
 
 
-    5: {    # more realistic patient, shows that function is ordering dm+d codes lexicographically rather than numerically. 
+    10: {    # more realistic patient, shows that function is ordering dm+d codes lexicographically rather than numerically. 
             # doesn't really matter as long as consistent
         
         "patients": { # one row per patient
