@@ -11,6 +11,8 @@ No clinical, policy or safety conclusions must be drawn from the contents of thi
 
 # How to navigate this repo
 
+- See [project pipeline](./project_pipeline.md) for a full diagram of the analysis flow.
+
 - The study protocols can be found in the [`protocols`](./protocols/) folder
 
 - The [`codelists`](./codelists/) folder contains [`codelists/codelists.txt`](./codelists/codelists.txt) a list of all of the codelists used in this project. This folder also contains .csv files - one for each of the codelists.
