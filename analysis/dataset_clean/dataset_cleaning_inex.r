@@ -82,6 +82,7 @@ dataset_cleaning_inex_6_krt_inex_applied <- fn_krt_inex_criteria(
 ## and there are no categorical data to reframe
 
 # write all datasets to .txt and flow dataframe
+message("\nWrite data_descriptions to output/data_descriptions/")
 flow <- describe_and_flow(
   project_stage = "cleaning_inex"
 )
@@ -90,13 +91,14 @@ flow <- describe_and_flow(
 dataset_inex_cleaned <- dataset_cleaning_inex_6_krt_inex_applied
 
 # save the outputs
-message("\nSave cleaned dataset and flow")
+message("\nSave cleaned dataset to output/data/")
 
 dataset_inex_cleaned |>
   arrow::write_feather(
     here::here("output", "data", "dataset_inex_cleaned.arrow"),
   )
 
+message("\nSave flow table to to output/data_descriptions/")
 data.table::fwrite(
   flow,
   here::here("output", "data_descriptions", "cleaning_inex-data_flow.csv")

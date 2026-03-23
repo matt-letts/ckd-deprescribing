@@ -9,7 +9,7 @@ actions:
         study_dates_json: output/study_dates.json
 
 
-  generate_dataset:
+  generate_dataset_inex:
     run: >
         ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_inex.py
         --test-data-file analysis/dataset_definition/test_dataset_definition_inex.py
@@ -21,10 +21,10 @@ actions:
         dataset_inex: output/dataset_inex.arrow
 
 
-  dataset_inex_cleaning:
+  dataset_cleaning_inex:
     run: r:v2 analysis/dataset_clean/dataset_cleaning_inex.r
     needs: 
-    - generate_dataset
+    - generate_dataset_inex
     outputs:
       highly_sensitive:
         dataset_inex_cleaned: output/data/dataset_inex_cleaned.arrow

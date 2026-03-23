@@ -80,7 +80,7 @@ fn_modify_dummy_data <- function(
 
       # serum creatinine dates
       mutate(
-        # Date 1 - must be before index_date01/03/2022,
+        # Date 1 - must be before index_date
         # only for those with SCR1 value, 0.05% missing
         inex_ckd_date_scr_date_1 = if_else(
           !is.na(inex_ckd_num_scr_value_1) & runif(nrow(dummy_data)) > 0.005,
@@ -103,7 +103,7 @@ fn_modify_dummy_data <- function(
       ) |>
 
       # CKD45 codes - probability scales with creatinine value
-      # this creates ~ 40% TRUE and 60% FALSE
+      # this creates roughly 40% TRUE and 60% FALSE
       mutate(
         inex_ckd_bin_has_ckd45_code = as.logical(rbinom(
           nrow(dummy_data),
