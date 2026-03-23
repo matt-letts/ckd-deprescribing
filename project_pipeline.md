@@ -3,7 +3,7 @@
 This diagram pictorially represents the flow through the project 
 
 ## Diagram
-![Pipeline diagram](./pipeline_diagram_23.3.26.svg)
+![Pipeline diagram](./docs/pipeline_diagram_23.3.26.svg)
 
 ## Legend
 
