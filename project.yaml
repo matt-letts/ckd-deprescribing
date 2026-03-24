@@ -23,7 +23,7 @@ actions:
 
 
   dataset_cleaning_inex:
-    run: r:v2 analysis/dataset_clean/dataset_cleaning_inex.r
+    run: r:v2 analysis/dataset_processing/dataset_cleaning_inex.r
     needs: 
     - generate_dataset_inex
     outputs:
