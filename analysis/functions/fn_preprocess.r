@@ -1,11 +1,10 @@
 #############################################################################
-# This function takes an arrow file (specified by input_filename
-# taken from 'output' directory) and ensures that the data are in the
-# correct class (date ~ as.Date etc). collect_and_describe is an additional argument
-# that when true will 'collect' the arrow data file as an R data.table object
-# and then pass it through the describe_data() function defined in fn_describe_data.r
-# describe_name and suffix will give the name of the file that the data is
-# described to in the output/data_descriptions directory
+# This function takes an arrow file and ensures that the data are of the
+# correct type. collect_and_describe is an optional argument
+# that if true will collect() the data into an R data.table object
+# and pass it into describe_data() defined in fn_describe_data.r
+# describe_name and suffix determine the name of the file that the data is
+# described to: output/data_descriptions/<describe_name>-<suffix>.txt
 #############################################################################
 
 fn_preprocess <- function(
@@ -33,7 +32,8 @@ fn_preprocess <- function(
       across(contains("_date_"), ~ as.Date(.)),
       across(contains("_num_"), ~ as.numeric(.)),
       across(contains("_cat_"), ~ as.character(.)), # as.factor() not supported lazily in arrow format
-      across(contains("_bin_"), ~ as.logical(.))
+      across(contains("_bin_"), ~ as.logical(.)),
+      across(contains("_dmd_code_"), ~ as.character(.)) # dmd_codes as strings as too big as numbers
     ) |>
     filter(!is.na(patient_id))
 

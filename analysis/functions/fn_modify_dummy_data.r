@@ -251,6 +251,8 @@ fn_modify_dummy_data <- function(
         inex_qa_bin_ethnicity = as.logical(rbinom(n(), 1, p = 0.99)),
         inex_qa_bin_imd = as.logical(rbinom(n(), 1, p = 0.99))
       )
+  } else if (dataset == "baseline_meds") {
+    # intentionally leave blank - no modifications to dummy data
   } else {
     stop(paste0(
       "Unknown dataset: ",

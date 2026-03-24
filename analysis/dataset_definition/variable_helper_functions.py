@@ -64,8 +64,8 @@ def add_recent_prescriptions(index_date, max_meds=10, days_before_index=90):
         current = remaining.last_for_patient() # most recent still remaining
 
         # store the current dates and codes
-        output[f"med_{i}_code"] = current.dmd_code
-        output[f"med_{i}_date"] = current.date
+        output[f"med_dmd_code_{i}"] = current.dmd_code
+        output[f"med_date_{i}"] = current.date
 
         # update the lists to include the most recently used dates and codes
         prev_dates = prev_dates + [current.date] 
