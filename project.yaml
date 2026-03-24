@@ -40,7 +40,7 @@ actions:
       ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_inex_meds.py
       --dummy-tables dummy_tables/
       --output output/dataset_inex_meds.arrow
-#     --test-data-file analysis/dataset_definition/test_dataset_definition_inex_meds.py
+    # --test-data-file analysis/dataset_definition/test_dataset_definition_inex_meds.py
     needs:
     - study_dates
     - dataset_cleaning_inex
