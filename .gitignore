@@ -14,3 +14,4 @@ venv/
 /generate_dummy_tables/
 /ehrql-dummy-data*
 /dummy_tables/*
+/docs/

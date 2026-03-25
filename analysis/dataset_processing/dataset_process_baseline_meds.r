@@ -10,8 +10,10 @@ library(here)
 library(arrow)
 library(dplyr)
 library(lubridate)
+library(tidyverse)
 source(here::here("analysis", "functions", "fn_preprocess.r"))
 source(here::here("analysis", "functions", "fn_modify_dummy_data.r"))
+source(here::here("analysis", "functions", "fn_dmd_to_bnf.r"))
 
 
 # Create output folders --------------------------------------------------
@@ -21,28 +23,36 @@ dir_create(here::here("output", "data_descriptions"))
 dir.create(here::here("output", "figures"))
 
 # Import dates -----------------------------------------------------------
-message("Import dates")
+message("\nImport dates")
 source(here::here("analysis", "dataset_definition", "study_dates.r"))
 study_dates <- lapply(study_dates, function(x) as.Date(x))
 
 # Load dataset, keeping in arrow format for speed ------------------------
-message("Load the dataset")
+message("\nLoad the dataset")
 input_filename = "dataset_inex_meds.arrow"
 dataset_process_baseline_meds_1_input <- arrow::open_dataset(
   here::here("output", input_filename),
   format = "ipc"
 )
 
-# Preprocess data: transform variables and modify dummy data
+# Preprocess data: transform variables and modify dummy data -------------
 dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
   arrow_data = dataset_process_baseline_meds_1_input,
-  dataset = "baseline_meds",
+  dataset = "baseline_meds", # leads to no modification at present
   index_date = study_dates$index_date,
   collect_and_describe = FALSE
+) |>
+  collect() # collect before passing into fn_dmd_to_bnf
+
+# Convert dmd_codes to BNF codes for categorisation ----------------------
+dataset_process_baseline_meds_3_dmd_converted <- fn_dmd_to_bnf(
+  patient_data = dataset_process_baseline_meds_2_preprocessed,
+  mapping_path = here::here("docs", "BNF Snomed Mapping data 20260324.xlsx"),
+  impute_bnf_from_vtm = TRUE,
+  output = c("wide"),
+  unmapped_action = c("keep")
 )
 
-
-cleaned_data <- dataset_process_baseline_meds_1_input |> collect()
 # with_meds <- read_feather(here::here("output", "dataset_inex_meds.arrow"))
 # big_meds_table <- read_delim_arrow(
 #   here::here("dummy_tables", "medications.csv"),
