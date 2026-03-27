@@ -39,7 +39,9 @@ describe_data <- function(data, name, suffix = "") {
 #   4. Frees the collected data from memory before moving to the next dataset
 #############################################################################
 
-describe_and_flow <- function(project_stage) {
+describe_and_flow <- function(
+  project_stage
+) {
   data_names <- ls(
     pattern = paste0("^dataset_", project_stage, "_"),
     envir = .GlobalEnv
