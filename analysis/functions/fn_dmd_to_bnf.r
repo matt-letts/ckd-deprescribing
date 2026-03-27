@@ -17,6 +17,7 @@
 
 fn_dmd_to_bnf <- function(
   patient_data,
+  project_stage,
   mapping_path = here::here("docs", "BNF Snomed Mapping data 20260324.xlsx"),
   impute_bnf_from_vtm = TRUE,
   output = c("wide", "long"),
@@ -27,6 +28,9 @@ fn_dmd_to_bnf <- function(
   require(tidyverse)
 
   message("\nRunning dmd to bnf function:")
+
+  output <- match.arg(output)
+  unmapped_action <- match.arg(unmapped_action)
 
   # 1. Data validation ----------------------------------------------------------------
 
@@ -48,7 +52,9 @@ fn_dmd_to_bnf <- function(
 
   if (length(dmd_cols) != length(date_cols)) {
     stop(
-      "Number of `med_dmd_code_*` columns (%d) does not match `med_date_*` columns (%d)."
+      "Number of `med_dmd_code_*` columns (%d) does not match `med_date_*` columns (%d).",
+      length(dmd_cols),
+      length(date_cols)
     )
   }
 
@@ -57,6 +63,9 @@ fn_dmd_to_bnf <- function(
     nrow(patient_data),
     length(dmd_cols)
   ))
+
+  has_med_count <- "med_count" %in% names(patient_data)
+  patient_level_cols <- c("patient_id", if (has_med_count) "med_count")
 
   # 2. Build BNF lookup from NHSBSA mapping file -------------------------------------
   # Keep only Presentation-level rows (VMP and AMP) and exclude pack-level
@@ -145,6 +154,28 @@ fn_dmd_to_bnf <- function(
   # 4. Reshape patient data to long format -------------------------------------------
   # One row per medication per person - allows for much easier analysis/imputation
   # and drops lots of unnecessary NULL columns.
+
+  # store those with no dmd_codes at all and give them the correct columns
+  patients_no_meds <- patient_data |>
+    filter(if_all(all_of(dmd_cols), ~ is.na(.) | . == "" | . == "NA")) |>
+    select(all_of(patient_level_cols)) |>
+    mutate(
+      med_index = NA_character_,
+      dmd_code = NA_character_,
+      med_date = as.Date(NA),
+      vtm_code = NA_character_,
+      bnf_code = NA_character_,
+      vtm_name = NA_character_,
+      bnf_subparagraph,
+      NA_character_,
+      bnf_imputed = NA
+    )
+
+  message(sprintf(
+    "--- %d patients with no medicines recorded - reattach at output",
+    nrow(patients_no_meds)
+  ))
+
   message("--- Reshape patient dataset to long format")
 
   patient_long <- patient_data |>
@@ -170,7 +201,36 @@ fn_dmd_to_bnf <- function(
     left_join(lookup, by = "dmd_code") |>
     mutate(bnf_imputed = FALSE)
 
-  dmd_not_in_lookup <- patinet_bnf
+  dmd_not_in_lookup <- patient_bnf |>
+    filter(is.na(in_lookup)) |> # NA if dmd_code in dataset but not in lookup
+    count(dmd_code, name = "n_occurrences") |>
+    arrange(desc(n_occurrences)) |>
+    mutate(
+      n_occurrences_midpoint6 = if_else(
+        n_occurrences <= 7,
+        NA,
+        fn_roundmid_any(n_occurrences)
+      )
+    ) |>
+    select(dmd_code, n_occurrences_midpoint6)
+
+  write_csv(
+    dmd_not_in_lookup,
+    here::here(
+      "output",
+      "data_descriptions",
+      paste0(project_stage, "-dmd_not_in_lookup.csv")
+    )
+  )
+
+  message(sprintf(
+    "--- %d dmd codes in patient data not in NHSBSA lookup file; saved for inspection",
+    nrow(dmd_not_in_lookup)
+  ))
+
+  # remove in_lookup flag
+  patient_bnf <- patient_bnf |>
+    select(-in_lookup)
 
   # 6. Impute missing BNF via VTM ----------------------------------------------------
 
@@ -192,10 +252,9 @@ fn_dmd_to_bnf <- function(
     after_impute <- sum(is.na(patient_bnf$bnf_subparagraph))
 
     message(sprintf(
-      "--- Imputation applied: %d → %d missing BNF codes (%.1f%% reduction)",
+      "--- Imputation applied: %d --> %d missing BNF codes",
       before_impute,
-      after_impute,
-      100 * (before_impute - after_impute) / before_impute
+      after_impute
     ))
   }
 
@@ -214,34 +273,34 @@ fn_dmd_to_bnf <- function(
       patient_bnf <- patient_bnf |> filter(!is.na(bnf_subparagraph))
       warning("--- Unmapped records dropped")
     } else {
-      warning("--- Unmapped records retained with NA BNF")
+      warning("--- Unmapped records retained as NAs")
     }
   }
 
   # 8 Output --------------------------------------------------------------------------------
   if (output == "long") {
     message("--- Returning long format")
-    return(patient_bnf)
+    return(bind_rows(patient_bnf, patients_no_meds))
   }
 
   if (output == "wide") {
     message("--- Returning wide format")
 
-    return(
-      patient_bnf |>
-        select(
-          patient_id,
-          med_index,
-          bnf_subparagraph,
-          vtm_name,
-          med_date,
-          bnf_imputed
-        ) |>
-        pivot_wider(
-          names_from = med_index,
-          values_from = c(bnf_subparagraph, vtm_name, med_date, bnf_imputed),
-          names_glue = "med_{.value}_{med_index}"
-        )
-    )
+    wide <- patient_bnf |>
+      select(
+        all_of(patient_level_cols),
+        med_index,
+        bnf_subparagraph,
+        vtm_name,
+        med_date,
+        bnf_imputed
+      ) |>
+      pivot_wider(
+        names_from = med_index,
+        values_from = c(bnf_subparagraph, vtm_name, med_date, bnf_imputed),
+        names_glue = "med_{.value}_{med_index}"
+      )
+
+    return(bind_rows(wide, patients_no_meds))
   }
 }

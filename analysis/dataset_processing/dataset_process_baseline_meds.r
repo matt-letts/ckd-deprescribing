@@ -14,6 +14,7 @@ library(tidyverse)
 source(here::here("analysis", "functions", "fn_preprocess.r"))
 source(here::here("analysis", "functions", "fn_modify_dummy_data.r"))
 source(here::here("analysis", "functions", "fn_dmd_to_bnf.r"))
+source(here::here("analysis", "functions", "fn_disclosure_control.r"))
 
 
 # Create output folders --------------------------------------------------
@@ -47,6 +48,7 @@ dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
 # Convert dmd_codes to BNF codes for categorisation ----------------------
 dataset_process_baseline_meds_3_dmd_converted <- fn_dmd_to_bnf(
   patient_data = dataset_process_baseline_meds_2_preprocessed,
+  project_stage = "process_baseline_meds",
   mapping_path = here::here("docs", "BNF Snomed Mapping data 20260324.xlsx"),
   impute_bnf_from_vtm = TRUE,
   output = c("wide"),
