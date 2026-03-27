@@ -1,12 +1,18 @@
 #######################################################################################
 # fn_dmd_to_bnf.R
 #######################################################################################
-## Converts wide-format patient medication data with dm+d (SNOMED) codes into VTM
-# (Virtual Therapeutic Moiety) classifications using NHSBSA BNF/SNOMED mapping file:
+
+# Converts wide-format patient medication data with AMP/VPM dm+d codes into BNF/VTM
+# classifications using NHSBSA BNF/SNOMED mapping file:
 # https://www.nhsbsa.nhs.uk/prescription-data/understanding-our-data/bnf-snomed-mapping
 # Currently using January 2026 version, but this can be updated by changing file,
 # and mapping path below. dm+d codes within TPP's `medications` table (dmd_id column)
 # contain VMP/AMP level codes only.
+
+# The optional impute_from_vtm attempts to fill in missing AMP/VMP-->BNF mappings,
+# where there already exist mappings between the same corresponding VTM and BNF code
+# (which works because only interested in the BNF code down to subparagraph level)
+
 #######################################################################################
 
 fn_dmd_to_bnf <- function(
@@ -21,9 +27,6 @@ fn_dmd_to_bnf <- function(
   require(tidyverse)
 
   message("\nRunning dmd to bnf function:")
-
-  output <- match.arg(output)
-  unmapped_action <- match.arg(unmapped_action)
 
   # 1. Data validation ----------------------------------------------------------------
 
@@ -97,7 +100,10 @@ fn_dmd_to_bnf <- function(
       bnf_code = as.character(bnf_code),
       vtm_name = as.character(vtm_name),
       # First 7 characters of BNF code = subparagraph
-      bnf_subparagraph = substr(bnf_code, 1, 7)
+      bnf_subparagraph = substr(bnf_code, 1, 7),
+      # in_lookup is a flag for use later to identify if dmd_codes present
+      # in the patient data that aren't in the lookup file
+      in_lookup = TRUE
     ) |>
     distinct(dmd_code, .keep_all = TRUE) |>
     select(
@@ -105,7 +111,8 @@ fn_dmd_to_bnf <- function(
       vtm_code,
       bnf_code,
       vtm_name,
-      bnf_subparagraph
+      bnf_subparagraph,
+      in_lookup
     )
 
   # print stats about the lookup table compiled;
@@ -153,7 +160,7 @@ fn_dmd_to_bnf <- function(
     filter(!is.na(dmd_code), dmd_code != "", dmd_code != "NA")
 
   message(sprintf(
-    "--- %d patients (with at 1+ medicine) | %d medication rows",
+    "--- %d patients (with 1+ medicine) | %d medication rows",
     n_distinct(patient_long$patient_id),
     nrow(patient_long)
   ))
@@ -162,6 +169,8 @@ fn_dmd_to_bnf <- function(
   patient_bnf <- patient_long |>
     left_join(lookup, by = "dmd_code") |>
     mutate(bnf_imputed = FALSE)
+
+  dmd_not_in_lookup <- patinet_bnf
 
   # 6. Impute missing BNF via VTM ----------------------------------------------------
 
