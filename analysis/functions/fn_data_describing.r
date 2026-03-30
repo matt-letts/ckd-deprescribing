@@ -14,7 +14,10 @@ fn_describe_data <- function(data, name, suffix = "") {
     ".txt"
   ))
   on.exit(sink())
-  print(skimr::skim(data))
+  suppressWarnings({
+    # stop annoying warning messages from skim entering log
+    print(skimr::skim(data))
+  })
   message(paste0(
     "output/data_descriptions/",
     full_name,
