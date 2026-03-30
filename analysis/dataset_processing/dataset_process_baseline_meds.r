@@ -13,7 +13,7 @@ library(lubridate)
 library(tidyverse)
 source(here::here("analysis", "functions", "fn_preprocess.r"))
 source(here::here("analysis", "functions", "fn_modify_dummy_data.r"))
-source(here::here("analysis", "functions", "fn_dmd_to_bnf.r"))
+source(here::here("analysis", "functions", "fn_med_data_conversions.r"))
 source(here::here("analysis", "functions", "fn_disclosure_control.r"))
 source(here::here("analysis", "functions", "fn_data_describing.r"))
 
@@ -51,17 +51,20 @@ dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
 dmd_to_bnf_lookups <- fn_build_dmd_bnf_lookup()
 bnf_hierarchy <- fn_build_bnf_hierarchy()
 
-# To check the concordance in BNF subparagraph codes between the sources:
-# bnf_codes_hierarchy <- bnf_hierarchy$bnf_subparagraph_code
-# bnf_codes_lookup <- dmd_to_bnf_lookups$dmd_lookup$bnf_subparagraph
+# To check the concordance in BNF substance codes between the NHSBSA
+# sources:
+# bnf_codes_hierarchy <- bnf_hierarchy$bnf_substance_code
+# bnf_codes_lookup <- dmd_to_bnf_lookups$dmd_lookup$bnf_substance_code
 # missing_in_lookup <- setdiff(bnf_codes_hierarchy, bnf_codes_lookup)
 # missing_in_hierarchy <- setdiff(bnf_codes_lookup, bnf_codes_hierarchy)
 
-# All BNF subparagraph codes are present in both apart from:
-# 1902010 + 1902020 - other individually formulated bought in preparations
-# and then all of the BNF codes that start with a 2 match poorly, but
-# these reflect slings, bandages, devices etc - I do not want to analyse
-# these.
+# All BNF substance codes are present in both apart from:
+# 190201000 + 190202000 - 'other individually formulated preparations'
+# 0202030Z0 - potassium canrenoate
+# 0309010Z0 - gefapixant
+# 0801050CZ - Inavolisib
+# and all BNF codes that start with a 2, which reflect medical devices etc
+# I do not want to analyse these, so not an issue
 
 # Convert dmd_codes to BNF codes for categorisation ----------------------
 dataset_process_baseline_meds_3_dmd_converted <- fn_dmd_to_bnf(
@@ -77,18 +80,25 @@ dataset_process_baseline_meds_3_dmd_converted <- fn_dmd_to_bnf(
 # Convert BNF codes to names and categories ------------------------------
 dataset_process_baseline_meds_4_bnf_names_added <- fn_add_bnf_names(
   patient_data = dataset_process_baseline_meds_3_dmd_converted,
-  bnf_hierarchy = bnf_hierarchy
+  bnf_hierarchy = bnf_hierarchy,
+  project_stage = "process_baseline_meds"
 )
+
 
 # Apply medication exclusion and inclusion criteria ----------------------
 # Things to decide next time:
-# - look over fn_add_bnf_names and think more about it, any pitfalls,
-# - any data want to extract from it?
-# - what level of BNF hierarchy do I want to go down to.
-# - what inclusion and exclusion criteria should be appliec?
+# - what inclusion and exclusion criteria should be applied?
+
+dataset_baseline_meds_processed <- dataset_process_baseline_meds_4_bnf_names_added
 
 # Save output
 message("\nWrite/save data_descriptions to output/data_descriptions/")
-flow <- describe_and_flow(
+flow <- fn_describe_and_flow(
   project_stage = "process_baseline_meds"
 )
+
+message("\nSave cleaned dataset to output/data/")
+dataset_baseline_meds_processed |>
+  arrow::write_feather(
+    here::here("output", "data", "dataset_baseline_meds_processed.arrow"),
+  )

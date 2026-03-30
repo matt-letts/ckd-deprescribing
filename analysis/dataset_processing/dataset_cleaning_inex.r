@@ -97,7 +97,7 @@ dataset_cleaning_inex_6_krt_inex_applied <- fn_krt_inex_criteria(
 
 # Write all datasets to .txt and create flow dataframe -------------------
 message("\nWrite/save data_descriptions to output/data_descriptions/")
-flow <- describe_and_flow(
+flow <- fn_describe_and_flow(
   project_stage = "cleaning_inex"
 )
 
