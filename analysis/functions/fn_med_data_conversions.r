@@ -196,6 +196,8 @@ fn_build_bnf_hierarchy <- function(
 # Converts wide-format patient medication data with AMP/VMP dm+d codes into
 # BNF substance level classifications using the mapping from fn_build_dmd_bnf_lookup()
 #
+# ENSURE THOSE WITH ZERO MEDICINES RECORDED ARE REMOVED FIRST
+#
 # Arguments:
 #   patient_data : wide-format data frame with med_dmd_code_* and med_date_*
 #   project_stage : string label used to name diagnostic output files
@@ -203,7 +205,7 @@ fn_build_bnf_hierarchy <- function(
 #   vtm_lookup : $vtm_lookup from fn_build_dmd_bnf_lookup()
 #   impute_bnf_from_vtm : if TRUE, impute missing BNF codes via VTM lookup
 #   output : "wide" or "long"
-#   unmapped_action : "keep" (retain NAs) or "drop" (remove NA rows)
+#   unmapped_action : "keep" (retain unmapped) or "drop" (remove)
 #######################################################################################
 
 fn_dmd_to_bnf <- function(
@@ -248,27 +250,6 @@ fn_dmd_to_bnf <- function(
     "--- Data valid for conversion: %d rows | %d med_dmd_code_* columns",
     nrow(patient_data),
     length(dmd_cols)
-  ))
-
-  # Separate patients with no medicines
-  patients_no_meds_long <- patient_data |>
-    filter(if_all(all_of(dmd_cols), ~ is.na(.) | . == "" | . == "NA")) |>
-    select(all_of(patient_level_cols)) |>
-    mutate(
-      med_index = NA_character_,
-      dmd_code = NA_character_,
-      med_date = as.Date(NA),
-      bnf_substance_code = NA_character_,
-      bnf_imputed = NA
-    )
-
-  patients_no_meds_wide <- patient_data |>
-    filter(if_all(all_of(dmd_cols), ~ is.na(.) | . == "" | . == "NA")) |>
-    select(all_of(patient_level_cols))
-
-  message(sprintf(
-    "--- %d patients with no medicines - will be reattached at output",
-    nrow(patients_no_meds_long)
   ))
 
   # Reshape to long format
@@ -326,7 +307,7 @@ fn_dmd_to_bnf <- function(
   )
 
   message(sprintf(
-    "--- %d dm+d codes not in NHSBSA lookup; saved to output/data_descriptions folder",
+    "--- %d dm+d codes not in NHSBSA lookup; *-dmd_not_in_lookup.csv",
     nrow(dmd_not_in_lookup)
   ))
 
@@ -387,7 +368,7 @@ fn_dmd_to_bnf <- function(
 
   if (n_unmapped > 0) {
     message(sprintf(
-      "--- %d records (%.1f%%) still missing BNF substance after processing",
+      "--- %d records (%.1f%%) still missing BNF substance after processing *-dmd_unmapped_to_bnf.csv",
       n_unmapped,
       pct_unmapped
     ))
@@ -407,7 +388,7 @@ fn_dmd_to_bnf <- function(
   # Output
   if (output == "long") {
     message("--- Returning long format")
-    return(bind_rows(patient_bnf, patients_no_meds_long))
+    return(patient_bnf)
   }
 
   if (output == "wide") {
@@ -433,7 +414,7 @@ fn_dmd_to_bnf <- function(
         names_glue = "med_{.value}_{med_index}"
       )
 
-    return(bind_rows(wide, patients_no_meds_wide))
+    return(wide)
   }
 }
 
@@ -445,18 +426,24 @@ fn_dmd_to_bnf <- function(
 # onto a dataset containing a bnf_substance_code column (i.e. the "long" output
 # from fn_dmd_to_bnf())
 #
+# ENSURE THOSE WITH ZERO MEDICINES RECORDED ARE REMOVED FIRST
+#
 # Arguments:
 #   patient_data    : data frame containing a bnf_substance_code column
 #   bnf_hierarchy   : lookup from fn_build_bnf_hierarchy()
 #   project_stage   : string label used to name diagnostic output files
+#   unmapped_action : "keep" (retain NAs) or "drop" (remove NA rows)
 #######################################################################################
 
 fn_add_bnf_names <- function(
   patient_data,
   bnf_hierarchy,
-  project_stage
+  project_stage,
+  unmapped_action = c("keep", "drop")
 ) {
   require(tidyverse)
+
+  unmapped_action <- match.arg(unmapped_action)
 
   message("Running fn_add_bnf_names")
 
@@ -481,9 +468,12 @@ fn_add_bnf_names <- function(
   n_bnf_code_not_matched <- nrow(unmatched_codes)
 
   if (n_bnf_code_not_matched > 0) {
+    # Handle remaining unmapped data
+    pct_unmapped <- 100 * n_bnf_code_not_matched / nrow(joined_data)
     message(sprintf(
-      "--- %d rows have a bnf_substance_code present in data but absent from hierarchy",
-      n_bnf_code_not_matched
+      "--- %d rows (%.1f%%) have a bnf_substance_code in data but absent from hierarchy *-bnf_unmapped_to_hierarchy.csv",
+      n_bnf_code_not_matched,
+      pct_unmapped
     ))
 
     bnf_unmapped_to_hierarchy <- unmatched_codes |>
@@ -506,6 +496,13 @@ fn_add_bnf_names <- function(
         paste0(project_stage, "-bnf_unmapped_to_hierarchy.csv")
       )
     )
+
+    if (unmapped_action == "drop") {
+      joined_data <- joined_data |> filter(!is.na(bnf_substance_name))
+      message("--- Unmapped records dropped")
+    } else {
+      message("--- Unmapped records retained as NAs")
+    }
   } else {
     message(
       "--- All patient bnf_substance_codes successfully mapped to hierarchy"
