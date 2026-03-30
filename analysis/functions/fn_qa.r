@@ -57,7 +57,7 @@ fn_qa <- function(
       collect() %>%
       data.table::as.data.table()
 
-    describe_data(
+    fn_describe_data(
       data = arrow_data_qa_applied,
       name = describe_name,
       suffix = suffix

@@ -51,7 +51,7 @@ fn_dem_inex_criteria <- function(
       collect() %>%
       data.table::as.data.table()
 
-    describe_data(
+    fn_describe_data(
       data = arrow_data_dem_inex_applied,
       name = describe_name,
       suffix = suffix

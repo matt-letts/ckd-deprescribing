@@ -1,11 +1,11 @@
 #############################################################################
-# describe_data()
+# fn_describe_data()
 # prints a summary using the skim() function and places it into a file called
 # name.txt which is in a directory which is created if doesn't already exist:
 # output/data_descriptions/
 #############################################################################
 
-describe_data <- function(data, name, suffix = "") {
+fn_describe_data <- function(data, name, suffix = "") {
   fs::dir_create(here::here("output", "data_descriptions"))
   full_name <- paste0(name, if (nzchar(suffix)) paste0("-", suffix) else "")
   sink(paste0(
@@ -24,7 +24,7 @@ describe_data <- function(data, name, suffix = "") {
 
 
 #############################################################################
-# describe_and_flow() - allows flow of patients through the pipeline to be
+# fn_describe_and_flow() - allows flow of patients through the pipeline to be
 # tracked without holding all the datasets in memory simultaneously
 #
 # Takes a project_stage argument (e.g. "cleaning") and searches the global
@@ -33,13 +33,13 @@ describe_data <- function(data, name, suffix = "") {
 
 # For each matching variable:
 #   1. Collects the Arrow dataset into memory
-#   2. Passes it to describe_data() to create:
+#   2. Passes it to fn_describe_data() to create:
 #      output/data_descriptions/<project_stage>-<stage>.txt
 #   3. Records the stage name and row count in a flow dataframe
 #   4. Frees the collected data from memory before moving to the next dataset
 #############################################################################
 
-describe_and_flow <- function(
+fn_describe_and_flow <- function(
   project_stage
 ) {
   data_names <- ls(
@@ -59,7 +59,7 @@ describe_and_flow <- function(
       envir = .GlobalEnv
     ))
 
-    describe_data(
+    fn_describe_data(
       data = collected,
       name = project_stage,
       suffix = stage_name

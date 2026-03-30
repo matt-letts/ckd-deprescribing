@@ -43,7 +43,7 @@ fn_preprocess <- function(
       collect() %>%
       data.table::as.data.table()
 
-    describe_data(
+    fn_describe_data(
       data = arrow_data_preprocessed,
       name = describe_name,
       suffix = suffix

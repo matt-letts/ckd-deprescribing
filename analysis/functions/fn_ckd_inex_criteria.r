@@ -182,7 +182,7 @@ fn_ckd_inex_criteria <- function(
       collect() |>
       data.table::as.data.table()
 
-    describe_data(
+    fn_describe_data(
       data = arrow_data_ckd_inex_applied,
       name = describe_name,
       suffix = suffix
@@ -249,7 +249,7 @@ fn_krt_inex_criteria <- function(
       collect() |>
       data.table::as.data.table()
 
-    describe_data(
+    fn_describe_data(
       data = arrow_data_krt_inex_applied,
       name = describe_name,
       suffix = suffix
