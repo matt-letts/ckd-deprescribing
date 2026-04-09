@@ -1,0 +1,42 @@
+---
+config:
+  layout: elk
+  elk:
+    mergeEdges: true
+    nodePlacementStrategy: LINEAR_SEGMENTS
+---
+flowchart TD
+    %% define nodes
+    a1("Study dates"):::R
+    a2("Generate dataset 1"):::ehrql
+    b1("Patient data"):::openSAFELY
+    d1("1. Patient-level inc/exc dataset"):::data
+    a3("Dataset cleaning"):::R
+    d2("Cleaned dataset 1"):::data
+    o1("flow chart, data description files, medication count plot"):::output
+    a4("Generate dataset 2"):::ehrql
+    b2("Patient data"):::openSAFELY
+    d3("2. Medications before baseline"):::data
+    a5("Handling of medication data"):::R
+    b3("NHSBSA dmd/bnf code map"):::external
+    b4("BNF hierarchy file"):::external
+    d4("Cleaned dataset 2"):::data
+
+
+    %% connect nodes
+    
+    b1 & a1 & a2 --> d1
+    d1 --> a3 --> o1 & d2
+    d2 & b2 --> a4 --> d3 --> a5 
+    a5 & b3 & b4 --> d4
+
+    %% colour scheme
+    classDef openSAFELY color:#FFFFFF, fill:#212121, stroke:#212121
+    classDef ehrql color:#000000, fill:#FFD600, stroke:#FFD600
+    classDef R color:#FFFFFF, fill:#E65100, stroke:#E65100
+    classDef data color:#FFFFFF, fill:#1565C0, stroke:#1565C0
+    classDef output color:#FFFFFF, fill:#00C853, stroke:#00C853
+    classDef external color:#FFFFFF, fill:#FFA500, stroke:#FFA500
+
+%% to render this type into powershell terminal
+%% mmdc -i docs/pipeline_diagram_plain.mmd -o docs/pipeline_diagram_plain.svg

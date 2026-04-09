@@ -11,6 +11,7 @@ This diagram pictorially represents the flow through the project
 |--------|------|
 | ⬛ | OpenSAFELY-TPP input |
 | 🟨 | ehrQL script action |
-| 🟧 | R script action |
+| 🟥 | R script action |
 | 🟦 | Data files |
 | 🟩 | Output files |
+| 🟧 | External File |
