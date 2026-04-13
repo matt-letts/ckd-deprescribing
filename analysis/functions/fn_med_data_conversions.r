@@ -1,4 +1,48 @@
 #######################################################################################
+# fn_write_unmapped_codes() - helper function for diagnostics
+#######################################################################################
+# Counts unmapped codes, applies midpoint-6 rounding for disclosure
+# control, and writes the result to a CSV in output/data_descriptions/
+#
+# Arguments:
+#   data : data frame containing the codes to count (e.g. filtered patient_bnf)
+#   code_col : name of the column containing the code to count
+#   project_stage : string label used to name the output file
+#   file_suffix : suffix for the output filename (e.g. "dmd_not_in_lookup")
+#######################################################################################
+
+fn_write_unmapped_codes <- function(
+  data,
+  code_col,
+  project_stage,
+  file_suffix
+) {
+  result <- data |>
+    count(.data[[code_col]], name = "n_occurrences") |>
+    arrange(desc(n_occurrences)) |>
+    mutate(
+      n_occurrences_midpoint6 = if_else(
+        n_occurrences <= 7,
+        NA_real_,
+        fn_roundmid_any(n_occurrences)
+      )
+    ) |>
+    select(all_of(c(code_col, "n_occurrences_midpoint6")))
+
+  write_csv(
+    result,
+    here::here(
+      "output",
+      "data_descriptions",
+      paste0(project_stage, "-", file_suffix, ".csv")
+    )
+  )
+
+  return(nrow(result))
+}
+
+
+#######################################################################################
 # fn_build_dmd_bnf_lookup()
 #######################################################################################
 # Reads the NHSBSA BNF/SNOMED mapping file downloadable from:
@@ -32,7 +76,8 @@ fn_build_dmd_bnf_lookup <- function(
     "BNF Code",
     "Presentation / Pack Level",
     "VTM",
-    "VTM Name"
+    "VTM Name",
+    "DM+D: Product Description"
   )
   missing_cols <- setdiff(expected_cols, names(snomed_bnf_raw))
   if (length(missing_cols) > 0) {
@@ -52,7 +97,8 @@ fn_build_dmd_bnf_lookup <- function(
       bnf_code = `BNF Code`,
       pres_pack = `Presentation / Pack Level`,
       vtm_code = `VTM`,
-      vtm_name = `VTM Name`
+      vtm_name = `VTM Name`,
+      dmd_name = `DM+D: Product Description`
     ) |>
     filter(pres_pack == "Presentation") |>
     mutate(
@@ -60,6 +106,7 @@ fn_build_dmd_bnf_lookup <- function(
       vtm_code = as.character(vtm_code),
       bnf_code = as.character(bnf_code),
       vtm_name = as.character(vtm_name),
+      dmd_name = as.character(dmd_name),
       # First 9 characters of BNF code = substance
       bnf_substance_code = substr(bnf_code, 1, 9),
       # Flag for identifying dm+d codes in patient data absent from lookup
@@ -72,6 +119,7 @@ fn_build_dmd_bnf_lookup <- function(
       bnf_code,
       vtm_name,
       bnf_substance_code,
+      dmd_name,
       in_lookup
     )
 
@@ -102,6 +150,107 @@ fn_build_dmd_bnf_lookup <- function(
     dmd_lookup = dmd_lookup,
     vtm_lookup = vtm_lookup
   ))
+}
+
+#######################################################################################
+# fn_classify_med_route()
+#######################################################################################
+# Adds route of administration  to the dmd_lookup table, using the
+# DM+D product description (dmd_name). Operates on the lookup
+# so that each product is classified once. Categories are checked in priority order
+# (most specific first) so that e.g. "solution for injection" is classified as
+# injection rather than triggering oral "solution" pattern.
+# route_uncertain is TRUE only when no pattern matched or the description was missing.
+#
+# Arguments:
+#   dmd_lookup    : $dmd_lookup from fn_build_dmd_bnf_lookup()
+#   project_stage : string label used to name the diagnostic output file
+#
+# Returns: dmd_lookup with route_cat (factor) and route_uncertain (logical) added
+#######################################################################################
+
+fn_classify_med_route <- function(
+  dmd_lookup,
+  project_stage
+) {
+  require(tidyverse)
+
+  message("Running fn_classify_med_route")
+
+  if (!"dmd_name" %in% names(dmd_lookup)) {
+    stop("dmd_lookup must contain a dmd_name column")
+  }
+
+  route_levels <- c(
+    "parenteral",
+    "eye_ear_nasal",
+    "rectal_vaginal",
+    "transdermal",
+    "inhaled",
+    "sublingual",
+    "topical",
+    "oral",
+    "other/unclassified"
+  )
+
+  # Patterns checked in priority order — most specific first.
+  # Word boundaries (\b) prevent partial matches (e.g. "gel" matching "Angel").
+  route_patterns <- list(
+    parenteral = "\\b(injection|infusion|intravenous|intramuscular|subcutaneous)\\b",
+    eye_ear_nasal = "\\b(eye|ear|nasal)\\s+(drops?|spray|ointment|gel)",
+    rectal_vaginal = "\\b(suppositories?|enemas?|pessar(y|ies)|rectal|vaginal)\\b",
+    transdermal = "\\b(patches?|transdermal)\\b",
+    inhaled = "\\b(inhalers?|inhalation|nebulisers?|nebules?|respules?|turbohaler|accuhaler|evohaler)\\b|powder for inhalation",
+    sublingual = "\\b(sublingual|buccal|oromucosal)\\b",
+    topical = "\\b(creams?|ointments?|gels?|lotions?|shampoos?|scalp|cutaneous|foam)\\b",
+    oral = "\\b(tablets?|capsules?|oral|syrup|caplets?|lozenges?|pastilles?|granules?|orodispersible)\\b"
+  )
+
+  result <- dmd_lookup |>
+    mutate(
+      .desc = str_to_lower(dmd_name),
+      # Assign route in priority order; "unknown" if nothing matches or no description
+      route_cat = case_when(
+        is.na(.desc) ~ "other/unclassified",
+        str_detect(.desc, route_patterns$parenteral) ~ "parenteral",
+        str_detect(.desc, route_patterns$eye_ear_nasal) ~ "eye_ear_nasal",
+        str_detect(.desc, route_patterns$rectal_vaginal) ~ "rectal_vaginal",
+        str_detect(.desc, route_patterns$transdermal) ~ "transdermal",
+        str_detect(.desc, route_patterns$inhaled) ~ "inhaled",
+        str_detect(.desc, route_patterns$sublingual) ~ "sublingual",
+        str_detect(.desc, route_patterns$topical) ~ "topical",
+        str_detect(.desc, route_patterns$oral) ~ "oral",
+        TRUE ~ "other/unclassified"
+      ),
+      route_uncertain = route_cat == "other/unclassified",
+      route_cat = factor(route_cat, levels = route_levels)
+    ) |>
+    select(-.desc)
+
+  n_uncertain <- sum(result$route_uncertain, na.rm = TRUE)
+  message(sprintf(
+    "--- Route classification complete: %d dm+d products | %d (%.1f%%) unclassified",
+    nrow(result),
+    n_uncertain,
+    100 * n_uncertain / nrow(result)
+  ))
+
+  # Disclosure-controlled summary across lookup products
+  route_summary <- result |>
+    count(route_cat, route_uncertain) |>
+    mutate(n_midpoint6 = if_else(n <= 7, NA_real_, fn_roundmid_any(n))) |>
+    select(route_cat, route_uncertain, n_midpoint6)
+
+  write_csv(
+    route_summary,
+    here::here(
+      "output",
+      "data_descriptions",
+      paste0(project_stage, "-route_classification_lookup_summary.csv")
+    )
+  )
+
+  return(result)
 }
 
 
@@ -284,31 +433,15 @@ fn_dmd_to_bnf <- function(
     mutate(bnf_imputed = FALSE)
 
   # Capture dm+d codes present in patient data but absent from the lookup
-  dmd_not_in_lookup <- patient_bnf |>
-    filter(is.na(in_lookup)) |>
-    count(dmd_code, name = "n_occurrences") |>
-    arrange(desc(n_occurrences)) |>
-    mutate(
-      n_occurrences_midpoint6 = if_else(
-        n_occurrences <= 7,
-        NA_real_,
-        fn_roundmid_any(n_occurrences)
-      )
-    ) |>
-    select(dmd_code, n_occurrences_midpoint6)
-
-  write_csv(
-    dmd_not_in_lookup,
-    here::here(
-      "output",
-      "data_descriptions",
-      paste0(project_stage, "-dmd_not_in_lookup.csv")
-    )
+  n_not_in_lookup <- fn_write_unmapped_codes(
+    data = filter(patient_bnf, is.na(in_lookup)),
+    code_col = "dmd_code",
+    project_stage = project_stage,
+    file_suffix = "dmd_not_in_lookup"
   )
-
   message(sprintf(
     "--- %d dm+d codes not in NHSBSA lookup; *-dmd_not_in_lookup.csv",
-    nrow(dmd_not_in_lookup)
+    n_not_in_lookup
   ))
 
   # Impute missing BNF via VTM
@@ -337,29 +470,16 @@ fn_dmd_to_bnf <- function(
       before_impute,
       after_impute
     ))
+  } else {
+    message("--- VTM imputation skipped (impute_bnf_from_vtm = FALSE)")
   }
 
-  # Capture codes still unmapped to bnf for examination
-  dmd_unmapped_to_bnf <- patient_bnf |>
-    filter(is.na(bnf_substance_code)) |>
-    count(dmd_code, name = "n_occurrences") |>
-    arrange(desc(n_occurrences)) |>
-    mutate(
-      n_occurrences_midpoint6 = if_else(
-        n_occurrences <= 7,
-        NA_real_,
-        fn_roundmid_any(n_occurrences)
-      )
-    ) |>
-    select(dmd_code, n_occurrences_midpoint6)
-
-  write_csv(
-    dmd_unmapped_to_bnf,
-    here::here(
-      "output",
-      "data_descriptions",
-      paste0(project_stage, "-dmd_unmapped_to_bnf.csv")
-    )
+  # Capture codes still unmapped to BNF after imputation
+  fn_write_unmapped_codes(
+    data = filter(patient_bnf, is.na(bnf_substance_code)),
+    code_col = "dmd_code",
+    project_stage = project_stage,
+    file_suffix = "dmd_unmapped_to_bnf"
   )
 
   # Handle remaining unmapped data
@@ -385,13 +505,28 @@ fn_dmd_to_bnf <- function(
   patient_bnf <- patient_bnf |>
     select(-vtm_code, -vtm_name, -in_lookup, -bnf_code)
 
+  # Patient-level route diagnostic (only if route classification was run on lookup)
+  if ("route_cat" %in% names(patient_bnf)) {
+    route_summary <- patient_bnf |>
+      count(route_cat, route_uncertain) |>
+      mutate(n_midpoint6 = if_else(n <= 7, NA_real_, fn_roundmid_any(n))) |>
+      select(route_cat, route_uncertain, n_midpoint6)
+
+    write_csv(
+      route_summary,
+      here::here(
+        "output",
+        "data_descriptions",
+        paste0(project_stage, "-route_classification_patient_summary.csv")
+      )
+    )
+  }
+
   # Output
   if (output == "long") {
     message("--- Returning long format")
     return(patient_bnf)
-  }
-
-  if (output == "wide") {
+  } else {
     message("--- Returning wide format")
 
     wide <- patient_bnf |>
@@ -471,30 +606,16 @@ fn_add_bnf_names <- function(
     # Handle remaining unmapped data
     pct_unmapped <- 100 * n_bnf_code_not_matched / nrow(joined_data)
     message(sprintf(
-      "--- %d rows (%.1f%%) have a bnf_substance_code in data but absent from hierarchy *-bnf_unmapped_to_hierarchy.csv",
+      "--- %d rows (%.1f%%) have a bnf_substance_code in data but absent from hierarchy *-bnf_unmapped_to_bnf_hierarchy.csv",
       n_bnf_code_not_matched,
       pct_unmapped
     ))
 
-    bnf_unmapped_to_hierarchy <- unmatched_codes |>
-      count(bnf_substance_code, name = "n_occurrences") |>
-      arrange(desc(n_occurrences)) |>
-      mutate(
-        n_occurrences_midpoint6 = if_else(
-          n_occurrences <= 7,
-          NA_real_,
-          fn_roundmid_any(n_occurrences)
-        )
-      ) |>
-      select(bnf_substance_code, n_occurrences_midpoint6)
-
-    write_csv(
-      bnf_unmapped_to_hierarchy,
-      here::here(
-        "output",
-        "data_descriptions",
-        paste0(project_stage, "-bnf_unmapped_to_hierarchy.csv")
-      )
+    fn_write_unmapped_codes(
+      data = unmatched_codes,
+      code_col = "bnf_substance_code",
+      project_stage = project_stage,
+      file_suffix = "bnf_unmapped_to_bnf_hierarchy"
     )
 
     if (unmapped_action == "drop") {
