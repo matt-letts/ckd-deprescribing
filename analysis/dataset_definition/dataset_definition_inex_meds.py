@@ -1,8 +1,7 @@
 # test using test_dataset_definition_prescriptions.py
-# This dataset calls add_prescription_columns() 
-# This function creates a dataset containing wide-form prescription
-# codes and dates and a count of medicines in the days_before_index
-# up to max_meds
+# This script calls add_prescription_columns() which creates a dataset containing 
+# wide-form prescription codes and dates and a count of medicines in the 
+# days_before_index up to max_meds
 
 from ehrql import create_dataset, table_from_file
 from ehrql.tables.tpp import medications, patients

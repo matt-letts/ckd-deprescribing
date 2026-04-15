@@ -6,7 +6,6 @@ from ehrql import days, minimum_of, maximum_of
 from codelists import creatinine_codes
 
 
-
 def compute_ckd_variables(index_date) -> dict:
 
     # Extract all non-null creatinine_values for patients prior to index date
