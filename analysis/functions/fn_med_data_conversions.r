@@ -50,13 +50,20 @@ fn_write_unmapped_codes <- function(
 # Currently using January 2026 version, but this can be updated by changing file,
 # and mapping path below.
 #
-# Returns a named list with two lookups:
-#   dmd_lookup : AMP/VMP --> BNF/VTM mapping, with in_lookup flag
-#   vtm_lookup : VTM --> most common BNF substance, for imputation when missing
+# Arguments:
+#   dmd_bnf_mapping_path : path to the NHSBSA BNF/SNOMED mapping file
+#   impute_bnf_from_vtm  : if TRUE, fill missing bnf_substance_code using the most
+#                          common BNF substance for that product's VTM. Adds an
+#                          bnf_imputed flag to dmd_lookup.
+#
+# Returns a named list:
+#   dmd_lookup : AMP/VMP --> BNF/VTM mapping, with in_lookup and bnf_imputed flags
+#   vtm_lookup : VTM --> most common BNF substance (retained for inspection)
 #######################################################################################
 
 fn_build_dmd_bnf_lookup <- function(
-  dmd_bnf_mapping_path = here::here("docs", "bnf_dmd_mapping_20260324.xlsx")
+  dmd_bnf_mapping_path = here::here("docs", "bnf_dmd_mapping_20260324.xlsx"),
+  impute_bnf_from_vtm = TRUE
 ) {
   require(readxl)
   require(tidyverse)
@@ -146,6 +153,36 @@ fn_build_dmd_bnf_lookup <- function(
     nrow(vtm_lookup)
   ))
 
+  # Apply VTM imputation to the lookup itself so that bnf_substance_code and
+  # bnf_imputed are fully resolved before any patient-level joins occur.
+  if (impute_bnf_from_vtm) {
+    before_impute <- sum(is.na(dmd_lookup$bnf_substance_code))
+
+    dmd_lookup <- dmd_lookup |>
+      left_join(vtm_lookup, by = "vtm_code") |>
+      mutate(
+        bnf_imputed = if_else(
+          is.na(bnf_substance_code) & !is.na(bnf_substance_imputed),
+          TRUE,
+          FALSE
+        ),
+        bnf_substance_code = coalesce(bnf_substance_code, bnf_substance_imputed)
+      ) |>
+      select(-bnf_substance_imputed)
+
+    after_impute <- sum(is.na(dmd_lookup$bnf_substance_code))
+
+    message(sprintf(
+      "--- VTM imputation applied: %d --> %d products missing BNF substance code",
+      before_impute,
+      after_impute
+    ))
+  } else {
+    dmd_lookup <- dmd_lookup |>
+      mutate(bnf_imputed = FALSE)
+    message("--- VTM imputation skipped (impute_bnf_from_vtm = FALSE)")
+  }
+
   return(list(
     dmd_lookup = dmd_lookup,
     vtm_lookup = vtm_lookup
@@ -166,7 +203,12 @@ fn_build_dmd_bnf_lookup <- function(
 #   dmd_lookup    : $dmd_lookup from fn_build_dmd_bnf_lookup()
 #   project_stage : string label used to name the diagnostic output file
 #
-# Returns: dmd_lookup with route_cat (factor) and route_uncertain (logical) added
+# Returns:
+#   dmd_lookup with route_cat (factor) and route_uncertain (logical) added
+#   three diagnostic CSVs are also output to output/data_descriptions/:
+#     *route_classification_lookup_summary.csv : routes across all lookup products
+#     *route_classification_bnf_chapter_summary.csv : route classification by BNF chapter
+#     *route_classification_unclassified_detail.csv : details of unclassified products
 #######################################################################################
 
 fn_classify_med_route <- function(
@@ -187,29 +229,31 @@ fn_classify_med_route <- function(
     "rectal_vaginal",
     "transdermal",
     "inhaled",
-    "sublingual",
+    "oromucosal",
     "topical",
     "oral",
     "other/unclassified"
   )
 
   # Patterns checked in priority order — most specific first.
-  # Word boundaries (\b) prevent partial matches (e.g. "gel" matching "Angel").
+  # These regex patterns were created iteratively by sampling unmapped products and
+  # refining patterns to capture common terms while avoiding false positives.
+  # They are not exhaustive, but cover the most common forms and routes of administration.
   route_patterns <- list(
     parenteral = "\\b(injection|infusion|intravenous|intramuscular|subcutaneous)\\b",
-    eye_ear_nasal = "\\b(eye|ear|nasal)\\s+(drops?|spray|ointment|gel)",
-    rectal_vaginal = "\\b(suppositories?|enemas?|pessar(y|ies)|rectal|vaginal)\\b",
-    transdermal = "\\b(patches?|transdermal)\\b",
-    inhaled = "\\b(inhalers?|inhalation|nebulisers?|nebules?|respules?|turbohaler|accuhaler|evohaler)\\b|powder for inhalation",
-    sublingual = "\\b(sublingual|buccal|oromucosal)\\b",
-    topical = "\\b(creams?|ointments?|gels?|lotions?|shampoos?|scalp|cutaneous|foam)\\b",
-    oral = "\\b(tablets?|capsules?|oral|syrup|caplets?|lozenges?|pastilles?|granules?|orodispersible)\\b"
+    eye_ear_nasal = "\\b(eye|ear|nasal)\\s+(drops?|spray|ointment|gel)|\\bear/eye/nose\\b|\\beye/ear/nose\\b",
+    rectal_vaginal = "\\b(suppositor(y|ies)|enemas?|pessar(y|ies)|rectal|vaginal)\\b",
+    transdermal = "\\b(patch(|es)|transdermal)\\b",
+    inhaled = "\\b(inhalers?|inhalation|nebulisers?|nebules?|respules?|turbohaler|accuhaler|evohaler|autohaler|clickhaler|twisthaler|diskhaler|aerohaler|aerocaps|rotacaps|cyclocaps|genuair|spincaps|inhalator)\\b|powder for inhalation",
+    oromucosal = "\\b(sublingual|buccal|oromucosal|mouthwash)\\b",
+    topical = "\\b(creams?|ointments?|gels?|lotions?|shampoos?|scalp|cutaneous|foam|lacquers?|paste|paints?)\\b",
+    oral = "\\b(tablets?|capsules?|sachets?|powders?|oral|drops?|syrup|caplets?|lozenges?|pastilles?|granules?|orodispersible|linctus|elixir|chewing gum)\\b"
   )
+  # note solution and liquid are ambiguous and not included in regex, most are captured by other patterns
 
   result <- dmd_lookup |>
     mutate(
-      .desc = str_to_lower(dmd_name),
-      # Assign route in priority order; "unknown" if nothing matches or no description
+      .desc = str_to_lower(dmd_name), # temp column for pattern matching
       route_cat = case_when(
         is.na(.desc) ~ "other/unclassified",
         str_detect(.desc, route_patterns$parenteral) ~ "parenteral",
@@ -217,7 +261,7 @@ fn_classify_med_route <- function(
         str_detect(.desc, route_patterns$rectal_vaginal) ~ "rectal_vaginal",
         str_detect(.desc, route_patterns$transdermal) ~ "transdermal",
         str_detect(.desc, route_patterns$inhaled) ~ "inhaled",
-        str_detect(.desc, route_patterns$sublingual) ~ "sublingual",
+        str_detect(.desc, route_patterns$oromucosal) ~ "oromucosal",
         str_detect(.desc, route_patterns$topical) ~ "topical",
         str_detect(.desc, route_patterns$oral) ~ "oral",
         TRUE ~ "other/unclassified"
@@ -229,24 +273,41 @@ fn_classify_med_route <- function(
 
   n_uncertain <- sum(result$route_uncertain, na.rm = TRUE)
   message(sprintf(
-    "--- Route classification complete: %d dm+d products | %d (%.1f%%) unclassified",
+    "--- Route classification complete: %d dm+d products | %d (%.1f%%) unclassified (most of these are devices)",
     nrow(result),
     n_uncertain,
     100 * n_uncertain / nrow(result)
   ))
 
-  # Disclosure-controlled summary across lookup products
-  route_summary <- result |>
-    count(route_cat, route_uncertain) |>
-    mutate(n_midpoint6 = if_else(n <= 7, NA_real_, fn_roundmid_any(n))) |>
-    select(route_cat, route_uncertain, n_midpoint6)
+  # Route breakdown within each BNF chapter.
+  bnf_chapter_route_summary <- result |>
+    filter(!is.na(bnf_code)) |>
+    mutate(bnf_chapter = substr(bnf_code, 1, 2)) |>
+    count(bnf_chapter, route_cat) |>
+    arrange(bnf_chapter, route_cat)
 
   write_csv(
-    route_summary,
+    bnf_chapter_route_summary,
     here::here(
       "output",
       "data_descriptions",
-      paste0(project_stage, "-route_classification_lookup_summary.csv")
+      paste0(project_stage, "-dmd_lookup_route_by_bnf_chapter_summary.csv")
+    )
+  )
+
+  # Detail of unclassified products, for manual inspection / regex improvement.
+  unclassified_detail <- result |>
+    filter(route_uncertain, !is.na(bnf_code)) |>
+    mutate(bnf_chapter = substr(bnf_code, 1, 2)) |>
+    select(bnf_chapter, dmd_name) |>
+    arrange(bnf_chapter, dmd_name)
+
+  write_csv(
+    unclassified_detail,
+    here::here(
+      "output",
+      "data_descriptions",
+      paste0(project_stage, "-dmd_lookup_route_unclassified_detail.csv")
     )
   )
 
@@ -350,9 +411,8 @@ fn_build_bnf_hierarchy <- function(
 # Arguments:
 #   patient_data : wide-format data frame with med_dmd_code_* and med_date_*
 #   project_stage : string label used to name diagnostic output files
-#   dmd_lookup : $dmd_lookup from fn_build_dmd_bnf_lookup()
-#   vtm_lookup : $vtm_lookup from fn_build_dmd_bnf_lookup()
-#   impute_bnf_from_vtm : if TRUE, impute missing BNF codes via VTM lookup
+#   dmd_lookup : $dmd_lookup from fn_build_dmd_bnf_lookup() — VTM imputation and
+#                bnf_imputed flag are resolved at lookup-build time, not here
 #   output : "wide" or "long"
 #   unmapped_action : "keep" (retain unmapped) or "drop" (remove)
 #######################################################################################
@@ -361,8 +421,6 @@ fn_dmd_to_bnf <- function(
   patient_data,
   project_stage,
   dmd_lookup,
-  vtm_lookup,
-  impute_bnf_from_vtm = TRUE,
   output = c("long", "wide"),
   unmapped_action = c("keep", "drop")
 ) {
@@ -414,6 +472,7 @@ fn_dmd_to_bnf <- function(
       dmd_code = med_dmd_code,
       med_date = med_date
     ) |>
+    mutate(med_index = as.integer(med_index)) |>
     filter(!is.na(dmd_code), dmd_code != "", dmd_code != "NA")
 
   message(sprintf(
@@ -428,9 +487,9 @@ fn_dmd_to_bnf <- function(
     stop("dmd_lookup contains dmd_code duplicates, fn will break")
   }
 
+  # bnf_imputed flag is resolved in fn_build_dmd_bnf_lookup() and joins here automatically
   patient_bnf <- patient_long |>
-    left_join(dmd_lookup, by = "dmd_code") |>
-    mutate(bnf_imputed = FALSE)
+    left_join(dmd_lookup, by = "dmd_code")
 
   # Capture dm+d codes present in patient data but absent from the lookup
   n_not_in_lookup <- fn_write_unmapped_codes(
@@ -443,36 +502,6 @@ fn_dmd_to_bnf <- function(
     "--- %d dm+d codes not in NHSBSA lookup; *-dmd_not_in_lookup.csv",
     n_not_in_lookup
   ))
-
-  # Impute missing BNF via VTM
-  if (impute_bnf_from_vtm) {
-    before_impute <- sum(is.na(patient_bnf$bnf_substance_code))
-
-    patient_bnf <- patient_bnf |>
-      left_join(vtm_lookup, by = "vtm_code") |>
-      mutate(
-        bnf_imputed = if_else(
-          is.na(bnf_substance_code) & !is.na(bnf_substance_imputed),
-          TRUE,
-          FALSE
-        ),
-        bnf_substance_code = coalesce(
-          bnf_substance_code,
-          bnf_substance_imputed
-        )
-      ) |>
-      select(-bnf_substance_imputed)
-
-    after_impute <- sum(is.na(patient_bnf$bnf_substance_code))
-
-    message(sprintf(
-      "--- VTM --> BNF Imputation applied: %d --> %d missing BNF codes",
-      before_impute,
-      after_impute
-    ))
-  } else {
-    message("--- VTM imputation skipped (impute_bnf_from_vtm = FALSE)")
-  }
 
   # Capture codes still unmapped to BNF after imputation
   fn_write_unmapped_codes(
@@ -629,19 +658,6 @@ fn_add_bnf_names <- function(
       "--- All patient bnf_substance_codes successfully mapped to hierarchy"
     )
   }
-
-  # Convert hierarchy columns to factors
-  joined_data <- joined_data |>
-    mutate(across(
-      c(
-        bnf_chapter_code,
-        bnf_section_code,
-        bnf_paragraph_code,
-        bnf_subparagraph_code,
-        bnf_substance_code
-      ),
-      as.factor
-    ))
 
   return(joined_data)
 }

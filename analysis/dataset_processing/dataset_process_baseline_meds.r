@@ -2,12 +2,13 @@
 # This script does the following:
 # 1. Loads medication dataset (dataset_inex_meds.arrow) and preprocesses it
 # 2. Separates patients with no medications recorded
-# 3. Builds DMD-to-BNF lookup and classifies route on the lookup
-# 4. Converts DMD codes to BNF substance codes (with VTM imputation)
-#    - patient-level route diagnostic written here as route flows from lookup
+# 3. Builds a DMD-to-BNF lookup table (with optional VTM imputation) and
+#    classifies medication routes using a regex applied to DMD product names
+# 4. Converts DMD codes to BNF substance codes via lookup join
 # 5. Adds BNF hierarchy names (chapter, section, paragraph, subparagraph)
 # 6. Reattaches patients with no medications
-# 7. Saves processed dataset, flow table, and data descriptions
+# 7. Applies minimal medication exclusion criteria
+# 8. Saves processed dataset, flow table, and data descriptions
 ##########################################################################
 
 # Import libraries and functions -----------------------------------------
@@ -17,9 +18,11 @@ library(here)
 library(arrow)
 library(tidyverse)
 library(data.table)
+library(readxl)
 source(here::here("analysis", "functions", "fn_preprocess.r"))
 source(here::here("analysis", "functions", "fn_modify_dummy_data.r"))
 source(here::here("analysis", "functions", "fn_med_data_conversions.r"))
+source(here::here("analysis", "functions", "fn_med_inex_criteria.r"))
 source(here::here("analysis", "functions", "fn_disclosure_control.r"))
 source(here::here("analysis", "functions", "fn_data_describing.r"))
 
@@ -46,41 +49,38 @@ dataset_process_baseline_meds_1_input <- arrow::open_dataset(
 # Preprocess data: transform variables and modify dummy data -------------
 dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
   arrow_data = dataset_process_baseline_meds_1_input,
-  dataset = "baseline_meds", # leads to no modification at present
+  dataset = "baseline_meds", # no modification at present
   index_date = study_dates$index_date,
   collect_and_describe = FALSE
 ) |>
   # collect the data - required for the next processes
   collect()
 
-# Extract people who have no medications at all so don't get lost --------
+# Extract people who have no medications at all for reattachment later ---
 dmd_cols <- grep(
   "^med_dmd_code",
   names(dataset_process_baseline_meds_2_preprocessed),
   value = TRUE
 )
-# Compute a no-meds flag once so dmd_cols is only evaluated in one pass
 dataset_process_baseline_meds_2_preprocessed <-
   dataset_process_baseline_meds_2_preprocessed |>
-  mutate(.no_meds = if_all(all_of(dmd_cols), ~ is.na(.) | . == "" | . == "NA"))
+  mutate(.no_meds = if_all(all_of(dmd_cols), is.na)) # no meds flag
 
-# Those without any medications at all
 patients_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
   filter(.no_meds) |>
-  select(patient_id, med_count)
+  select(patient_id, med_count) # those with no medications
 
-# Those with at least one medication - carry forward for processing
 dataset_process_baseline_meds_3_remove_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
   filter(!.no_meds) |>
-  select(-.no_meds)
+  select(-.no_meds) # those with >=1 medications, for processing
 
 message(sprintf(
   "%d patients with no medicines recorded - separated to rejoin at end",
   nrow(patients_no_meds)
 ))
 
-# Build dmd_to_bnf and bnf_code_hierarchy lookups ------------------------
-dmd_to_bnf_lookups <- fn_build_dmd_bnf_lookup()
+# Build medication code conversion lookup tables -------------------------
+dmd_to_bnf_lookups <- fn_build_dmd_bnf_lookup(impute_bnf_from_vtm = TRUE)
 dmd_to_bnf_lookups$dmd_lookup <- fn_classify_med_route(
   dmd_lookup = dmd_to_bnf_lookups$dmd_lookup,
   project_stage = "process_baseline_meds"
@@ -107,8 +107,6 @@ dataset_process_baseline_meds_4_dmd_converted <- fn_dmd_to_bnf(
   patient_data = dataset_process_baseline_meds_3_remove_no_meds,
   project_stage = "process_baseline_meds",
   dmd_lookup = dmd_to_bnf_lookups$dmd_lookup,
-  vtm_lookup = dmd_to_bnf_lookups$vtm_lookup,
-  impute_bnf_from_vtm = TRUE,
   output = "long",
   unmapped_action = "drop"
 )
@@ -121,34 +119,31 @@ dataset_process_baseline_meds_5_bnf_names_added <- fn_add_bnf_names(
   unmapped_action = "drop"
 )
 
-# Apply medication exclusion and inclusion criteria ----------------------
-# - what inclusion and exclusion criteria should be applied?
-
 # Reattach patients who had no medications prescribed --------------------
 patients_no_meds <- patients_no_meds |>
   transmute(
     patient_id,
     med_count,
-    med_index = NA_character_,
+    med_index = NA_integer_,
     dmd_code = NA_character_,
     med_date = as.Date(NA),
-    bnf_substance_code = NA,
+    bnf_substance_code = NA_character_,
+    dmd_name = NA_character_,
     bnf_imputed = NA,
+    route_cat = factor(NA),
+    route_uncertain = NA,
     bnf_chapter_name = NA_character_,
-    bnf_chapter_code = NA,
+    bnf_chapter_code = NA_character_,
     bnf_section_name = NA_character_,
-    bnf_section_code = NA,
+    bnf_section_code = NA_character_,
     bnf_paragraph_name = NA_character_,
-    bnf_paragraph_code = NA,
+    bnf_paragraph_code = NA_character_,
     bnf_subparagraph_name = NA_character_,
-    bnf_subparagraph_code = NA,
+    bnf_subparagraph_code = NA_character_,
     bnf_substance_name = NA_character_,
-    dmd_product_desc = NA_character_,
-    route_cat = NA_character_,
-    route_uncertain = NA
   )
 
-# Ensure transmute() coerces patients_no_meds to have same columns
+# Check transmute() has made patients_no_meds have same columns
 # as process_baseline_meds dataset so bind_rows() works properly
 if (
   !setequal(
@@ -159,11 +154,31 @@ if (
   stop("patients_no_meds columns do not match main dataset after transmute")
 }
 
-# Reattach and rename for clarity
-dataset_baseline_meds_processed <- bind_rows(
+dataset_process_baseline_meds_5b_no_meds_reattached <- bind_rows(
   patients_no_meds,
   dataset_process_baseline_meds_5_bnf_names_added
+) |>
+  arrange(patient_id, med_index)
+
+# Apply minimal medication exclusion criteria ----------------------------
+# Remove BNF chapters that will never be analysed:
+#  14: immunological products (immunoglobulins and vaccines)
+#  15: anaesthesia
+#  18: preparations used in diagnosis
+#  19: other drugs and preparations
+#  20: dressings
+#  21: appliances
+#  22: incontinence appliances
+#  23: stoma appliances
+dataset_process_baseline_meds_6_exclusions_applied <- fn_apply_med_inex_criteria(
+  patient_data = dataset_process_baseline_meds_5b_no_meds_reattached,
+  project_stage = "process_baseline_meds",
+  exclude_bnf_chapters = c("14", "15", "18", "19", "20", "21", "22", "23"),
+  exclude_route_cats = NULL
 )
+
+# rename for clarity and consistency
+dataset_baseline_meds_processed <- dataset_process_baseline_meds_6_exclusions_applied
 
 # Save output
 message("\nWrite/save data_descriptions to output/data_descriptions/")
