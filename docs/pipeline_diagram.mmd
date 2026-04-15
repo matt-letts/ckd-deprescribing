@@ -7,22 +7,27 @@ config:
 ---
 flowchart TD
     %% define nodes
-    a1("study_dates"):::R
-    a2("generate_dataset_inex"):::ehrql
+    a1("study_dates.r"):::R
+    a2("dataset_definition_inex.py"):::ehrql
     b1("openSAFELY-TPP backend"):::openSAFELY
     d1("dataset_inex.arrow"):::data
-    a3("dataset_cleaning_inex"):::R
+    a3("dataset_cleaning_inex.r"):::R
     d2("dataset_inex_cleaned.arrow"):::data
     o1("cleaning_inex-data_flow.csv, cleaning_inex-*.txt, plot_med_count_distribution.png"):::output
-    a4("generate_dataset_inex_meds"):::ehrql
+    a4("dataset_definition_inex_meds.py"):::ehrql
     b2("openSAFELY-TPP backend"):::openSAFELY
     d3("dataset_inex_meds.arrow"):::data
+    a5("dataset_process_baseline_meds.r"):::R
+    b3("bnf_dmd_mapping_file.xlsx"):::external
+    b4("bnf_hierarchy_file.csv"):::external
+    d4("dataset_baseline_meds_processed.arrow"):::data
 
     %% connect nodes
     
     b1 & a1 & a2 --> d1
     d1 --> a3 --> o1 & d2
-    d2 & b2 --> a4 --> d3
+    d2 & b2 --> a4 --> d3 --> a5 
+    a5 & b3 & b4 --> d4
 
     %% colour scheme
     classDef openSAFELY color:#FFFFFF, fill:#212121, stroke:#212121
@@ -30,6 +35,7 @@ flowchart TD
     classDef R color:#FFFFFF, fill:#E65100, stroke:#E65100
     classDef data color:#FFFFFF, fill:#1565C0, stroke:#1565C0
     classDef output color:#FFFFFF, fill:#00C853, stroke:#00C853
+    classDef external color:#FFFFFF, fill:#FFA500, stroke:#FFA500
 
 %% to render this type into powershell terminal
 %% mmdc -i docs/pipeline_diagram.mmd -o docs/pipeline_diagram.svg
