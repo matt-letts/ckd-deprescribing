@@ -154,7 +154,7 @@ if (
   stop("patients_no_meds columns do not match main dataset after transmute")
 }
 
-dataset_process_baseline_meds_5b_no_meds_reattached <- bind_rows(
+dataset_process_baseline_meds_6_no_meds_reattached <- bind_rows(
   patients_no_meds,
   dataset_process_baseline_meds_5_bnf_names_added
 ) |>
@@ -170,15 +170,15 @@ dataset_process_baseline_meds_5b_no_meds_reattached <- bind_rows(
 #  21: appliances
 #  22: incontinence appliances
 #  23: stoma appliances
-dataset_process_baseline_meds_6_exclusions_applied <- fn_apply_med_inex_criteria(
-  patient_data = dataset_process_baseline_meds_5b_no_meds_reattached,
+dataset_process_baseline_meds_7_exclusions_applied <- fn_apply_med_inex_criteria(
+  patient_data = dataset_process_baseline_meds_6_no_meds_reattached,
   project_stage = "process_baseline_meds",
   exclude_bnf_chapters = c("14", "15", "18", "19", "20", "21", "22", "23"),
   exclude_route_cats = NULL
 )
 
 # rename for clarity and consistency
-dataset_baseline_meds_processed <- dataset_process_baseline_meds_6_exclusions_applied
+dataset_baseline_meds_processed <- dataset_process_baseline_meds_7_exclusions_applied
 
 # Save output
 message("\nWrite/save data_descriptions to output/data_descriptions/")
@@ -187,6 +187,7 @@ flow <- fn_describe_and_flow(
 )
 
 message("\nSave flow table to output/data_descriptions/")
+flow$n_rows <- fn_roundmid_any(flow$n_rows, to = 6) # apply SDC
 data.table::fwrite(
   flow,
   here::here(
