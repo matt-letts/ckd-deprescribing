@@ -1,15 +1,12 @@
 ##########################################################################
-# This script does the following:
-# 1. Defines fn_dem_inex_criteria() which applies demographic inclusion
-#    and exclusion criteria
-# 2. Excludes patients who are not alive at index date
-# 3. Excludes patients outside the eligible age range at index date
-# 4. Excludes patients without 12 months of continuous registration
+# This script defines fn_dem_inex_criteria() which applies
+# demographic inclusion and exclusion criteria
+# - Excludes patients who are not alive at index date
+# - Excludes patients outside the eligible age range at index date
+# - Excludes patients without 12 months of continuous registration
 #    prior to index date
-# 5. Counts and records exclusions at each step using fn_data_flow()
+# - Counts and records exclusions at each step using fn_data_flow()
 #    with disclosure control rounding applied via fn_roundmid_any()
-#
-# Called by dataset_cleaning_inex.r
 ##########################################################################
 
 fn_dem_inex_criteria <- function(

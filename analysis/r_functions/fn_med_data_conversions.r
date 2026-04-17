@@ -1,3 +1,12 @@
+##########################################################################################
+# This script three functions used to manipulate medication data codes
+#   fn_write_unmapped_codes() - counts and outputs unmapped codes for diagnostics
+#   fn_build_dmd_bnf_lookup() - builds a lookup to map dm+d codes to BNF substances
+#   fn_classify_med_route() - classifies route of administration from product description
+#   fn_dmd_to_bnf() - joins patient medication data with dm+d codes to BNF substance level
+#   fn_add_bnf_names() - adds BNF hierarchy names/codes to data with bnf_substance_code
+##########################################################################################
+
 #######################################################################################
 # fn_write_unmapped_codes() - helper function for diagnostics
 #######################################################################################
@@ -52,13 +61,12 @@ fn_write_unmapped_codes <- function(
 #
 # Arguments:
 #   dmd_bnf_mapping_path : path to the NHSBSA BNF/SNOMED mapping file
-#   impute_bnf_from_vtm  : if TRUE, fill missing bnf_substance_code using the most
-#                          common BNF substance for that product's VTM. Adds an
+#   impute_bnf_from_vtm : if TRUE, fill missing bnf_substance_codes using the most
+#                          common BNF substance code for that product's VTM. Adds an
 #                          bnf_imputed flag to dmd_lookup.
 #
-# Returns a named list:
-#   dmd_lookup : AMP/VMP --> BNF/VTM mapping, with in_lookup and bnf_imputed flags
-#   vtm_lookup : VTM --> most common BNF substance (retained for inspection)
+# Returns dmd_lookup - data frame of AMP/VMP --> BNF substance mappings,
+# with in_lookup and optional bnf_imputed flags
 #######################################################################################
 
 fn_build_dmd_bnf_lookup <- function(
@@ -183,10 +191,7 @@ fn_build_dmd_bnf_lookup <- function(
     message("--- VTM imputation skipped (impute_bnf_from_vtm = FALSE)")
   }
 
-  return(list(
-    dmd_lookup = dmd_lookup,
-    vtm_lookup = vtm_lookup
-  ))
+  return(dmd_lookup)
 }
 
 #######################################################################################
@@ -195,12 +200,12 @@ fn_build_dmd_bnf_lookup <- function(
 # Adds route of administration  to the dmd_lookup table, using the
 # DM+D product description (dmd_name). Operates on the lookup
 # so that each product is classified once. Categories are checked in priority order
-# (most specific first) so that e.g. "solution for injection" is classified as
-# injection rather than triggering oral "solution" pattern.
+# (most specific first) so that e.g. "eye drops" is classified as
+# eye rather than triggering oral "drops" pattern.
 # route_uncertain is TRUE only when no pattern matched or the description was missing.
 #
 # Arguments:
-#   dmd_lookup    : $dmd_lookup from fn_build_dmd_bnf_lookup()
+#   dmd_lookup : from fn_build_dmd_bnf_lookup()
 #   project_stage : string label used to name the diagnostic output file
 #
 # Returns:
@@ -411,8 +416,7 @@ fn_build_bnf_hierarchy <- function(
 # Arguments:
 #   patient_data : wide-format data frame with med_dmd_code_* and med_date_*
 #   project_stage : string label used to name diagnostic output files
-#   dmd_lookup : $dmd_lookup from fn_build_dmd_bnf_lookup() — VTM imputation and
-#                bnf_imputed flag are resolved at lookup-build time, not here
+#   dmd_lookup : dmd_lookup from fn_build_dmd_bnf_lookup()
 #   output : "wide" or "long"
 #   unmapped_action : "keep" (retain unmapped) or "drop" (remove)
 #######################################################################################
@@ -450,8 +454,8 @@ fn_dmd_to_bnf <- function(
     ))
   }
 
-  has_med_count <- "med_count" %in% names(patient_data)
-  patient_level_cols <- c("patient_id", if (has_med_count) "med_count")
+  has_med_num_count <- "med_num_count" %in% names(patient_data)
+  patient_level_cols <- c("patient_id", if (has_med_num_count) "med_num_count")
 
   message(sprintf(
     "--- Data valid for conversion: %d rows | %d med_dmd_code_* columns",
@@ -593,9 +597,9 @@ fn_dmd_to_bnf <- function(
 # ENSURE THOSE WITH ZERO MEDICINES RECORDED ARE REMOVED FIRST
 #
 # Arguments:
-#   patient_data    : data frame containing a bnf_substance_code column
-#   bnf_hierarchy   : lookup from fn_build_bnf_hierarchy()
-#   project_stage   : string label used to name diagnostic output files
+#   patient_data : data frame containing a bnf_substance_code column
+#   bnf_hierarchy : lookup from fn_build_bnf_hierarchy()
+#   project_stage : string label used to name diagnostic output files
 #   unmapped_action : "keep" (retain NAs) or "drop" (remove NA rows)
 #######################################################################################
 

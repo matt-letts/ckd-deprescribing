@@ -1,15 +1,17 @@
-##########################################################################
+###########################################################################
 # This script does the following:
 # 1. Loads medication dataset (dataset_inex_meds.arrow) and preprocesses it
-# 2. Separates patients with no medications recorded
-# 3. Builds a DMD-to-BNF lookup table (with optional VTM imputation) and
-#    classifies medication routes using a regex applied to DMD product names
-# 4. Converts DMD codes to BNF substance codes via lookup join
+# 2. Separates patients with no medications recorded for later reattachment
+# 3. Builds two lookups for medication code conversion and categorisation:
+#    - DMD-to-BNF lookup (with optional VTM imputation) with classification
+#      of medication routes using regex applied to DMD product names
+#    - BNF hierarchy lookup
+# 4. Converts DMD to BNF substance codes via join to dmd-to-bnf lookup
 # 5. Adds BNF hierarchy names (chapter, section, paragraph, subparagraph)
 # 6. Reattaches patients with no medications
 # 7. Applies minimal medication exclusion criteria
 # 8. Saves processed dataset, flow table, and data descriptions
-##########################################################################
+###########################################################################
 
 # Import libraries and functions -----------------------------------------
 message("Import libraries and functions \n")
@@ -49,7 +51,7 @@ dataset_process_baseline_meds_1_input <- arrow::open_dataset(
 # Preprocess data: transform variables and modify dummy data -------------
 dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
   arrow_data = dataset_process_baseline_meds_1_input,
-  dataset = "baseline_meds", # no modification at present
+  project_stage = "baseline_meds", # no modification at present
   index_date = study_dates$index_date,
   collect_and_describe = FALSE
 ) |>
@@ -68,7 +70,7 @@ dataset_process_baseline_meds_2_preprocessed <-
 
 patients_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
   filter(.no_meds) |>
-  select(patient_id, med_count) # those with no medications
+  select(patient_id, med_num_count) # those with no medications
 
 dataset_process_baseline_meds_3_remove_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
   filter(!.no_meds) |>
@@ -80,33 +82,18 @@ message(sprintf(
 ))
 
 # Build medication code conversion lookup tables -------------------------
-dmd_to_bnf_lookups <- fn_build_dmd_bnf_lookup(impute_bnf_from_vtm = TRUE)
-dmd_to_bnf_lookups$dmd_lookup <- fn_classify_med_route(
-  dmd_lookup = dmd_to_bnf_lookups$dmd_lookup,
+dmd_lookup <- fn_build_dmd_bnf_lookup(impute_bnf_from_vtm = TRUE)
+dmd_lookup <- fn_classify_med_route(
+  dmd_lookup = dmd_lookup,
   project_stage = "process_baseline_meds"
 )
 bnf_hierarchy <- fn_build_bnf_hierarchy()
-
-# To check the concordance in BNF substance codes between the NHSBSA
-# sources:
-# bnf_codes_hierarchy <- bnf_hierarchy$bnf_substance_code
-# bnf_codes_lookup <- dmd_to_bnf_lookups$dmd_lookup$bnf_substance_code
-# missing_in_lookup <- setdiff(bnf_codes_hierarchy, bnf_codes_lookup)
-# missing_in_hierarchy <- setdiff(bnf_codes_lookup, bnf_codes_hierarchy)
-
-# All BNF substance codes are present in both apart from:
-# 190201000 + 190202000 - 'other individually formulated preparations'
-# 0202030Z0 - potassium canrenoate
-# 0309010Z0 - gefapixant
-# 0801050CZ - Inavolisib
-# and all BNF codes that start with a 2, which reflect medical devices etc
-# I do not want to analyse these, so not an issue
 
 # Convert dmd_codes to BNF codes for categorisation ----------------------
 dataset_process_baseline_meds_4_dmd_converted <- fn_dmd_to_bnf(
   patient_data = dataset_process_baseline_meds_3_remove_no_meds,
   project_stage = "process_baseline_meds",
-  dmd_lookup = dmd_to_bnf_lookups$dmd_lookup,
+  dmd_lookup = dmd_lookup,
   output = "long",
   unmapped_action = "drop"
 )
@@ -123,7 +110,7 @@ dataset_process_baseline_meds_5_bnf_names_added <- fn_add_bnf_names(
 patients_no_meds <- patients_no_meds |>
   transmute(
     patient_id,
-    med_count,
+    med_num_count,
     med_index = NA_integer_,
     dmd_code = NA_character_,
     med_date = as.Date(NA),

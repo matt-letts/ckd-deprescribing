@@ -1,16 +1,9 @@
 ##########################################################################
-# This script does the following:
-# 1. Defines fn_modify_dummy_data() which replaces OpenSAFELY's synthetic
-#    dummy data with more realistic values for local development and testing
-# 2. Generates plausible demographic variables (age, sex, region, ethnicity,
-#    IMD, registration dates)
-# 3. Generates plausible CKD variables (creatinine values, CKD codes,
-#    eGFR-consistent patterns) using fixed seeds for reproducibility
-# 4. Generates plausible KRT variables (dialysis, transplant dates)
-# 5. Generates plausible medication variables (DMD codes, issue dates)
+# This script defines fn_modify_dummy_data() which replaces OpenSAFELY's
+# synthetic dummy data with more plausible data for local testing
 #
-# Called by fn_preprocess.r when running in dummy/local mode.
-# Seeds used: 123456, 234
+# The project stage argument allows for different modifications to be
+# applied depending on when the function is passed e.g. "baseline_meds"
 #
 # Adapted from:
 #   https://github.com/opensafely/waning-ve-2dose-1year
@@ -20,22 +13,22 @@
 
 fn_modify_dummy_data <- function(
   arrow_data,
-  dataset,
+  project_stage,
   index_date
 ) {
   require(arrow)
   require(dplyr)
 
-  # Collect arrow dataset into an R data.frame for modification ----
+  # Collect arrow project_stage into an R data.frame for modification ----
   dummy_data <- arrow_data |> collect()
 
   # # for tinkering
-  # dummy_data <- dataset_cleaning_inex_1_input |> collect()
+  # dummy_data <- project_stage_cleaning_inex_1_input |> collect()
   # skimr::skim(dummy_data)
 
   set.seed(234)
 
-  if (dataset == "inex") {
+  if (project_stage == "cleaning_inex") {
     dummy_data <- dummy_data |>
 
       ##  Demographic variables ##
@@ -267,13 +260,13 @@ fn_modify_dummy_data <- function(
         inex_qa_bin_ethnicity = as.logical(rbinom(n(), 1, p = 0.99)),
         inex_qa_bin_imd = as.logical(rbinom(n(), 1, p = 0.99))
       )
-  } else if (dataset == "baseline_meds") {
+  } else if (project_stage == "baseline_meds") {
     # intentionally leave blank - no modifications to dummy data
   } else {
     stop(paste0(
-      "Unknown dataset: ",
-      dataset,
-      ". Please ensure dataset argument = (dataset_)type."
+      "Unknown project_stage: ",
+      project_stage,
+      ". Please ensure project_stage argument = (project_stage_)type."
     ))
   }
 

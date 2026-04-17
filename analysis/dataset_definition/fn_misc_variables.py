@@ -1,13 +1,12 @@
 ##########################################################################
-# This script does the following:
-# 1. Defines count_recent_meds() - counts prescriptions issued within a
+# This script defines functions for miscellaneous variables used 
+# various dataset definitions:
+# 1. count_recent_meds() - counts prescriptions issued within a
 #    lookback window before index date
-# 2. Defines get_latest_ethnicity() - returns the most recent ethnicity
+# 2. get_latest_ethnicity() - returns the most recent ethnicity
 #    category from primary care codes or SUS, with 6- or 16-group options
-# 3. Defines get_imd() - categorises IMD into groups (e.g. quintiles)
+# 3. get_imd() - categorises IMD into groups (e.g. quintiles)
 #    based on address-linked IMD at index date
-#
-# Imported by inex_variables.py
 ##########################################################################
 
 from ehrql import (
@@ -27,8 +26,8 @@ from ehrql.tables.tpp import (
 # count_recent_meds()
 # this function returns the number of rows in the medications table for a given person
 # between the index date and a specified number of days before the index date.
-# If two rows contained the same date and the same dmd code (i.e. duplicates) then they
-# would be counted twice.
+# Warning: if two rows contain the same date and same dmd code (i.e. duplicates) then 
+# they will be counted twice.
 #######################################################################################
 
 def count_recent_meds(index_date, days_before_index=90):
@@ -127,7 +126,8 @@ def get_latest_ethnicity(
 
 
 #########################################################################################
-# get_imd categorises IMD into groups (e.g. quintiles, deciles) based on the distribution of IMD in the dataset
+# get_imd categorises IMD into groups (e.g. quintiles, deciles) 
+# based on the distribution of IMD in the dataset
 ##########################################################################################
 
 def get_imd(
@@ -158,3 +158,4 @@ def get_imd(
     )
 
     return imd_grouped
+    

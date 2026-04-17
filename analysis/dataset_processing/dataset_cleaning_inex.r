@@ -1,11 +1,11 @@
 ##########################################################################
 # This script does the following:
-# 1. Load output/dataset_inex.arrow created by generate_dataset_inex
+# 1. Loads output/dataset_inex.arrow created by generate_dataset_inex
 # 2. Modifies the dummy data if being run locally
 # 3. Type formats the variables
 # 4. Applies QA criteria and inclusion/exclusion criteria
-# 5. Plots and tabulates the medication counts within 90/180 days of index
-# 6. Saves cleaned dataset, plot, data-flow table and description files
+# 5. Plots and tabulates medication counts 90 + 180 days before index date
+# 6. Saves cleaned dataset, plots, data-flow table and description files
 ##########################################################################
 
 # Import libraries and functions -----------------------------------------
@@ -30,7 +30,7 @@ source(here::here("analysis", "r_functions", "fn_ckd_inex_criteria.r"))
 message("Create output folders")
 dir_create(here::here("output", "data"))
 dir_create(here::here("output", "data_descriptions"))
-dir.create(here::here("output", "figures"))
+dir_create(here::here("output", "figures"))
 
 # Import dates -----------------------------------------------------------
 message("Import dates")
@@ -46,12 +46,12 @@ dataset_cleaning_inex_1_input <- arrow::open_dataset(
 )
 
 # Preprocess data: transform variables and modify dummy data -------------
-# do I need to convert str variables to factors once collected?
 dataset_cleaning_inex_2_preprocessed <- fn_preprocess(
   arrow_data = dataset_cleaning_inex_1_input,
-  dataset = "inex",
+  project_stage = "cleaning_inex",
   index_date = study_dates$index_date,
-  collect_and_describe = FALSE
+  collect_and_describe = FALSE,
+  one_row_per_patient = TRUE
 )
 
 # Apply qa criteria ------------------------------------------------------
@@ -92,9 +92,6 @@ dataset_cleaning_inex_6_krt_inex_applied <- fn_krt_inex_criteria(
   krt_source = "primary"
 )
 
-# I don't think that there will be any missing data to handle.
-# and no categorical data to reframe
-
 # Write all datasets to .txt and create flow dataframe -------------------
 message("\nWrite/save data_descriptions to output/data_descriptions/")
 flow <- fn_describe_and_flow(
@@ -106,7 +103,7 @@ dataset_inex_cleaned <- dataset_cleaning_inex_6_krt_inex_applied
 
 # Examine medication counts in 90 and 180 days prior to index date -------
 message("\nTabulate the medication counts")
-dataset_inex_cleaned |>
+med_count_summary <- dataset_inex_cleaned |>
   summarise(
     across(
       c(inex_med_num_90, inex_med_num_180),
@@ -119,11 +116,22 @@ dataset_inex_cleaned |>
       )
     )
   ) |>
-  collect() |>
-  t() |>
-  print()
+  collect()
 
-message("\nGraph the medication counts")
+# Save all  outputs -------------------------------------------------------
+message("\nSave outputs:")
+
+message("Save medication count summary to output/data_descriptions/")
+data.table::fwrite(
+  med_count_summary,
+  here::here(
+    "output",
+    "data_descriptions",
+    "cleaning_inex-med_count_summary.csv"
+  )
+)
+
+message("Save graph of medication counts")
 plot_med_count_distribution <-
   dataset_inex_cleaned |>
   select(inex_med_num_90, inex_med_num_180) |>
@@ -142,26 +150,12 @@ plot_med_count_distribution <-
   ggplot(aes(x = n_prescriptions, colour = time_window, fill = time_window)) +
   geom_freqpoly(binwidth = 1, linewidth = 0.8) +
   labs(
-    title = "Distribution of prescription counts before index date",
+    title = "Distribution of medication numbers before index date",
     x = "Number of prescriptions",
     y = "Number of patients",
     colour = "Window"
   )
 
-# Save the outputs -------------------------------------------------------
-message("\nSave cleaned dataset to output/data/")
-dataset_inex_cleaned |>
-  arrow::write_feather(
-    here::here("output", "data", "dataset_inex_cleaned.arrow"),
-  )
-
-message("\nSave flow table to to output/data_descriptions/")
-data.table::fwrite(
-  flow,
-  here::here("output", "data_descriptions", "cleaning_inex-data_flow.csv")
-)
-
-message("\nSave plot of medication count distributions")
 ggsave(
   filename = here::here("output", "figures", "plot_med_count_distribution.png"),
   plot = plot_med_count_distribution,
@@ -170,4 +164,14 @@ ggsave(
   dpi = 300
 )
 
-# data <- dataset_inex_cleaned |> collect() # for local inspection
+message("Save cleaned dataset to output/data/")
+dataset_inex_cleaned |>
+  arrow::write_feather(
+    here::here("output", "data", "dataset_inex_cleaned.arrow"),
+  )
+
+message("Save flow table to to output/data_descriptions/")
+data.table::fwrite(
+  flow,
+  here::here("output", "data_descriptions", "cleaning_inex-data_flow.csv")
+)

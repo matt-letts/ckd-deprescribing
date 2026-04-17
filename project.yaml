@@ -30,6 +30,7 @@ actions:
       moderately_sensitive:
         cleaning_inex_data_descriptions: output/data_descriptions/cleaning_inex-*.txt
         cleaning_inex_data_flow: output/data_descriptions/cleaning_inex-data_flow.csv
+        cleaning_inex_med_count_summary: output/data_descriptions/cleaning_inex-med_count_summary.csv
         plot_med_count_distribution: output/figures/plot_med_count_distribution.png
 
   
