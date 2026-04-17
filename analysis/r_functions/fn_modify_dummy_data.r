@@ -1,6 +1,22 @@
-# Modified from https://github.com/opensafely/waning-ve-2dose-1year/blob/main/analysis/dummy_data_vax.R
-# And https://github.com/opensafely/post-covid-vaccinated/blob/main/analysis/modify_dummy_vax_data.R
-# And https://github.com/opensafely/post-covid-neurodegenerative/blob/main/analysis/dataset_clean/fn-modify_dummy.R
+##########################################################################
+# This script does the following:
+# 1. Defines fn_modify_dummy_data() which replaces OpenSAFELY's synthetic
+#    dummy data with more realistic values for local development and testing
+# 2. Generates plausible demographic variables (age, sex, region, ethnicity,
+#    IMD, registration dates)
+# 3. Generates plausible CKD variables (creatinine values, CKD codes,
+#    eGFR-consistent patterns) using fixed seeds for reproducibility
+# 4. Generates plausible KRT variables (dialysis, transplant dates)
+# 5. Generates plausible medication variables (DMD codes, issue dates)
+#
+# Called by fn_preprocess.r when running in dummy/local mode.
+# Seeds used: 123456, 234
+#
+# Adapted from:
+#   https://github.com/opensafely/waning-ve-2dose-1year
+#   https://github.com/opensafely/post-covid-vaccinated
+#   https://github.com/opensafely/post-covid-neurodegenerative
+##########################################################################
 
 fn_modify_dummy_data <- function(
   arrow_data,

@@ -14,5 +14,4 @@ venv/
 /generate_dummy_tables/
 /ehrql-dummy-data*
 /dummy_tables/*
-/docs/BNF Snomed Mapping data*
 *claude*

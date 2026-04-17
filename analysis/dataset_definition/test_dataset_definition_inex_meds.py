@@ -1,8 +1,16 @@
-# test script to check the performance of the prescription helper functions from
-# variable_helper_functions
-# The issue with this is if the dataset_definition_inex_meds is set up with 
-# dataset_inex_cleaned.exists_for_patient() then it will only work if the id numbers
-# below are in this initial cleaned dataset. Ultimately won't know in the real data
+###########################################################################
+# Test data for dataset_definition_inex_meds.py
+#
+# This test checks the performance of add_prescription_columns(), which is
+# the main component of dataset_definition_inex_meds.py 
+#
+# Note: as dataset_definition_inex_meds filters to patients in
+# dataset_inex_cleaned.arrow, patient IDs here must also appear in that
+# dataset - this test can only be performed locally, as will not know
+# patient IDs in real data.
+#
+# opensafely exec ehrql:v1 assure analysis/dataset_definition/test_dataset_definition_inex_meds.py
+###########################################################################
 
 from datetime import date
 from dataset_definition_inex_meds import dataset
@@ -23,16 +31,16 @@ test_data = {
 
         "expected_in_population": True,
         "expected_columns": {
-            "med_1_code": "34953211000001105",
-            "med_1_date": date(2022, 1, 1),
-            "med_2_code": None,
-            "med_2_date": None,
-            "med_3_code": None,
-            "med_3_date": None,
-            "med_4_code": None,
-            "med_4_date": None,
-            "med_5_code": None,
-            "med_5_date": None
+            "med_dmd_code_1": "34953211000001105",
+            "med_date_1": date(2022, 1, 1),
+            "med_dmd_code_2": None,
+            "med_date_2": None,
+            "med_dmd_code_3": None,
+            "med_date_3": None,
+            "med_dmd_code_4": None,
+            "med_date_4": None,
+            "med_dmd_code_5": None,
+            "med_date_5": None
         },
     },
 
@@ -56,16 +64,16 @@ test_data = {
 
         "expected_in_population": True,
         "expected_columns": {
-            "med_1_code": "34953211000001105",
-            "med_1_date": date(2022, 1, 1),
-            "med_2_code": None,
-            "med_2_date": None,
-            "med_3_code": None,
-            "med_3_date": None,
-            "med_4_code": None,
-            "med_4_date": None,
-            "med_5_code": None,
-            "med_5_date": None
+            "med_dmd_code_1": "34953211000001105",
+            "med_date_1": date(2022, 1, 1),
+            "med_dmd_code_2": None,
+            "med_date_2": None,
+            "med_dmd_code_3": None,
+            "med_date_3": None,
+            "med_dmd_code_4": None,
+            "med_date_4": None,
+            "med_dmd_code_5": None,
+            "med_date_5": None
         },
     },
 
@@ -88,16 +96,16 @@ test_data = {
 
         "expected_in_population": True,
         "expected_columns": {
-            "med_1_code": "360711000001100",
-            "med_1_date": date(2022, 1, 1),
-            "med_2_code": "34953211000001105",
-            "med_2_date": date(2022, 1, 1),
-            "med_3_code": None,
-            "med_3_date": None,
-            "med_4_code": None,
-            "med_4_date": None,
-            "med_5_code": None,
-            "med_5_date": None
+            "med_dmd_code_1": "360711000001100",
+            "med_date_1": date(2022, 1, 1),
+            "med_dmd_code_2": "34953211000001105",
+            "med_date_2": date(2022, 1, 1),
+            "med_dmd_code_3": None,
+            "med_date_3": None,
+            "med_dmd_code_4": None,
+            "med_date_4": None,
+            "med_dmd_code_5": None,
+            "med_date_5": None
         },
     },
 
@@ -122,23 +130,23 @@ test_data = {
 
         "expected_in_population": True,
         "expected_columns": {
-            "med_1_code": "34953211000001105",
-            "med_1_date": date(2022, 1, 1),
-            "med_2_code": None,
-            "med_2_date": None,
-            "med_3_code": None,
-            "med_3_date": None,
-            "med_4_code": None,
-            "med_4_date": None,
-            "med_5_code": None,
-            "med_5_date": None
+            "med_dmd_code_1": "34953211000001105",
+            "med_date_1": date(2022, 1, 1),
+            "med_dmd_code_2": None,
+            "med_date_2": None,
+            "med_dmd_code_3": None,
+            "med_date_3": None,
+            "med_dmd_code_4": None,
+            "med_date_4": None,
+            "med_dmd_code_5": None,
+            "med_date_5": None
         },
     },
 
 
 
-    10: {    # more realistic patient, shows that function is ordering dm+d codes lexicographically rather than numerically. 
-            # doesn't really matter as long as consistent
+    10: {   # more realistic patient, shows that function is ordering dm+d codes lexicographically rather than numerically. 
+            # ordering doesn't really matter as long as consistent
         
         "patients": { # one row per patient
             "date_of_birth": date(1910, 1, 1), # always first day of month, never NULL
@@ -184,16 +192,16 @@ test_data = {
 
         "expected_in_population": True,
         "expected_columns": {
-            "med_1_code": "9557111000001102",
-            "med_1_date": date(2022, 1, 1),
-            "med_2_code": "360711000001100",
-            "med_2_date": date(2022, 1, 1),
-            "med_3_code": "34953211000001105",
-            "med_3_date": date(2022, 1, 1),
-            "med_4_code": "21801411000001101",
-            "med_4_date": date(2022, 1, 1),
-            "med_5_code": "9557111000001102",
-            "med_5_date": date(2021, 12, 24)
+            "med_dmd_code_1": "9557111000001102",
+            "med_date_1": date(2022, 1, 1),
+            "med_dmd_code_2": "360711000001100",
+            "med_date_2": date(2022, 1, 1),
+            "med_dmd_code_3": "34953211000001105",
+            "med_date_3": date(2022, 1, 1),
+            "med_dmd_code_4": "21801411000001101",
+            "med_date_4": date(2022, 1, 1),
+            "med_dmd_code_5": "9557111000001102",
+            "med_date_5": date(2021, 12, 24)
         },
     },
 

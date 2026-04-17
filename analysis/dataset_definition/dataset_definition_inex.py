@@ -1,6 +1,17 @@
+##########################################################################
+# This script does the following:
+# 1. Reads study dates from output/study_dates.json
+# 2. Calls add_inex_variables() to attach all demographic, CKD, and KRT
+#    variables to the dataset
+# 3. Defines the population as patients meeting the broad inclusion criteria
+#
+# Output: output/dataset_inex.arrow (see yaml: generate_dataset_inex)
+# Test: test_dataset_definition_inex.py
+##########################################################################
+
 from ehrql import create_dataset
 from ehrql.tables.tpp import patients
-from inex_variables import add_inex_variables
+from fn_inex_variables import add_inex_variables
 import numpy as np
 
 # define the project-relevant dates
@@ -15,11 +26,5 @@ dataset = create_dataset()
 dataset.configure_dummy_data(population_size=40000)
 dataset.define_population(patients.date_of_birth.is_not_null())
 
+# add demographic, CKD/KRT and QA variables to the dataset
 add_inex_variables(dataset, index_date)
-
-# recent_medication_counts() also hidden from primary dataset definition. Can consider whether to add in at later stage.
-# add_prescription_columns(dataset, index_date, max_meds=3) - hidden for now
-# ckd = compute_ckd_variables(index_date) - hidden for now
-
-# opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_inex.py --dummy-tables dummy_tables --output output/dummy_dataset.arrow
-# opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_inex.py --output output/dataset.csv.gz

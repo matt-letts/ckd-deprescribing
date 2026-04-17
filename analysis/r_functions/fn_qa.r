@@ -1,3 +1,13 @@
+##########################################################################
+# This script does the following:
+# 1. Defines fn_qa() which applies quality assurance exclusion criteria
+# 2. Excludes patients with missing sex, region, ethnicity, or IMD
+# 3. Counts and records exclusions at each step using fn_data_flow()
+#    with disclosure control rounding applied via fn_roundmid_any()
+#
+# Called by dataset_cleaning_inex.r
+##########################################################################
+
 fn_qa <- function(
   arrow_data,
   rounding_threshold = 6,

@@ -1,9 +1,12 @@
-# Write the study dates as a json file to then be called via the project.yaml
+###########################################################
+# Simple R script to write the study dates as a json file
+# which can be called at various stages of project pipeline
+###########################################################
 
 library(jsonlite)
 library(here)
 
-# Create an output directory
+# Ensure output directory exists
 fs::dir_create(here::here("output"))
 
 # list the study dates and then write into json

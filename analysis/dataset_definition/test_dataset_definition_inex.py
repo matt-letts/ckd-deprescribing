@@ -1,3 +1,12 @@
+#############################################################################################
+# Test data for dataset_definition_inex.py
+# 
+# This test checks the performance of add_inex_variables(), which is
+# the main component of dataset_definition_inex_.py 
+#
+# opensafely exec ehrql:v1 assure analysis/dataset_definition/test_dataset_definition_inex.py
+#############################################################################################
+
 from datetime import date
 from dataset_definition_inex import dataset
 
@@ -55,11 +64,28 @@ test_data = {
         },      
 
         "apcs": [ # many rows per patient, each row an in-hospital spell
-            { 
+            {
                 "apcs_ident": "12345", # never NULL
                 "admission_date": date(2021, 6, 1),
                 "all_diagnoses": "||Z940",
                 "all_procedures": "||M01"
+            }
+        ],
+
+        "medications": [ # many rows per patient, each row a medication prescription
+            {   # less than 90 days before index
+                "date": date(2022, 1, 1),
+                "dmd_code": "0123456789" # not a real code
+            },
+            {
+                # more than 90 days but less than 180 before index
+                "date": date(2021, 10, 1),
+                "dmd_code": "0123456789"
+            },
+            {
+                # more than 180 days before index
+                "date": date(2021, 1, 1),
+                "dmd_code": "0123456789"
             }
         ],
 
@@ -76,7 +102,7 @@ test_data = {
         "ethnicity_from_sus": { # one row per patient
             "code": "A" # possible values A through S (excluding I, O, Q)
         },
-        
+
         "expected_in_population": True,
         "expected_columns": {
             "inex_dem_bin_alive": True,                            
@@ -101,7 +127,9 @@ test_data = {
             "inex_qa_bin_sex": True,                                 
             "inex_qa_bin_region": True,                             
             "inex_qa_bin_ethnicity": True,                           
-            "inex_qa_bin_imd": True   
+            "inex_qa_bin_imd": True,
+            "inex_med_num_90": 1,
+            "inex_med_num_180": 2   
         },
     },
 
@@ -163,13 +191,15 @@ test_data = {
         },      
 
         "apcs": [ # many rows per patient, each row an in-hospital spell
-            { 
+            {
                 "apcs_ident": "12345", # never NULL
                 "admission_date": date(2021, 6, 1),
                 "all_diagnoses": "||E119", # not a krt code
                 "all_procedures": "||E851" # not a krt code
             }
         ],
+
+        "medications": [],
 
         "addresses": [
             { # many rows per patient, each row one registration period per patient
@@ -267,13 +297,15 @@ test_data = {
         },       
 
         "apcs": [ # many rows per patient, each row an in-hospital spell
-            { 
+            {
                 "apcs_ident": "12345", # never NULL
                 "admission_date": date(2021, 6, 1),
                 "all_diagnoses": "||Y841", # edge case, dialysis ICD10, transplant OPCS4
                 "all_procedures": "||M01"
             }
         ],
+
+        "medications": [],
 
         "addresses": [
             { # many rows per patient, each row one registration period per patient
@@ -377,12 +409,14 @@ test_data = {
         },      
   
         "apcs": [ # many rows per patient, each row an in-hospital spell
-            { 
+            {
                 "apcs_ident": "12345", # never NULL
                 "admission_date": date(2021, 6, 1),
                 "all_procedures": "||X409" # dialysis
             }
         ],
+
+        "medications": [],
 
         "addresses": [
             { # many rows per patient, each row one registration period per patient

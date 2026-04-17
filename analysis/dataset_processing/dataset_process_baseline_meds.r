@@ -19,12 +19,12 @@ library(arrow)
 library(tidyverse)
 library(data.table)
 library(readxl)
-source(here::here("analysis", "functions", "fn_preprocess.r"))
-source(here::here("analysis", "functions", "fn_modify_dummy_data.r"))
-source(here::here("analysis", "functions", "fn_med_data_conversions.r"))
-source(here::here("analysis", "functions", "fn_med_inex_criteria.r"))
-source(here::here("analysis", "functions", "fn_disclosure_control.r"))
-source(here::here("analysis", "functions", "fn_data_describing.r"))
+source(here::here("analysis", "r_functions", "fn_preprocess.r"))
+source(here::here("analysis", "r_functions", "fn_modify_dummy_data.r"))
+source(here::here("analysis", "r_functions", "fn_med_data_conversions.r"))
+source(here::here("analysis", "r_functions", "fn_med_inex_criteria.r"))
+source(here::here("analysis", "r_functions", "fn_disclosure_control.r"))
+source(here::here("analysis", "r_functions", "fn_data_describing.r"))
 
 
 # Create output folders --------------------------------------------------

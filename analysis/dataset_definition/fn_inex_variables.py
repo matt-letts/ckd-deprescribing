@@ -1,5 +1,5 @@
 #####################################################################
-# This file defines all of the inclusion and exclusion variables 
+# This script defines all inclusion and exclusion variables 
 # and pulls them into a function add_inex_variables() that is then 
 # called into dataset.definition.py to create initial dataset
 #####################################################################
@@ -7,6 +7,7 @@
 #####################################################################
 # IMPORTS
 #####################################################################
+
 from ehrql.tables.tpp import (
     patients, 
     practice_registrations, 
@@ -20,20 +21,21 @@ from ehrql import (
     case, 
     when
 )
-from variable_helper_functions import (
+from fn_misc_variables import (
     get_imd,
     get_latest_ethnicity,
     count_recent_meds
 )
 from codelists import *
 
-
 #####################################################################
-# DEMOGRAPHIC INCLUSION/EXCLUSION VARIABLES 
+# INCLUSION/EXCLUSION FUNCTIONS
 #####################################################################
 
-# this function generates booleans for each of the demographic inclusion/exclusion criteria, and a column for the age and sex
-# The latter are needed to compute eGFR through CKDEPI equation
+# DEMOGRAPHIC INCLUSION/EXCLUSION VARIABLES -------------------------
+# add_demographic_inex_variables generates booleans for each of the
+# demographic inclusion/exclusion criteria, and a column for the age 
+# and sex. The latter are needed to compute eGFR
 
 def add_demographic_inex_variables(
     index_date
@@ -64,16 +66,14 @@ def add_demographic_inex_variables(
 
         "inex_dem_bin_alive": alive,
         "inex_dem_bin_age_include": (age >= 18) & (age <= 110),
-        "inex_dem_bin_12m_registered": registered_12m, # what about if someone has a missed end_date on a previous registration and they have two 'active registrations'
+        "inex_dem_bin_12m_registered": registered_12m, # what about if someone has no end_date on a previous registration and they have two 'active registrations'
         "inex_dem_num_age": age,
         "inex_dem_cat_sex": patients.sex
 
     }
 
 
-#####################################################################
-# CKD INCLUSION/EXCLUSION VARIABLES - CODES AND CREATININE VALUES
-#####################################################################
+# CKD INCLUSION/EXCLUSION VARIABLES - CODES AND CREATININE VALUES ---
 # generates variables based on creatinine values/dates and CKD codes:
 
 def add_ckd_inex_variables(
@@ -105,7 +105,7 @@ def add_ckd_inex_variables(
     # 90-day cutoff from most recent
     cutoff = most_recent_creatinine.date - days(90)
 
-    # Second creatinine at least 90 days earlier
+    # Second creatinine at least 90 days earlier (as needed for CKD definition)
     second_recent_90plus = (
         creatinine_values
         .where(clinical_events.date <= cutoff)
@@ -162,11 +162,10 @@ def add_ckd_inex_variables(
 
     }
 
-#####################################################################
-# KRT VARIABLES (FOR EXCLUSION) - PRIMARY AND SECONDARY CARE CODES
-#####################################################################
 
-# Plan to look just using primary care codes, then primary and secondary combined and see the numbers
+# KRT VARIABLES (FOR EXCLUSION) - PRIMARY AND SECONDARY CARE CODES --
+# Primary care codes, then primary and secondary combined 
+# that can be used in sensitivity analysis
 
 def add_krt_inex_variables(
     clinical_events,
@@ -289,13 +288,13 @@ def add_krt_inex_variables(
     
     ### Combined primary and secondary KRT codes ###
     
-    # capture both boolean
+    # present in primary OR secondary care boolean
     has_krt_code_either = (
         has_primary_care_krt_code
         | has_secondary_care_krt_code
     )
 
-    # present in primary and secondary care boolean
+    # present in primary AND secondary care boolean
     has_krt_code_both = (
         has_primary_care_krt_code
         & has_secondary_care_krt_code
@@ -315,7 +314,8 @@ def add_krt_inex_variables(
             & has_secondary_care_krt_code
         ).then(most_recent_secondary_care_krt_code.admission_date),
 
-        # both exist and primary is later or equal
+        # both primary and secondary exist and:
+        # primary is later or equal
         when(
             has_krt_code_both
             & (
@@ -323,8 +323,7 @@ def add_krt_inex_variables(
                 >= most_recent_secondary_care_krt_code.admission_date
             )
         ).then(most_recent_primary_care_krt_code.date),
-
-        # both exist and secondary is later
+        # secondary is later
         when(
             has_krt_code_both
         ).then(most_recent_secondary_care_krt_code.admission_date),
@@ -346,7 +345,8 @@ def add_krt_inex_variables(
             & has_secondary_care_krt_code
         ).then(secondary_care_krt_type),
 
-        # both exist and primary is later or equal
+        # both exist and:
+        # primary is later or equal
         when(
             has_krt_code_both
             & (
@@ -354,8 +354,7 @@ def add_krt_inex_variables(
                 >= most_recent_secondary_care_krt_code.admission_date
             )
         ).then(primary_care_krt_type),
-
-        # both exist and secondary is later
+        # secondary is later
         when(
             has_krt_code_both
         ).then(secondary_care_krt_type),
@@ -379,9 +378,8 @@ def add_krt_inex_variables(
 
     }
 
-#####################################################################
-# SIMPLE PRE-INDEX DATE MEDICATION COUNTS
-#####################################################################
+
+# SIMPLE PRE-INDEX DATE MEDICATION COUNTS -----------------------------
 
 def add_medication_inex_variables(
     index_date
@@ -397,9 +395,8 @@ def add_medication_inex_variables(
         )
     }
 
-#####################################################################
-# QA VARIABLES
-#####################################################################
+
+# QA VARIABLES -------------------------------------------------------
 # generates booleans for each of the quality assurance criteria
 
 def add_qa_inex_variables(
@@ -435,7 +432,6 @@ def add_qa_inex_variables(
         )
 
     }
-
 
 
 #####################################################################
@@ -480,45 +476,4 @@ def add_inex_variables(dataset, index_date):
 
     for name, expr in columns.items():
         dataset.add_column(name, expr)
-
-
-# ### sex
-# cov_cat_sex = patients.sex
-
-# ### ethnicity
-# cov_cat_ethnicity = get_latest_ethnicity(index_date, ethnicity_snomed, grouping=6)
-
-# ### deprivation
-# cov_cat_imd = get_imd(index_date, groups = 10, max_imd=32844)
-
-# ### care home
-# # cov_boolean_care_home --> this needs writing 
-# # addresses.care_home_is_potential_match
-# # addresses.care_home_requires_nursing
-# # addresses.care_home_does_not_require_nursing
-
-# #patient_address = addresses.for_patient_on("2022-03-01")
-
-# # patient's practice STP
-# dataset.stp = practice_registrations.for_patient_on(study_start_date).practice_stp
-
-# from variable_helper_functions import (
-#     get_imd,
-#     get_latest_ethnicity
-# )
-
-# # death dates/causes from ONS
-# dataset.date_of_death = ons_deaths.date
-# dataset.underlying_cause_of_death = ons_deaths.underlying_cause_of_death
-# dataset.cause_of_death = ons_deaths.cause_of_death_01
-
-# # eFI
-# latest_efi_record = (
-#   decision_support_values
-#     .electronic_frailty_index()
-#     .where(decision_support_values.calculation_date.is_on_or_before(study_start_date)) # I added this line in
-#     .sort_by(decision_support_values.calculation_date)
-#     .last_for_patient()
-# )
-# dataset.latest_efi = latest_efi_record.numeric_value
-# dataset.latest_efi_date = latest_efi_record.calculation_date
+        

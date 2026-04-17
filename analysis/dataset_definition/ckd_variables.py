@@ -1,5 +1,9 @@
-#### THIS SCRIPT NOT CURRENTLY BEING USED ####
-##### but is being kept for its useful eGFR equations
+#### THIS SCRIPT NOT BEING USED ################################
+# This script defines functions to compute CKD variables
+# including computing eGFR from creatinine values, and flags for 
+# CKD stages 4 and 5 based on eGFR values at least 90 days apart
+# these now being done in R after export of creatinine from data
+################################################################
 
 from ehrql.tables.tpp import clinical_events, patients
 from ehrql import days, minimum_of, maximum_of 
