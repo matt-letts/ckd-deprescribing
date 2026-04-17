@@ -52,6 +52,12 @@ actions:
     outputs:
       highly_sensitive:
         dataset_baseline_meds_processed: output/data/dataset_baseline_meds_processed.arrow
+        process_baseline_meds_dmd_lookup_route_unclassified_detail: output/data_descriptions/process_baseline_meds-dmd_lookup_route_unclassified_detail.csv
       moderately_sensitive:
         process_baseline_meds_data_descriptions: output/data_descriptions/process_baseline_meds-*.txt
-        process_baseline_meds_unmapped_data: output/data_descriptions/process_baseline_meds-*.csv
+        process_baseline_meds_bnf_unmapped_to_bnf_hierarchy: output/data_descriptions/process_baseline_meds-bnf_unmapped_to_bnf_hierarchy.csv
+        process_baseline_meds_data_flow: output/data_descriptions/process_baseline_meds-data_flow.csv
+        process_baseline_meds_dmd_lookup_route_by_bnf_chapter_summary: output/data_descriptions/process_baseline_meds-dmd_lookup_route_by_bnf_chapter_summary.csv
+        process_baseline_meds_dmd_not_in_lookup: output/data_descriptions/process_baseline_meds-dmd_not_in_lookup.csv
+        process_baseline_meds_dmd_unmapped_to_bnf: output/data_descriptions/process_baseline_meds-dmd_unmapped_to_bnf.csv
+        process_baseline_meds_route_classification_patient_summary: output/data_descriptions/process_baseline_meds-route_classification_patient_summary.csv
