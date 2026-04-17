@@ -120,4 +120,5 @@ def add_ckd_variables(dataset, ckd: dict):
     dataset.egfr_2 = ckd["egfr_2"]
     dataset.ckd4 = ckd["ckd4"]
     dataset.ckd5 = ckd["ckd5"]
-    dataset.ckd_between4and5 = ckd["ckd_between4and5"]    
+    dataset.ckd_between4and5 = ckd["ckd_between4and5"]
+    
