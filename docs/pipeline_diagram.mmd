@@ -9,13 +9,13 @@ flowchart TD
     %% define nodes
     a1("study_dates.r"):::R
     a2("dataset_definition_inex.py"):::ehrql
-    p1("openSAFELY-TPP backend"):::openSAFELY
+    %% p1("openSAFELY-TPP backend"):::openSAFELY
     d1("dataset_inex.arrow"):::data
     a3("dataset_cleaning_inex.r"):::R
     d2("dataset_inex_cleaned.arrow"):::data
     o1("cleaning_inex-*.csv, cleaning_inex-*.txt, plot_med_count_distribution.png"):::output
     a4("dataset_definition_inex_meds.py"):::ehrql
-    p2("openSAFELY-TPP backend"):::openSAFELY
+    %% p2("openSAFELY-TPP backend"):::openSAFELY
     d3("dataset_inex_meds.arrow"):::data
     a5("dataset_process_baseline_meds.r"):::R
     e3("bnf_dmd_mapping_file.xlsx"):::external
@@ -26,14 +26,16 @@ flowchart TD
     %% a = analysis, d = data, o = output, p = patients, e = external file
     %% connect nodes
     
-    p1 & a1 & a2 --> d1
+    %% p1 & 
+    a1 & a2 --> d1
     d1 --> a3 --> o1 & d2
-    d2 & p2 --> a4 --> d3 
+    %% p2 &
+    d2 --> a4 --> d3 
     d3 & e3 & e4 --> a5
     a5 --> d4 & o2
 
     %% colour scheme
-    classDef openSAFELY color:#FFFFFF, fill:#212121, stroke:#212121
+    %% classDef openSAFELY color:#FFFFFF, fill:#212121, stroke:#212121
     classDef ehrql color:#000000, fill:#FFD600, stroke:#FFD600
     classDef R color:#FFFFFF, fill:#E65100, stroke:#E65100
     classDef data color:#FFFFFF, fill:#1565C0, stroke:#1565C0
