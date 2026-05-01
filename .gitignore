@@ -13,5 +13,4 @@ venv/
 .devcontainer/ehrql-main/
 /generate_dummy_tables/
 /ehrql-dummy-data*
-/dummy_tables/*
 *claude*
