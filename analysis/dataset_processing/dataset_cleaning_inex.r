@@ -29,8 +29,8 @@ source(here::here("analysis", "r_functions", "fn_ckd_inex_criteria.r"))
 # Create output folders --------------------------------------------------
 message("Create output folders")
 dir_create(here::here("output", "data"))
-dir_create(here::here("output", "data_descriptions"))
-dir_create(here::here("output", "figures"))
+dir_create(here::here("output", "data_descriptions", "cleaning_inex"))
+dir_create(here::here("output", "figures", "cleaning_inex"))
 
 # Import dates -----------------------------------------------------------
 message("Import dates")
@@ -112,7 +112,6 @@ med_count_summary <- dataset_inex_cleaned |>
         median = ~ median(.x, na.rm = TRUE),
         p90 = ~ quantile(.x, 0.9, na.rm = TRUE),
         p95 = ~ quantile(.x, 0.95, na.rm = TRUE),
-        max = ~ max(.x, na.rm = TRUE)
       )
     )
   ) |>
@@ -122,12 +121,13 @@ med_count_summary <- dataset_inex_cleaned |>
 message("\nSave outputs:")
 
 message("Save medication count summary to output/data_descriptions/")
-data.table::fwrite(
+write_csv(
   med_count_summary,
   here::here(
     "output",
     "data_descriptions",
-    "cleaning_inex-med_count_summary.csv"
+    "cleaning_inex",
+    "med_count_summary.csv"
   )
 )
 
@@ -137,6 +137,7 @@ plot_med_count_distribution <-
   select(inex_med_num_90, inex_med_num_180) |>
   collect() |>
   pivot_longer(
+    # necessary for ggplot to colour by time window
     cols = everything(),
     names_to = "time_window",
     values_to = "n_prescriptions"
@@ -150,14 +151,19 @@ plot_med_count_distribution <-
   ggplot(aes(x = n_prescriptions, colour = time_window, fill = time_window)) +
   geom_freqpoly(binwidth = 1, linewidth = 0.8) +
   labs(
-    title = "Distribution of medication numbers before index date",
+    title = "Distribution of medication counts before index date",
     x = "Number of prescriptions",
     y = "Number of patients",
-    colour = "Window"
+    colour = "Time window"
   )
 
 ggsave(
-  filename = here::here("output", "figures", "plot_med_count_distribution.png"),
+  filename = here::here(
+    "output",
+    "figures",
+    "cleaning_inex",
+    "plot_med_count_distribution.png"
+  ),
   plot = plot_med_count_distribution,
   width = 8,
   height = 6,
@@ -171,7 +177,7 @@ dataset_inex_cleaned |>
   )
 
 message("Save flow table to to output/data_descriptions/")
-data.table::fwrite(
+write_csv(
   flow,
-  here::here("output", "data_descriptions", "cleaning_inex-data_flow.csv")
+  here::here("output", "data_descriptions", "cleaning_inex", "data_flow.csv")
 )

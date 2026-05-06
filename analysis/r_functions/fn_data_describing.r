@@ -6,23 +6,16 @@
 #############################################################################
 
 fn_describe_data <- function(data, name, suffix = "") {
-  fs::dir_create(here::here("output", "data_descriptions"))
-  full_name <- paste0(name, if (nzchar(suffix)) paste0("-", suffix) else "")
-  sink(paste0(
-    "output/data_descriptions/",
-    full_name,
-    ".txt"
-  ))
+  fs::dir_create(here::here("output", "data_descriptions", name))
+  filename <- if (nzchar(suffix)) paste0(suffix, ".txt") else paste0(name, ".txt")
+  filepath <- here::here("output", "data_descriptions", name, filename)
+  sink(filepath)
   on.exit(sink())
   suppressWarnings({
     # stop annoying warning messages from skim entering log
     print(skimr::skim(data))
   })
-  message(paste0(
-    "output/data_descriptions/",
-    full_name,
-    ".txt written successfully."
-  ))
+  message(filepath, " written successfully.")
 }
 
 

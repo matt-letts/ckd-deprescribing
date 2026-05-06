@@ -38,11 +38,7 @@ fn_write_unmapped_codes <- function(
 
   write_csv(
     result,
-    here::here(
-      "output",
-      "data_descriptions",
-      paste0(project_stage, "-", file_suffix, ".csv")
-    )
+    here::here("output", "data_descriptions", project_stage, paste0(file_suffix, ".csv"))
   )
 
   return(nrow(result))
@@ -191,11 +187,7 @@ fn_dmd_to_bnf <- function(
 
     write_csv(
       route_summary,
-      here::here(
-        "output",
-        "data_descriptions",
-        paste0(project_stage, "-route_classification_patient_summary.csv")
-      )
+      here::here("output", "data_descriptions", project_stage, "route_classification_patient_summary.csv")
     )
   }
 

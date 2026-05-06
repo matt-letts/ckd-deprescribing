@@ -29,8 +29,8 @@ source(here::here("analysis", "r_functions", "fn_data_describing.r"))
 # Create output folders --------------------------------------------------
 message("Create output folders")
 dir_create(here::here("output", "data"))
-dir_create(here::here("output", "data_descriptions"))
-dir_create(here::here("output", "figures"))
+dir_create(here::here("output", "data_descriptions", "process_baseline_meds"))
+dir_create(here::here("output", "figures", "process_baseline_meds"))
 
 # Import dates -----------------------------------------------------------
 message("\nImport dates")
@@ -48,7 +48,7 @@ dataset_process_baseline_meds_1_input <- arrow::open_dataset(
 # Preprocess data: transform variables and modify dummy data -------------
 dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
   arrow_data = dataset_process_baseline_meds_1_input,
-  project_stage = "baseline_meds", # no modification at present
+  project_stage = "process_baseline_meds", # no modification at present
   index_date = study_dates$index_date,
   collect_and_describe = FALSE
 ) |>
@@ -168,20 +168,23 @@ dataset_process_baseline_meds_7_exclusions_applied <- fn_apply_med_inex_criteria
 # rename for clarity and consistency
 dataset_baseline_meds_processed <- dataset_process_baseline_meds_7_exclusions_applied
 
-# Save output
-message("\nWrite/save data_descriptions to output/data_descriptions/")
+# Save outputs
+message(
+  "\nWrite/save data_descriptions to output/data_descriptions/process_baseline_meds/"
+)
 flow <- fn_describe_and_flow(
   project_stage = "process_baseline_meds"
 )
 
-message("\nSave flow table to output/data_descriptions/")
+message("\nSave flow table to output/data_descriptions/process_baseline_meds/")
 flow$n_rows <- fn_roundmid_any(flow$n_rows, to = 6) # apply SDC
-data.table::fwrite(
+write_csv(
   flow,
   here::here(
     "output",
     "data_descriptions",
-    "process_baseline_meds-data_flow.csv"
+    "process_baseline_meds",
+    "data_flow.csv"
   )
 )
 
