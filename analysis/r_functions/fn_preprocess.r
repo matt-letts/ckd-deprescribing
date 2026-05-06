@@ -64,9 +64,10 @@ fn_preprocess <- function(
 
   # load data as R data.table object if collect_data = TRUE
   if (collect_and_describe) {
+    require(data.table)
     arrow_data_preprocessed <- arrow_data_preprocessed %>%
       collect() %>%
-      data.table::as.data.table()
+      as.data.table()
 
     fn_describe_data(
       data = arrow_data_preprocessed,

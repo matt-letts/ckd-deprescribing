@@ -8,8 +8,8 @@
 #######################################################################################
 # fn_write_unmapped_codes() - diagnostics
 #######################################################################################
-# Counts unmapped codes, applies midpoint-6 rounding for disclosure
-# control, and writes the result to a CSV in output/data_descriptions/
+# Counts unmapped codes, applies SDC suppression via fn_apply_sdc(),
+# and writes the result to a CSV in output/data_descriptions/
 #
 # Arguments:
 #   data : data frame containing the codes to count (e.g. filtered patient_bnf)
@@ -27,18 +27,17 @@ fn_write_unmapped_codes <- function(
   result <- data |>
     count(.data[[code_col]], name = "n_occurrences") |>
     arrange(desc(n_occurrences)) |>
-    mutate(
-      n_occurrences_midpoint6 = if_else(
-        n_occurrences <= 7,
-        NA_real_,
-        fn_roundmid_any(n_occurrences)
-      )
-    ) |>
-    select(all_of(c(code_col, "n_occurrences_midpoint6")))
+    mutate(n_occurrences = fn_apply_sdc(n_occurrences)) |>
+    select(all_of(c(code_col, "n_occurrences")))
 
   write_csv(
     result,
-    here::here("output", "data_descriptions", project_stage, paste0(file_suffix, ".csv"))
+    here::here(
+      "output",
+      "data_descriptions",
+      project_stage,
+      paste0(file_suffix, ".csv")
+    )
   )
 
   return(nrow(result))
@@ -182,12 +181,22 @@ fn_dmd_to_bnf <- function(
   if ("route_cat" %in% names(patient_bnf)) {
     route_summary <- patient_bnf |>
       count(route_cat, route_uncertain) |>
-      mutate(n_midpoint6 = if_else(n <= 7, NA_real_, fn_roundmid_any(n))) |>
-      select(route_cat, route_uncertain, n_midpoint6)
+      mutate(n = fn_apply_sdc(n)) |>
+      select(route_cat, route_uncertain, n)
+
+    message(sprintf(
+      "--- %d instances of medications with uncertain route | *-route_classification_patient_summary.csv",
+      route_summary$n[route_summary$route_cat == "other/unclassified"]
+    ))
 
     write_csv(
       route_summary,
-      here::here("output", "data_descriptions", project_stage, "route_classification_patient_summary.csv")
+      here::here(
+        "output",
+        "data_descriptions",
+        project_stage,
+        "route_classification_patient_summary.csv"
+      )
     )
   }
 

@@ -63,7 +63,7 @@ fn_describe_and_flow <- function(
 
     flow <- rbind(
       flow,
-      data.frame(stage = stage_name, n_rows = nrow(collected))
+      data.frame(stage = stage_name, n_rows = fn_apply_sdc(nrow(collected)))
     )
 
     rm(collected)

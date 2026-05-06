@@ -52,12 +52,11 @@ fn_egfr_ckdepi2009 <- function(
 # 3. Include patients with either a CKD 4/5 code OR eGFR-derived CKD 4/5.
 # 4. Recalculate eGFR for all included patients post-filter (captures
 #    those included via CKD code who may only have one SCr value).
-# 5. Output rounded counts before and after filtering.
+# 5. Output counts before and after filtering.
 ##########################################################################
 
 fn_ckd_inex_criteria <- function(
   arrow_data,
-  rounding_threshold = 6,
   collect_and_describe = FALSE,
   index_date,
   describe_name = "",
@@ -141,19 +140,16 @@ fn_ckd_inex_criteria <- function(
       )
     )
 
-  # 5. Output rounded counts
+  # 5. Output counts
   n_before <- arrow_data |> summarise(n = n()) |> collect() |> pull(n)
   n_after <- arrow_data_ckd_inex_applied |>
     summarise(n = n()) |>
     collect() |>
     pull(n)
 
-  message("\nCKD 4/5 inclusion criteria (rounded):")
-  message("Before: ", fn_roundmid_any(n_before, to = rounding_threshold))
-  message(
-    "Excluded (no evidence of CKD 4/5): ",
-    fn_roundmid_any(n_before - n_after, to = rounding_threshold)
-  )
+  message("\nCKD 4/5 inclusion criteria:")
+  message("Before: ", n_before)
+  message("Excluded (no evidence of CKD 4/5): ", n_before - n_after)
 
   if (collect_and_describe) {
     arrow_data_ckd_inex_applied <- arrow_data_ckd_inex_applied |>
@@ -183,7 +179,6 @@ fn_ckd_inex_criteria <- function(
 fn_krt_inex_criteria <- function(
   arrow_data,
   krt_source = c("primary", "combined"),
-  rounding_threshold = 6,
   collect_and_describe = FALSE,
   describe_name = "",
   suffix = ""
@@ -205,12 +200,9 @@ fn_krt_inex_criteria <- function(
     collect() |>
     pull(n)
 
-  message("\nKRT exclusion criteria - source: ", krt_source, " (rounded):")
-  message("Before: ", fn_roundmid_any(n_before, to = rounding_threshold))
-  message(
-    "Excluded (prior KRT): ",
-    fn_roundmid_any(n_before - n_after, to = rounding_threshold)
-  )
+  message("\nKRT exclusion criteria - source: ", krt_source, ":")
+  message("Before: ", n_before)
+  message("Excluded (prior KRT): ", n_before - n_after)
 
   if (collect_and_describe) {
     arrow_data_krt_inex_applied <- arrow_data_krt_inex_applied |>

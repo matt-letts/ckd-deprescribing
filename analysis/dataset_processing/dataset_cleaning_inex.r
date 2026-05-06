@@ -12,12 +12,8 @@
 message("Import libraries and functions \n")
 library(fs)
 library(here)
-library(data.table)
 library(arrow)
-library(dplyr)
-library(lubridate)
-library(ggplot2)
-library(tidyr)
+library(tidyverse)
 source(here::here("analysis", "r_functions", "fn_preprocess.r"))
 source(here::here("analysis", "r_functions", "fn_modify_dummy_data.r"))
 source(here::here("analysis", "r_functions", "fn_data_describing.r"))
@@ -57,14 +53,12 @@ dataset_cleaning_inex_2_preprocessed <- fn_preprocess(
 # Apply qa criteria ------------------------------------------------------
 dataset_cleaning_inex_3_qa_applied <- fn_qa(
   arrow_data = dataset_cleaning_inex_2_preprocessed,
-  rounding_threshold = 6,
   collect_and_describe = FALSE
 )
 
 # Apply demographic inclusion and exclusion criteria ---------------------
 dataset_cleaning_inex_4_demographic_inex_applied <- fn_dem_inex_criteria(
   arrow_data = dataset_cleaning_inex_3_qa_applied,
-  rounding_threshold = 6,
   collect_and_describe = FALSE
 )
 
@@ -79,7 +73,6 @@ dataset_cleaning_inex_4_demographic_inex_applied <- fn_dem_inex_criteria(
 #    (G4, G5, G4/G5, or no G4/G5)
 dataset_cleaning_inex_5_ckd_inex_applied <- fn_ckd_inex_criteria(
   arrow_data = dataset_cleaning_inex_4_demographic_inex_applied,
-  rounding_threshold = 6,
   collect_and_describe = FALSE,
   index_date = study_dates$index_date
 )
@@ -87,14 +80,17 @@ dataset_cleaning_inex_5_ckd_inex_applied <- fn_ckd_inex_criteria(
 # Apply KRT exclusion criteria -------------------------------------------
 dataset_cleaning_inex_6_krt_inex_applied <- fn_krt_inex_criteria(
   arrow_data = dataset_cleaning_inex_5_ckd_inex_applied,
-  rounding_threshold = 6,
   collect_and_describe = FALSE,
   krt_source = "primary"
 )
 
 # Write all datasets to .txt and create flow dataframe -------------------
-message("\nWrite/save data_descriptions to output/data_descriptions/")
+message(
+  "\nWrite/save data_descriptions to output/data_descriptions/cleaning_inex/"
+)
+
 flow <- fn_describe_and_flow(
+  # function applies SDC rules
   project_stage = "cleaning_inex"
 )
 
@@ -111,7 +107,7 @@ med_count_summary <- dataset_inex_cleaned |>
         mean = ~ mean(.x, na.rm = TRUE),
         median = ~ median(.x, na.rm = TRUE),
         p90 = ~ quantile(.x, 0.9, na.rm = TRUE),
-        p95 = ~ quantile(.x, 0.95, na.rm = TRUE),
+        p95 = ~ quantile(.x, 0.95, na.rm = TRUE)
       )
     )
   ) |>
@@ -120,7 +116,9 @@ med_count_summary <- dataset_inex_cleaned |>
 # Save all  outputs -------------------------------------------------------
 message("\nSave outputs:")
 
-message("Save medication count summary to output/data_descriptions/")
+message(
+  "Save medication count summary to output/data_descriptions/cleaning_inex/"
+)
 write_csv(
   med_count_summary,
   here::here(
@@ -176,7 +174,7 @@ dataset_inex_cleaned |>
     here::here("output", "data", "dataset_inex_cleaned.arrow"),
   )
 
-message("Save flow table to to output/data_descriptions/")
+message("Save flow table to to output/data_descriptions/cleaning_inex/")
 write_csv(
   flow,
   here::here("output", "data_descriptions", "cleaning_inex", "data_flow.csv")

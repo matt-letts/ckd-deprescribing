@@ -2,13 +2,11 @@
 # This script Defines fn_qa() which applies quality assurance
 # exclusion criteria to the dataset:
 # 1. Excludes patients with missing sex, region, ethnicity, or IMD
-# 2. Counts and records exclusions at each step using fn_data_flow()
-#    with disclosure control rounding applied via fn_roundmid_any()
+# 2. Counts and records exclusions at each step
 ##########################################################################
 
 fn_qa <- function(
   arrow_data,
-  rounding_threshold = 6,
   collect_and_describe = FALSE,
   describe_name = "",
   suffix = ""
@@ -27,28 +25,13 @@ fn_qa <- function(
     ) |>
     collect()
 
-  # Print exclusion counts rounded for disclosure control
-  message("\nQA exclusions (rounded):")
-  message(
-    "n before QA exclusions: ",
-    fn_roundmid_any(counts$n_before, to = rounding_threshold)
-  )
-  message(
-    "Missing sex: ",
-    fn_roundmid_any(counts$n_missing_sex, to = rounding_threshold)
-  )
-  message(
-    "Missing region: ",
-    fn_roundmid_any(counts$n_missing_region, to = rounding_threshold)
-  )
-  message(
-    "Missing ethnicity: ",
-    fn_roundmid_any(counts$n_missing_ethnicity, to = rounding_threshold)
-  )
-  message(
-    "Missing deprivation level: ",
-    fn_roundmid_any(counts$n_missing_imd, to = rounding_threshold)
-  )
+  # Print exclusion counts
+  message("\nQA exclusions:")
+  message("n before QA exclusions: ", counts$n_before)
+  message("Missing sex: ", counts$n_missing_sex)
+  message("Missing region: ", counts$n_missing_region)
+  message("Missing ethnicity: ", counts$n_missing_ethnicity)
+  message("Missing deprivation level: ", counts$n_missing_imd)
 
   # Apply QA filters lazily
   arrow_data_qa_applied <- arrow_data %>%
@@ -61,9 +44,10 @@ fn_qa <- function(
 
   # load dataset as R data.table object if collect_and_describe = TRUE
   if (collect_and_describe) {
+    require(data.table)
     arrow_data_qa_applied <- arrow_data_qa_applied %>%
       collect() %>%
-      data.table::as.data.table()
+      as.data.table()
 
     fn_describe_data(
       data = arrow_data_qa_applied,

@@ -17,7 +17,6 @@ library(fs)
 library(here)
 library(arrow)
 library(tidyverse)
-library(data.table)
 source(here::here("analysis", "r_functions", "fn_preprocess.r"))
 source(here::here("analysis", "r_functions", "fn_modify_dummy_data.r"))
 source(here::here("analysis", "r_functions", "fn_med_data_conversions.r"))
@@ -173,11 +172,11 @@ message(
   "\nWrite/save data_descriptions to output/data_descriptions/process_baseline_meds/"
 )
 flow <- fn_describe_and_flow(
+  # function applies SDC rules
   project_stage = "process_baseline_meds"
 )
 
 message("\nSave flow table to output/data_descriptions/process_baseline_meds/")
-flow$n_rows <- fn_roundmid_any(flow$n_rows, to = 6) # apply SDC
 write_csv(
   flow,
   here::here(

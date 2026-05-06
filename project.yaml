@@ -27,11 +27,11 @@ actions:
     outputs:
       highly_sensitive:
         dataset_inex_cleaned: output/data/dataset_inex_cleaned.arrow
-      moderately_sensitive:
         cleaning_inex_data_descriptions: output/data_descriptions/cleaning_inex/*.txt
+        plot_med_count_distribution: output/figures/cleaning_inex/plot_med_count_distribution.png
+      moderately_sensitive:
         cleaning_inex_data_flow: output/data_descriptions/cleaning_inex/data_flow.csv
         cleaning_inex_med_count_summary: output/data_descriptions/cleaning_inex/med_count_summary.csv
-        plot_med_count_distribution: output/figures/cleaning_inex/plot_med_count_distribution.png
 
   
   generate_dataset_inex_meds:
@@ -52,8 +52,8 @@ actions:
     outputs:
       highly_sensitive:
         dataset_baseline_meds_processed: output/data/dataset_baseline_meds_processed.arrow
-      moderately_sensitive:
         process_baseline_meds_data_descriptions: output/data_descriptions/process_baseline_meds/*.txt
+      moderately_sensitive:
         process_baseline_meds_bnf_unmapped_to_bnf_hierarchy: output/data_descriptions/process_baseline_meds/bnf_unmapped_to_bnf_hierarchy.csv
         process_baseline_meds_data_flow: output/data_descriptions/process_baseline_meds/data_flow.csv
         process_baseline_meds_dmd_not_in_lookup: output/data_descriptions/process_baseline_meds/dmd_not_in_lookup.csv
