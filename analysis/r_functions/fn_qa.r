@@ -6,10 +6,7 @@
 ##########################################################################
 
 fn_qa <- function(
-  arrow_data,
-  collect_and_describe = FALSE,
-  describe_name = "",
-  suffix = ""
+  arrow_data
 ) {
   require(arrow)
   require(dplyr)
@@ -41,20 +38,6 @@ fn_qa <- function(
       inex_qa_bin_ethnicity,
       inex_qa_bin_imd
     )
-
-  # load dataset as R data.table object if collect_and_describe = TRUE
-  if (collect_and_describe) {
-    require(data.table)
-    arrow_data_qa_applied <- arrow_data_qa_applied %>%
-      collect() %>%
-      as.data.table()
-
-    fn_describe_data(
-      data = arrow_data_qa_applied,
-      name = describe_name,
-      suffix = suffix
-    )
-  }
 
   return(arrow_data_qa_applied)
 }

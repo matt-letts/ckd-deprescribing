@@ -1,71 +1,70 @@
 #############################################################################
 # fn_describe_data()
-# prints a summary using the skim() function and places it into a file called
-# name.txt which is in a directory which is created if doesn't already exist:
-# output/data_descriptions/
+# Writes a skimr summary of data to filepath.
 #############################################################################
 
-fn_describe_data <- function(data, name, suffix = "") {
-  fs::dir_create(here::here("output", "data_descriptions", name))
-  filename <- if (nzchar(suffix)) paste0(suffix, ".txt") else paste0(name, ".txt")
-  filepath <- here::here("output", "data_descriptions", name, filename)
+fn_describe_data <- function(data, filepath) {
   sink(filepath)
   on.exit(sink())
-  suppressWarnings({
-    # stop annoying warning messages from skim entering log
-    print(skimr::skim(data))
-  })
+  suppressWarnings(print(skimr::skim(data)))
   message(filepath, " written successfully.")
 }
 
 
 #############################################################################
-# fn_describe_and_flow() - allows flow of patients through the pipeline to be
-# tracked without holding all the datasets in memory simultaneously
+# fn_describe_and_flow()
 #
-# Takes a project_stage argument (e.g. "cleaning") and searches the global
-# environment for all variables matching the pattern:
-# "dataset_<project_stage>_<n>_<stage>"
-
-# For each matching variable:
-#   1. Collects the Arrow dataset into memory
-#   2. Passes it to fn_describe_data() to create:
-#      output/data_descriptions/<project_stage>-<stage>.txt
-#   3. Records the stage name and row count in a flow dataframe
-#   4. Frees the collected data from memory before moving to the next dataset
+# Relies on naming convention: dataset_<project_stage>_<n>_<stage_name>
+#
+# Produces:
+# 1. skimr summaries for all datasets matching the pattern and saves
+#    them to output/data_descriptions/<project_stage>/*.txt
+# 2. A flow dataframe with rows for each dataset within the project stage,
+#    containing the stage name and SDC-suppressed row count
 #############################################################################
 
-fn_describe_and_flow <- function(
-  project_stage
-) {
+fn_describe_and_flow <- function(project_stage) {
+  # scan the global environment for variables matching the pattern:
+  # dataset_<project_stage>_ and stores their names in data_names
   data_names <- ls(
     pattern = paste0("^dataset_", project_stage, "_"),
     envir = .GlobalEnv
   )
+
+  # create output directory and initialize flow dataframe
+  fs::dir_create(here::here("output", "data_descriptions", project_stage))
   flow <- data.frame(stage = character(), n_rows = integer())
 
+  # Loop over each name in data_names (i.e. each dataset matching the pattern)
   for (var_name in data_names) {
+    # Extract stage name by removing prefix "dataset_<project_stage>_<n>_"
     stage_name <- sub(
       paste0("^dataset_", project_stage, "_\\d+_"),
       "",
       var_name
     )
-    collected <- collect(get(
-      var_name,
-      envir = .GlobalEnv
-    ))
+    # collect the dataset into memory - required for skimr()
+    # if produces memory issue on the server can change to a lazy process
+    collected <- collect(get(var_name, envir = .GlobalEnv))
 
+    # produce skimr() output for the dataset
     fn_describe_data(
       data = collected,
-      name = project_stage,
-      suffix = stage_name
+      filepath = here::here(
+        "output",
+        "data_descriptions",
+        project_stage,
+        paste0(stage_name, ".txt")
+      )
     )
 
+    # append stage name and SDC-rounded row count to flow dataframe
     flow <- rbind(
       flow,
       data.frame(stage = stage_name, n_rows = fn_apply_sdc(nrow(collected)))
     )
 
+    # clear the RAM before next iteration
     rm(collected)
     gc()
   }

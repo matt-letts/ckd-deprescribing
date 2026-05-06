@@ -9,10 +9,7 @@
 ##########################################################################
 
 fn_dem_inex_criteria <- function(
-  arrow_data,
-  collect_and_describe = FALSE,
-  describe_name = "",
-  suffix = ""
+  arrow_data
 ) {
   require(arrow)
   require(dplyr)
@@ -41,19 +38,6 @@ fn_dem_inex_criteria <- function(
       inex_dem_bin_age_include,
       inex_dem_bin_12m_registered
     )
-
-  # load dataset as R data.table object if collect_and_describe = TRUE
-  if (collect_and_describe) {
-    arrow_data_dem_inex_applied <- arrow_data_dem_inex_applied %>%
-      collect() %>%
-      data.table::as.data.table()
-
-    fn_describe_data(
-      data = arrow_data_dem_inex_applied,
-      name = describe_name,
-      suffix = suffix
-    )
-  }
 
   return(arrow_data_dem_inex_applied)
 }

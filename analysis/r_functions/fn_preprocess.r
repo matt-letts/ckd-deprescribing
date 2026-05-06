@@ -4,14 +4,11 @@
 # 2. Checks for duplicate patient_ids if one-row-per-patient data
 # 3. Applies type casting based on variable naming conventions
 # 4. Filters out rows with missing patient_id
-# 5. Optionally collects to data.table and writes a data description
 #
 # Arguments:
-#   arrow_data : arrow project_stage object
-#   project_stage : string label passed to fn_modify_dummy_data()
-#   index_date : study index date
-#   collect_and_describe : if TRUE, collect() and write description file
-#   describe_name / suffix : name the description output file
+#   arrow_data          : arrow dataset object
+#   project_stage       : string label passed to fn_modify_dummy_data()
+#   index_date          : study index date
 #   one_row_per_patient : if TRUE (default), warn if duplicate patient_ids
 #############################################################################
 
@@ -19,9 +16,6 @@ fn_preprocess <- function(
   arrow_data,
   project_stage,
   index_date,
-  collect_and_describe = FALSE,
-  describe_name = "",
-  suffix = "",
   one_row_per_patient = TRUE
 ) {
   require(arrow)
@@ -61,20 +55,6 @@ fn_preprocess <- function(
       across(contains("_dmd_code_"), ~ as.character(.)) # dmd_codes as strings, too big as numbers
     ) |>
     filter(!is.na(patient_id))
-
-  # load data as R data.table object if collect_data = TRUE
-  if (collect_and_describe) {
-    require(data.table)
-    arrow_data_preprocessed <- arrow_data_preprocessed %>%
-      collect() %>%
-      as.data.table()
-
-    fn_describe_data(
-      data = arrow_data_preprocessed,
-      name = describe_name,
-      suffix = suffix
-    )
-  }
 
   return(arrow_data_preprocessed)
 }

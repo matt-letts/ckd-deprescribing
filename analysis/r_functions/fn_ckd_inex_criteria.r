@@ -57,10 +57,7 @@ fn_egfr_ckdepi2009 <- function(
 
 fn_ckd_inex_criteria <- function(
   arrow_data,
-  collect_and_describe = FALSE,
-  index_date,
-  describe_name = "",
-  suffix = ""
+  index_date
 ) {
   require(arrow)
   require(dplyr)
@@ -151,18 +148,6 @@ fn_ckd_inex_criteria <- function(
   message("Before: ", n_before)
   message("Excluded (no evidence of CKD 4/5): ", n_before - n_after)
 
-  if (collect_and_describe) {
-    arrow_data_ckd_inex_applied <- arrow_data_ckd_inex_applied |>
-      collect() |>
-      data.table::as.data.table()
-
-    fn_describe_data(
-      data = arrow_data_ckd_inex_applied,
-      name = describe_name,
-      suffix = suffix
-    )
-  }
-
   return(arrow_data_ckd_inex_applied)
 }
 
@@ -178,10 +163,7 @@ fn_ckd_inex_criteria <- function(
 
 fn_krt_inex_criteria <- function(
   arrow_data,
-  krt_source = c("primary", "combined"),
-  collect_and_describe = FALSE,
-  describe_name = "",
-  suffix = ""
+  krt_source = c("primary", "combined")
 ) {
   require(arrow)
   require(dplyr)
@@ -203,18 +185,6 @@ fn_krt_inex_criteria <- function(
   message("\nKRT exclusion criteria - source: ", krt_source, ":")
   message("Before: ", n_before)
   message("Excluded (prior KRT): ", n_before - n_after)
-
-  if (collect_and_describe) {
-    arrow_data_krt_inex_applied <- arrow_data_krt_inex_applied |>
-      collect() |>
-      data.table::as.data.table()
-
-    fn_describe_data(
-      data = arrow_data_krt_inex_applied,
-      name = describe_name,
-      suffix = suffix
-    )
-  }
 
   return(arrow_data_krt_inex_applied)
 }

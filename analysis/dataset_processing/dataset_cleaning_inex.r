@@ -46,20 +46,17 @@ dataset_cleaning_inex_2_preprocessed <- fn_preprocess(
   arrow_data = dataset_cleaning_inex_1_input,
   project_stage = "cleaning_inex",
   index_date = study_dates$index_date,
-  collect_and_describe = FALSE,
   one_row_per_patient = TRUE
 )
 
 # Apply qa criteria ------------------------------------------------------
 dataset_cleaning_inex_3_qa_applied <- fn_qa(
-  arrow_data = dataset_cleaning_inex_2_preprocessed,
-  collect_and_describe = FALSE
+  arrow_data = dataset_cleaning_inex_2_preprocessed
 )
 
 # Apply demographic inclusion and exclusion criteria ---------------------
 dataset_cleaning_inex_4_demographic_inex_applied <- fn_dem_inex_criteria(
-  arrow_data = dataset_cleaning_inex_3_qa_applied,
-  collect_and_describe = FALSE
+  arrow_data = dataset_cleaning_inex_3_qa_applied
 )
 
 # Apply CKD inclusion criteria -------------------------------------------
@@ -73,14 +70,12 @@ dataset_cleaning_inex_4_demographic_inex_applied <- fn_dem_inex_criteria(
 #    (G4, G5, G4/G5, or no G4/G5)
 dataset_cleaning_inex_5_ckd_inex_applied <- fn_ckd_inex_criteria(
   arrow_data = dataset_cleaning_inex_4_demographic_inex_applied,
-  collect_and_describe = FALSE,
   index_date = study_dates$index_date
 )
 
 # Apply KRT exclusion criteria -------------------------------------------
 dataset_cleaning_inex_6_krt_inex_applied <- fn_krt_inex_criteria(
   arrow_data = dataset_cleaning_inex_5_ckd_inex_applied,
-  collect_and_describe = FALSE,
   krt_source = "primary"
 )
 

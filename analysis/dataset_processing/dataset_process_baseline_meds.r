@@ -48,8 +48,7 @@ dataset_process_baseline_meds_1_input <- arrow::open_dataset(
 dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
   arrow_data = dataset_process_baseline_meds_1_input,
   project_stage = "process_baseline_meds", # no modification at present
-  index_date = study_dates$index_date,
-  collect_and_describe = FALSE
+  index_date = study_dates$index_date
 ) |>
   # collect the data - required for the next processes
   collect()
