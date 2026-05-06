@@ -2,11 +2,9 @@
 # This script does the following:
 # 1. Loads medication dataset (dataset_inex_meds.arrow) and preprocesses it
 # 2. Separates patients with no medications recorded for later reattachment
-# 3. Builds two lookups for medication code conversion and categorisation:
-#    - DMD-to-BNF lookup (with optional VTM imputation) with classification
-#      of medication routes using regex applied to DMD product names
-#    - BNF hierarchy lookup
-# 4. Converts DMD to BNF substance codes via join to dmd-to-bnf lookup
+# 3. Loads pre-built medication lookup tables (dmd_lookup, bnf_hierarchy)
+#    from local_processing/medication_lookup_tables/
+# 4. Converts DMD to BNF substance codes via join to dmd_lookup
 # 5. Adds BNF hierarchy names (chapter, section, paragraph, subparagraph)
 # 6. Reattaches patients with no medications
 # 7. Applies minimal medication exclusion criteria
@@ -20,7 +18,6 @@ library(here)
 library(arrow)
 library(tidyverse)
 library(data.table)
-library(readxl)
 source(here::here("analysis", "r_functions", "fn_preprocess.r"))
 source(here::here("analysis", "r_functions", "fn_modify_dummy_data.r"))
 source(here::here("analysis", "r_functions", "fn_med_data_conversions.r"))
@@ -81,13 +78,17 @@ message(sprintf(
   nrow(patients_no_meds)
 ))
 
-# Build medication code conversion lookup tables -------------------------
-dmd_lookup <- fn_build_dmd_bnf_lookup(impute_bnf_from_vtm = TRUE)
-dmd_lookup <- fn_classify_med_route(
-  dmd_lookup = dmd_lookup,
-  project_stage = "process_baseline_meds"
-)
-bnf_hierarchy <- fn_build_bnf_hierarchy()
+# Load pre-built medication lookup tables --------------------------------
+dmd_lookup <- readRDS(here::here(
+  "local_processing",
+  "medication_lookup_tables",
+  "dmd_lookup.rds"
+))
+bnf_hierarchy <- readRDS(here::here(
+  "local_processing",
+  "medication_lookup_tables",
+  "bnf_hierarchy.rds"
+))
 
 # Convert dmd_codes to BNF codes for categorisation ----------------------
 dataset_process_baseline_meds_4_dmd_converted <- fn_dmd_to_bnf(
