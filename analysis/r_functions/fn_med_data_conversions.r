@@ -180,14 +180,12 @@ fn_dmd_to_bnf <- function(
   # Patient-level route diagnostic (only if route classification was run on lookup)
   if ("route_cat" %in% names(patient_bnf)) {
     route_summary <- patient_bnf |>
-      count(route_cat, route_uncertain) |>
-      mutate(n = fn_apply_sdc(n)) |>
-      select(route_cat, route_uncertain, n)
+      count(route_cat) |>
+      mutate(n = fn_apply_sdc(n))
 
-    message(sprintf(
-      "--- %d instances of medications with uncertain route | *-route_classification_patient_summary.csv",
-      route_summary$n[route_summary$route_cat == "other/unclassified"]
-    ))
+    message(
+      "--- Patient route classification summary written to *-route_classification_patient_summary.csv"
+    )
 
     write_csv(
       route_summary,
