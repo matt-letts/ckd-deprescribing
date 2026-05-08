@@ -1,0 +1,80 @@
+route_code,route_desc,route_cat
+"47625008",Intravenous,intravenous
+"78421000",Intramuscular,intramuscular
+"34206005",Subcutaneous,subcutaneous
+"372464004",Intradermal,other
+"448077001",Intraepidermal,other
+"404820008",Epidural,other
+"72607000",Intrathecal,other
+"12130007",Intraarticular,other
+"58100008",Intraarterial,other
+"38239002",Intraperitoneal,other
+"372469009",Intrapleural,other
+"372460008",Intracardiac,other
+"420287000",Intraventricular cardiac,other
+"372461007",Intracavernous,other
+"420719007",Intracerebroventricular,other
+"41489711000001101",Intraputaminal,other
+"372463005",Intracoronary,other
+"372465003",Intradiscal,other
+"417255000",Intraosseous,other
+"372466002",Intralesional,other
+"372467006",Intralymphatic,other
+"372459003",Intrabursal,other
+"418821007",Intracameral,eye_ear_nasal
+"372470005",Intrasternal,other
+"372453002",Extraamniotic,other
+"372458006",Intraamniotic,other
+"58761000052107",Intracholangiopancreatic,other
+"718329006",Infiltration,other
+"11564311000001109",Regional perfusion,other
+"447122006",Intratumoral,other
+"58811000052103",Peritumoral,other
+"44183111000001107",Perilesional,other
+"372474001",Periarticular,other
+"372475000",Perineural,other
+"44528111000001102",Intracatheter instillation,other
+"9907001000001103",Line lock,other
+"58751000052109",Intraglandular,other
+"7782811000001109",Obsolete-Intraventricular,other
+"372472002",Ocular,eye_ear_nasal
+"418401004",Intravitreal,eye_ear_nasal
+"372476004",Subconjunctival,eye_ear_nasal
+"39338211000001108",Peribulbar ocular,eye_ear_nasal
+"58831000052108",Subretinal,eye_ear_nasal
+"372468001",Intraocular,eye_ear_nasal
+"10547007",Auricular,eye_ear_nasal
+"46713006",Nasal,eye_ear_nasal
+"372451000",Endosinusial,eye_ear_nasal
+"37161004",Rectal,rectal_vaginal
+"16857009",Vaginal,rectal_vaginal
+"11564211000001101",Submucosal rectal,rectal_vaginal
+"372462000",Intracervical,rectal_vaginal
+"62226000",Intrauterine,rectal_vaginal
+"372450004",Endocervical,rectal_vaginal
+"45890007",Transdermal,transdermal
+"21856811000001103",Iontophoresis,transdermal
+"18679011000001101",Inhalation,inhaled
+"372452007",Endotracheopulmonary,other
+"54471007",Buccal,oromucosal
+"37839007",Sublingual,oromucosal
+"372473007",Oromucosal,oromucosal
+"372457001",Gingival,oromucosal
+"66621000052103",Sublabial,oromucosal
+"17320711000001106",Obsolete-Oromucosal other,oromucosal
+"448598008",Cutaneous,topical
+"764723001",Epilesional,topical
+"372449004",Dental,other
+"26643006",Oral,oral
+"372454008",Gastroenteral,oral
+"417985001",Intestinal,oral
+"420254004",Body cavity,other
+"714743009",Extracorporeal,other
+"18682911000001103",Haemodialysis,other
+"10334211000001103",Haemofiltration,other
+"876824003",Intradialytic,other
+"42260111000001107",Implantation,other
+"372471009",Intravesical,other
+"419874009",Submucosal,other
+"90028008",Urethral,other
+"3594011000001102",Route of administration not applicable,unclassified

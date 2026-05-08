@@ -14,7 +14,7 @@ fn_describe_data <- function(data, filepath) {
 #############################################################################
 # fn_describe_and_flow()
 #
-# Relies on naming convention: dataset_<project_stage>_<n>_<stage_name>
+# Relies on naming convention: "dataset_<project_stage>_<n>_<stage_name>""
 #
 # Produces:
 # 1. skimr summaries for all datasets matching the pattern and saves
@@ -47,7 +47,7 @@ fn_describe_and_flow <- function(project_stage) {
     # if produces memory issue on the server can change to a lazy process
     collected <- collect(get(var_name, envir = .GlobalEnv))
 
-    # produce skimr() output for the dataset
+    # produce skimr() output for the dataset and sink() to filepath
     fn_describe_data(
       data = collected,
       filepath = here::here(

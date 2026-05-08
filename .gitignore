@@ -11,6 +11,7 @@ venv/
 .Rhistory
 .Rproj.user/
 .devcontainer/ehrql-main/
-/generate_dummy_tables/
+local_processing/generate_dummy_tables/
+docs/nhsbsa_dmd*
 /ehrql-dummy-data*
 *claude*
