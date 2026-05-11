@@ -178,18 +178,6 @@ fn_modify_dummy_data <- function(
             is.na(inex_ckd_cat_ckd_code_stage) ~ 0.03
           )
         )),
-        # Date - only for those with a KRT code, 0.5% missing
-        inex_krt_date_most_recent_primary_care_krt_code = if_else(
-          inex_krt_bin_has_primary_care_krt_code &
-            runif(nrow(dummy_data)) > 0.005,
-          as.Date("2017-01-01") +
-            days(sample(
-              0:as.integer(as.Date(index_date) - as.Date("2017-01-01")),
-              nrow(dummy_data),
-              replace = TRUE
-            )),
-          NA_Date_
-        ),
         # Type - only for those with a KRT code
         inex_krt_cat_primary_care_krt_type = as.factor(case_when(
           !inex_krt_bin_has_primary_care_krt_code ~ NA_character_,
@@ -202,54 +190,29 @@ fn_modify_dummy_data <- function(
         ))
       ) |>
 
-      # primary and secondary care combined
+      # Secondary care codes
       mutate(
-        # Combined KRT binary - includes all primary care KRT plus few more
-        inex_krt_bin_has_combined_krt_code = as.logical(rbinom(
+        inex_krt_bin_has_secondary_care_krt_code = as.logical(rbinom(
           nrow(dummy_data),
           1,
           prob = case_when(
-            inex_krt_bin_has_primary_care_krt_code ~ 1.00,
+            inex_krt_bin_has_primary_care_krt_code ~ 0.80,
             inex_ckd_cat_ckd_code_stage == "five" ~ 0.05,
             inex_ckd_cat_ckd_code_stage == "four" ~ 0.01,
             is.na(inex_ckd_cat_ckd_code_stage) ~ 0.005
           )
         )),
-        # Date - only for those with a combined KRT code, 0.5% missing
-        inex_krt_date_most_recent_combined_krt_code = if_else(
-          inex_krt_bin_has_combined_krt_code & runif(nrow(dummy_data)) > 0.005,
-          as.Date("2017-01-01") +
-            days(sample(
-              0:as.integer(as.Date(index_date) - as.Date("2017-01-01")),
-              nrow(dummy_data),
-              replace = TRUE
-            )),
-          NA_Date_
-        ),
-        # Combined KRT type - concordant with primary care type mostly
-        inex_krt_cat_combined_krt_type = as.factor(case_when(
-          !inex_krt_bin_has_combined_krt_code ~ NA_character_,
-          # Those with primary care code - mostly concordant, small discordance
-          inex_krt_cat_primary_care_krt_type == "dialysis" ~ sample(
-            c("dialysis", "transplant", "unknown"),
-            nrow(dummy_data),
-            replace = TRUE,
-            prob = c(0.9, 0.05, 0.05)
-          ),
-          inex_krt_cat_primary_care_krt_type == "transplant" ~ sample(
-            c("transplant", "dialysis", "unknown"),
-            nrow(dummy_data),
-            replace = TRUE,
-            prob = c(0.9, 0.05, 0.05)
-          ),
-          # Additional people not in primary care - split dialysis/transplant/unknown
+        inex_krt_cat_secondary_care_krt_type = as.factor(case_when(
+          !inex_krt_bin_has_secondary_care_krt_code ~ NA_character_,
           TRUE ~ sample(
             c("dialysis", "transplant", "unknown"),
             nrow(dummy_data),
             replace = TRUE,
             prob = c(0.50, 0.45, 0.05)
           )
-        ))
+        )),
+        inex_krt_bin_secondary_care_only = inex_krt_bin_has_secondary_care_krt_code &
+          !inex_krt_bin_has_primary_care_krt_code
       ) |>
 
       ## Reapply the QA criteria from inex_variables.py ##

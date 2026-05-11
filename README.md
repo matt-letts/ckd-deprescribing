@@ -11,23 +11,27 @@ No clinical, policy or safety conclusions must be drawn from the contents of thi
 
 # About this study
 
-This study analyses prescribing and deprescribing patterns in patients with chronic kidney disease (CKD) stage 4–5 who are not on kidney replacement therapy (KRT). Medications are viewed at baseline (1st March 2022) and then tracked over the following 4 years.
+This study analyses deprescribing patterns in patients with chronic kidney disease (CKD) stage 4–5 who are not on kidney replacement therapy (KRT). Medications are viewed at baseline (1st March 2022) and then tracked over the following 4 years.
 
 # Pipeline overview
 
 The analysis pipeline is defined in `project.yaml` and runs as a series of dependent actions:
-See [project_pipeline.md](./project_pipeline.md) for a full diagram of the analysis flow.
+See [project_pipeline.md](./project_pipeline.md) for a diagram of the analysis flow.
 
 # Repository structure
 
 ```
 analysis/
-  dataset_definition/   # ehrQL scripts for data extraction (Python)
-  dataset_processing/   # Cleaning and processing scripts (R)
-  r_functions/          # Reusable R functions sourced by processing scripts
-codelists/              # Clinical codelists (CSV) sourced from [OpenCodelists](https://www.opencodelists.org/)
-docs/                   # Reference files including medication code maps and pipeline diagram
-protocols/              # Study protocol
+  dataset_definition/       # Scripts for data extraction (ehrQL and python)
+  dataset_processing/       # Data cleaning and processing scripts (R)
+  r_functions/              # R functions sourced by processing scripts
+codelists/                  # Codelists sourced from [OpenCodelists](https://www.opencodelists.org/)
+docs/                       # Reference files and pipeline diagram
+protocols/                  # Study protocol
+dummy_tables/               # Tables used for local testing only
+local_processing/ 
+  generate_dummy_tables/    # Functions to create dummy tables - local testing only
+  medication_lookup_tables/ # Functions/scripts and resulting data files used for medication mapping
 ```
 
 # About the OpenSAFELY framework

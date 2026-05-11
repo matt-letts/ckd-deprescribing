@@ -164,8 +164,8 @@ def add_ckd_inex_variables(
 
 
 # KRT VARIABLES (FOR EXCLUSION) - PRIMARY AND SECONDARY CARE CODES --
-# Primary care codes, then primary and secondary combined 
-# that can be used in sensitivity analysis
+# Primary care codes used for exclusion; secondary care codes kept
+# with a sensitivity flag (inex_krt_bin_secondary_care_only)
 
 def add_krt_inex_variables(
     clinical_events,
@@ -231,14 +231,16 @@ def add_krt_inex_variables(
     # binary flag if a person has a secondary care krt code
     has_secondary_care_krt_code = secondary_care_krt_code.exists_for_patient()
 
-    # Most recent secondary care krt code
+    # Most recent spell containing a secondary care krt code
+ 
     most_recent_secondary_care_krt_code = (
         secondary_care_krt_code
         .sort_by(apcs.admission_date)
         .last_for_patient()
     )
 
-    # Then complex logic to decide whether this is a dialysis or transplant code
+    # Importantly any spell can contain both transplant and dialysis codes so need
+    # quite complex logic to decide whether to categorise as dialysis or transplant
     secondary_care_krt_type = case(
         # sort edge case first where BOTH dialysis AND transplant in same spell → unknown
         when(
@@ -286,95 +288,22 @@ def add_krt_inex_variables(
         otherwise=None,
     )
     
-    ### Combined primary and secondary KRT codes ###
-    
-    # present in primary OR secondary care boolean
-    has_krt_code_either = (
-        has_primary_care_krt_code
-        | has_secondary_care_krt_code
-    )
-
-    # present in primary AND secondary care boolean
-    has_krt_code_both = (
-        has_primary_care_krt_code
-        & has_secondary_care_krt_code
-    )
-
-    # the date of the most recent krt code, slightly complex given the various potential options
-    combined_most_recent_date = case(
-        # only primary exists
-        when(
-            has_primary_care_krt_code
-            & ~has_secondary_care_krt_code
-        ).then(most_recent_primary_care_krt_code.date),
-
-        # only secondary exists
-        when(
-            ~has_primary_care_krt_code
-            & has_secondary_care_krt_code
-        ).then(most_recent_secondary_care_krt_code.admission_date),
-
-        # both primary and secondary exist and:
-        # primary is later or equal
-        when(
-            has_krt_code_both
-            & (
-                most_recent_primary_care_krt_code.date
-                >= most_recent_secondary_care_krt_code.admission_date
-            )
-        ).then(most_recent_primary_care_krt_code.date),
-        # secondary is later
-        when(
-            has_krt_code_both
-        ).then(most_recent_secondary_care_krt_code.admission_date),
-
-        otherwise=None,
-    )
-
-    # the type of the most recent krt code, again slightly complex given potential options
-    combined_krt_type = case(
-        # only primary exists
-        when(
-            has_primary_care_krt_code
-            & ~has_secondary_care_krt_code
-        ).then(primary_care_krt_type),
-
-        # only secondary exists
-        when(
-            ~has_primary_care_krt_code
-            & has_secondary_care_krt_code
-        ).then(secondary_care_krt_type),
-
-        # both exist and:
-        # primary is later or equal
-        when(
-            has_krt_code_both
-            & (
-                most_recent_primary_care_krt_code.date
-                >= most_recent_secondary_care_krt_code.admission_date
-            )
-        ).then(primary_care_krt_type),
-        # secondary is later
-        when(
-            has_krt_code_both
-        ).then(secondary_care_krt_type),
-
-        otherwise=None,
-    )
-
     ### Return variables ###
 
     return {
 
         # Primary care only
         "inex_krt_bin_has_primary_care_krt_code": has_primary_care_krt_code,
-        "inex_krt_date_most_recent_primary_care_krt_code": most_recent_primary_care_krt_code.date,
         "inex_krt_cat_primary_care_krt_type": primary_care_krt_type,
 
-        # Combined primary + secondary
-        "inex_krt_bin_has_combined_krt_code": has_krt_code_either,
-        "inex_krt_date_most_recent_combined_krt_code": combined_most_recent_date,
-        "inex_krt_cat_combined_krt_type": combined_krt_type
+        # Secondary care only
+        "inex_krt_bin_has_secondary_care_krt_code": has_secondary_care_krt_code,
+        "inex_krt_cat_secondary_care_krt_type": secondary_care_krt_type,
+
+        # Sensitivity flag: secondary care evidence without primary care evidence
+        "inex_krt_bin_secondary_care_only": (
+            has_secondary_care_krt_code & ~has_primary_care_krt_code
+        ),
 
     }
 

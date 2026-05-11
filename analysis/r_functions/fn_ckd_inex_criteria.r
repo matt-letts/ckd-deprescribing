@@ -153,38 +153,62 @@ fn_ckd_inex_criteria <- function(
 
 
 ##########################################################################
-# fn_krt_inex_criteria()
+# fn_krt_inex_criteria_dialysis()
 #
-# Excludes patients with evidence of kidney replacement therapy (KRT)
-# prior to index date. The krt_source argument controls whether exclusion
-# is based on primary care codes only ("primary") or primary and
-# secondary care codes combined ("combined").
+# Excludes patients with primary care dialysis KRT codes prior to index
+# date. Split from transplant to give separate rows in data_flow.csv.
 ##########################################################################
 
-fn_krt_inex_criteria <- function(
-  arrow_data,
-  krt_source = c("primary", "combined")
-) {
+fn_krt_inex_criteria_dialysis <- function(arrow_data) {
   require(arrow)
   require(dplyr)
 
-  krt_source <- match.arg(krt_source)
-
-  arrow_data_krt_inex_applied <- if (krt_source == "primary") {
-    arrow_data |> filter(!inex_krt_bin_has_primary_care_krt_code)
-  } else {
-    arrow_data |> filter(!inex_krt_bin_has_combined_krt_code)
-  }
+  arrow_data_dialysis_out <- arrow_data |>
+    filter(
+      !(inex_krt_bin_has_primary_care_krt_code &
+        inex_krt_cat_primary_care_krt_type == "dialysis")
+    )
 
   n_before <- arrow_data |> summarise(n = n()) |> collect() |> pull(n)
-  n_after <- arrow_data_krt_inex_applied |>
+  n_after <- arrow_data_dialysis_out |>
     summarise(n = n()) |>
     collect() |>
     pull(n)
 
-  message("\nKRT exclusion criteria - source: ", krt_source, ":")
+  message("\nKRT exclusion - dialysis (primary care):")
   message("Before: ", n_before)
-  message("Excluded (prior KRT): ", n_before - n_after)
+  message("Excluded: ", n_before - n_after)
 
-  return(arrow_data_krt_inex_applied)
+  return(arrow_data_dialysis_out)
+}
+
+
+##########################################################################
+# fn_krt_inex_criteria_transplant()
+#
+# Excludes patients with primary care kidney transplant codes prior to
+# index date. Split from dialysis to give separate rows in data_flow.csv.
+##########################################################################
+
+fn_krt_inex_criteria_transplant <- function(arrow_data) {
+  require(arrow)
+  require(dplyr)
+
+  arrow_data_transplant_out <- arrow_data |>
+    filter(
+      !(inex_krt_bin_has_primary_care_krt_code &
+        inex_krt_cat_primary_care_krt_type == "transplant")
+    )
+
+  n_before <- arrow_data |> summarise(n = n()) |> collect() |> pull(n)
+  n_after <- arrow_data_transplant_out |>
+    summarise(n = n()) |>
+    collect() |>
+    pull(n)
+
+  message("\nKRT exclusion - transplant (primary care):")
+  message("Before: ", n_before)
+  message("Excluded: ", n_before - n_after)
+
+  return(arrow_data_transplant_out)
 }

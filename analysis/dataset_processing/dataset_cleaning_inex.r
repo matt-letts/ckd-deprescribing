@@ -73,11 +73,27 @@ dataset_cleaning_inex_5_ckd_inex_applied <- fn_ckd_inex_criteria(
   index_date = study_dates$index_date
 )
 
-# Apply KRT exclusion criteria -------------------------------------------
-dataset_cleaning_inex_6_krt_inex_applied <- fn_krt_inex_criteria(
-  arrow_data = dataset_cleaning_inex_5_ckd_inex_applied,
-  krt_source = "primary"
+# Apply KRT exclusion criteria — split by type for flow chart breakdown --------
+# Each step produces one row in data_flow.csv via fn_describe_and_flow().
+# inex_krt_bin_secondary_care_only is already present from Python output.
+dataset_cleaning_inex_6_krt_dialysis_excluded <- fn_krt_inex_criteria_dialysis(
+  arrow_data = dataset_cleaning_inex_5_ckd_inex_applied
 )
+
+dataset_cleaning_inex_7_krt_transplant_excluded <- fn_krt_inex_criteria_transplant(
+  arrow_data = dataset_cleaning_inex_6_krt_dialysis_excluded
+)
+
+n_secondary_care_krt_remain <- dataset_cleaning_inex_7_krt_transplant_excluded |>
+  filter(inex_krt_bin_secondary_care_only == TRUE) |>
+  summarise(n = n()) |>
+  collect() |>
+  pull(n)
+
+message(sprintf(
+  "\nPatients with secondary care KRT codes remaining after primary care excluded: %d",
+  n_secondary_care_krt_remain
+))
 
 # Write all datasets to .txt and create flow dataframe -------------------
 message(
@@ -90,7 +106,7 @@ flow <- fn_describe_and_flow(
 )
 
 # Rename cleaned dataset for clarity -------------------------------------
-dataset_inex_cleaned <- dataset_cleaning_inex_6_krt_inex_applied
+dataset_inex_cleaned <- dataset_cleaning_inex_7_krt_transplant_excluded
 
 # Examine medication counts in 90 and 180 days prior to index date -------
 message("\nTabulate the medication counts")
