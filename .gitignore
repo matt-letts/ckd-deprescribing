@@ -1,4 +1,5 @@
 *~
+.vscode/*
 model.log
 */input.csv
 __pycache__
@@ -10,3 +11,7 @@ venv/
 .Rhistory
 .Rproj.user/
 .devcontainer/ehrql-main/
+local_processing/generate_dummy_tables/
+docs/nhsbsa_dmd*
+/ehrql-dummy-data*
+*claude*

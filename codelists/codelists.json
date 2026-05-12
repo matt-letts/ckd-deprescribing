@@ -1,3 +1,70 @@
 {
-  "files": {}
+  "files": {
+    "user-mletts92-chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy.csv": {
+      "id": "user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2",
+      "url": "https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2/",
+      "downloaded_at": "2026-02-20 15:27:39.336912Z",
+      "sha": "a7280ca2929f4f62e37c37546223cfef13b924b3"
+    },
+    "user-mletts92-chronic-kidney-disease-stage-4.csv": {
+      "id": "user/mletts92/chronic-kidney-disease-stage-4/3e8d63c4",
+      "url": "https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-4/3e8d63c4/",
+      "downloaded_at": "2026-03-02 09:46:58.134292Z",
+      "sha": "8db337a77eeb31ae50f54fe2c54a67e24ab617cb"
+    },
+    "user-mletts92-chronic-kidney-disease-stage-5-not-receiving-kidney-replacement-therapy.csv": {
+      "id": "user/mletts92/chronic-kidney-disease-stage-5-not-receiving-kidney-replacement-therapy/579cd6f9",
+      "url": "https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-5-not-receiving-kidney-replacement-therapy/579cd6f9/",
+      "downloaded_at": "2026-03-02 09:46:58.229533Z",
+      "sha": "e6b62387bd4be59160389f1d4c63e56767698cdc"
+    },
+    "user-mletts92-kidney-transplant-opcs4.csv": {
+      "id": "user/mletts92/kidney-transplant-opcs4/1486bd3c",
+      "url": "https://www.opencodelists.org/codelist/user/mletts92/kidney-transplant-opcs4/1486bd3c/",
+      "downloaded_at": "2026-03-02 15:37:47.048403Z",
+      "sha": "2d43044b3056c2e5fe706bbb1dadb252c90259f2"
+    },
+    "nhsd-primary-care-domain-refsets-cre_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/cre_cod/20250912",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/cre_cod/20250912/",
+      "downloaded_at": "2026-02-23 13:58:55.472565Z",
+      "sha": "c6f53558c19c41b025c564d408d03eaad883345b"
+    },
+    "opensafely-kidney-transplant.csv": {
+      "id": "opensafely/kidney-transplant/21865860",
+      "url": "https://www.opencodelists.org/codelist/opensafely/kidney-transplant/21865860/",
+      "downloaded_at": "2026-02-20 15:27:39.431588Z",
+      "sha": "db6b47d17273b563cb428e4a97a7ba8b6d62afa9"
+    },
+    "opensafely-dialysis.csv": {
+      "id": "opensafely/dialysis/3ce108ac",
+      "url": "https://www.opencodelists.org/codelist/opensafely/dialysis/3ce108ac/",
+      "downloaded_at": "2026-02-20 15:27:39.503472Z",
+      "sha": "ace47eee209d55a7506e60e7e664f8e75ad9848c"
+    },
+    "opensafely-renal-replacement-therapy.csv": {
+      "id": "opensafely/renal-replacement-therapy/5b5ed963",
+      "url": "https://www.opencodelists.org/codelist/opensafely/renal-replacement-therapy/5b5ed963/",
+      "downloaded_at": "2026-02-20 15:27:39.603587Z",
+      "sha": "08e003f1222fe26781288b2eeff22db99780f202"
+    },
+    "opensafely-ethnicity-snomed-0removed.csv": {
+      "id": "opensafely/ethnicity-snomed-0removed/22911876",
+      "url": "https://www.opencodelists.org/codelist/opensafely/ethnicity-snomed-0removed/22911876/",
+      "downloaded_at": "2026-02-26 11:24:00.790709Z",
+      "sha": "d95a2f826299563aa57f6fa99009e6e13a65151b"
+    },
+    "ukrr-dialysis-opcs-4.csv": {
+      "id": "ukrr/dialysis-opcs-4/505bef04",
+      "url": "https://www.opencodelists.org/codelist/ukrr/dialysis-opcs-4/505bef04/",
+      "downloaded_at": "2026-02-23 11:36:32.653856Z",
+      "sha": "bf7244d0625246dabfd64334a034e52a8307c42d"
+    },
+    "ukrr-dialysis-icd10.csv": {
+      "id": "ukrr/dialysis-icd10/2a5cf9a2",
+      "url": "https://www.opencodelists.org/codelist/ukrr/dialysis-icd10/2a5cf9a2/",
+      "downloaded_at": "2026-02-23 11:36:32.740736Z",
+      "sha": "62e982c9884edff2a16c2c9f3963f773d2c3dd95"
+    }
+  }
 }
