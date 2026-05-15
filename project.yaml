@@ -3,7 +3,7 @@ version: '5.0'
 actions:
 
   study_dates:
-    run: r:v2 analysis/dataset_definition/study_dates.r
+    run: r:v2 analysis/config/config.r
     outputs:
       highly_sensitive:
         study_dates_json: output/study_dates.json

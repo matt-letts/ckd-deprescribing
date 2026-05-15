@@ -30,7 +30,7 @@ dir_create(here::here("output", "figures", "cleaning_inex"))
 
 # Import dates -----------------------------------------------------------
 message("Import dates")
-source(here::here("analysis", "dataset_definition", "study_dates.r"))
+source(here::here("analysis", "config", "config.r"))
 study_dates <- lapply(study_dates, function(x) as.Date(x))
 
 # Load dataset, keeping in arrow format for speed ------------------------
