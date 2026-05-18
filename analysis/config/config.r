@@ -1,6 +1,5 @@
 ##########################################################################
-# config.r
-# Defines and stores study-wide parameters and definitions
+# This script defines and stores study-wide parameters and definitions
 ##########################################################################
 
 library(jsonlite)
@@ -15,7 +14,7 @@ study_dates <- list(
   end_date = "2026-02-28"
 )
 
-# .json easily called by ehrQL and R scripts
+# .json to be called by ehrQL and R scripts
 write_json(
   study_dates,
   path = here::here("output", "study_dates.json"),
@@ -23,5 +22,13 @@ write_json(
   pretty = TRUE
 )
 
-# Chronic medication sensitivity analyses --------------------------------
-chronic_med_definitions <- list()
+# Chronic medication analyses ---------------------------------------------
+chronic_med_definitions <- list(
+  base = list(
+    min_prescriptions = 2,
+    lookback_days = 180,
+    allowable_index_gap = 90,
+    prior_fill_gap = 21,
+    per_half = FALSE
+  )
+)
