@@ -46,7 +46,6 @@ source(here::here(
 message("Create output folders")
 dir_create(here::here("output", "data"))
 dir_create(here::here("output", "data_descriptions", "process_baseline_meds"))
-dir_create(here::here("output", "figures", "process_baseline_meds"))
 
 # Import dates -----------------------------------------------------------
 message("Import dates")
