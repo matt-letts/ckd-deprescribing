@@ -1,6 +1,6 @@
 ##########################################################################
 # This script does the following:
-# 1. Loads medication dataset (dataset_inex_meds.arrow) and preprocesses it
+# 1. Loads medication dataset (dataset_baseline_meds.arrow) and preprocesses it
 # 2. Separates patients with no medications recorded for later reattachment
 # 3. Loads pre-built dmd_lookup from local_processing/medication_lookup_tables/
 # 4. Converts patient DMD codes to BNF substance codes via join to dmd_lookup
@@ -60,7 +60,7 @@ study_dates <- lapply(study_dates, function(x) as.Date(x))
 
 # Load dataset -----------------------------------------------------------
 message("Load the dataset")
-input_filename <- "dataset_inex_meds.arrow"
+input_filename <- "dataset_baseline_meds.arrow"
 dataset_process_baseline_meds_1_input <- arrow::open_dataset(
   here::here("output", input_filename),
   format = "ipc"

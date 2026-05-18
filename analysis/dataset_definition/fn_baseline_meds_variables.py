@@ -1,11 +1,10 @@
 ##########################################################################
 # This script writes functions to extract medication-related variables for
-# use in dataset_definition_inex_meds.py
+# use in dataset_definition_baseline_meds.py
 ##########################################################################
 
 from ehrql import days
 from ehrql.tables.tpp import medications
-from fn_misc_variables import count_recent_meds
 
 #########################################################################################
 # add_recent_prescriptions

@@ -1,19 +1,19 @@
 ###########################################################################
-# Test data for dataset_definition_inex_meds.py
+# Test data for dataset_definition_baseline_meds.py
 #
 # This test checks the performance of add_prescription_columns(), which is
-# the main component of dataset_definition_inex_meds.py 
+# the main component of dataset_definition_baseline_meds.py 
 #
-# Note: as dataset_definition_inex_meds filters to patients in
+# Note: as dataset_definition_baseline_meds filters to patients in
 # dataset_inex_cleaned.arrow, patient IDs here must also appear in that
 # dataset - this test can only be performed locally, as will not know
 # patient IDs in real data.
 #
-# opensafely exec ehrql:v1 assure analysis/dataset_definition/test_dataset_definition_inex_meds.py
+# opensafely exec ehrql:v1 assure analysis/dataset_definition/test_dataset_definition_baseline_meds.py
 ###########################################################################
 
 from datetime import date
-from dataset_definition_inex_meds import dataset
+from dataset_definition_baseline_meds import dataset
 
 test_data = {
     
