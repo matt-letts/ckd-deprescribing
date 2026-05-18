@@ -17,8 +17,9 @@
 # - add _midpoint6_derived to values derived from midpoint 6 values
 ##########################################################################
 
-fn_apply_sdc <- function(x, threshold = 7) {
-  replace(x, x > 0 & x <= threshold, NA)
+fn_apply_sdc <- function(x, threshold = 7, round_to = 5) {
+  x <- replace(x, x > 0 & x <= threshold, NA)
+  round(x / round_to) * round_to
 }
 
 fn_roundmid_any <- function(x, to = 6) {
