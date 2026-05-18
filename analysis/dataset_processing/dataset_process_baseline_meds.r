@@ -4,8 +4,8 @@
 # 2. Separates patients with no medications recorded for later reattachment
 # 3. Loads pre-built dmd_lookup from local_processing/medication_lookup_tables/
 # 4. Converts patient DMD codes to BNF substance codes via join to dmd_lookup
-# 5. Reattaches patients with no medications
-# 6. Applies minimal medication exclusion criteria
+# 5. Applies minimal medication exclusion criteria
+# 6. Reattaches patients with no medications
 # 7. Saves processed dataset, flow table, and data descriptions
 ##########################################################################
 
@@ -34,12 +34,6 @@ source(here::here(
   "r_functions",
   "medications",
   "fn_med_inex_criteria.r"
-))
-source(here::here(
-  "analysis",
-  "r_functions",
-  "utilities",
-  "fn_disclosure_control.r"
 ))
 source(here::here(
   "analysis",
@@ -75,8 +69,9 @@ dataset_process_baseline_meds_2_preprocessed <- fn_preprocess(
   collect() # have to collect for the next steps
 
 # Full list of patient IDs for denominator in later summaries
-all_patient_ids <- dataset_process_baseline_meds_2_preprocessed |>
-  distinct(patient_id)
+all_patient_ids <- tibble(
+  patient_id = dataset_process_baseline_meds_2_preprocessed$patient_id
+)
 
 # Separate patients with no medications ----------------------------------
 dmd_cols <- grep(
@@ -88,17 +83,13 @@ dataset_process_baseline_meds_2_preprocessed <-
   dataset_process_baseline_meds_2_preprocessed |>
   mutate(.no_meds = if_all(all_of(dmd_cols), is.na))
 
-patients_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
-  filter(.no_meds) |>
-  select(patient_id)
-
 dataset_process_baseline_meds_3_remove_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
   filter(!.no_meds) |>
   select(-.no_meds)
 
 message(sprintf(
-  "%d patients with no medicines recorded - separated to rejoin at end",
-  nrow(patients_no_meds)
+  "%d patients with no medicines recorded",
+  sum(dataset_process_baseline_meds_2_preprocessed$.no_meds)
 ))
 
 # Load pre-built medication lookup table ---------------------------------
@@ -117,34 +108,6 @@ dataset_process_baseline_meds_4_dmd_converted <- fn_dmd_to_bnf(
   unmapped_action = "drop"
 )
 
-# Reattach patients with no medications ----------------------------------
-patients_no_meds <- patients_no_meds |>
-  transmute(
-    patient_id,
-    med_index = NA_integer_,
-    dmd_code = NA_character_,
-    med_date = as.Date(NA),
-    bnf_substance_code = NA_character_,
-    dmd_name = NA_character_,
-    bnf_imputed = NA,
-    route_cat = factor(NA)
-  )
-
-if (
-  !setequal(
-    names(dataset_process_baseline_meds_4_dmd_converted),
-    names(patients_no_meds)
-  )
-) {
-  stop("patients_no_meds columns do not match main dataset after transmute")
-}
-
-dataset_process_baseline_meds_5_no_meds_reattached <- bind_rows(
-  patients_no_meds,
-  dataset_process_baseline_meds_4_dmd_converted
-) |>
-  arrange(patient_id, med_index)
-
 # Apply minimal medication exclusion criteria ----------------------------
 # Remove BNF chapters that will never be analysed:
 #  14: immunological products (immunoglobulins and vaccines)
@@ -155,8 +118,8 @@ dataset_process_baseline_meds_5_no_meds_reattached <- bind_rows(
 #  21: appliances
 #  22: incontinence appliances
 #  23: stoma appliances
-dataset_process_baseline_meds_6_exclusions_applied <-
-  dataset_process_baseline_meds_5_no_meds_reattached |>
+dataset_process_baseline_meds_5_exclusions_applied <-
+  dataset_process_baseline_meds_4_dmd_converted |>
   mutate(bnf_chapter_code = substr(bnf_substance_code, 1, 2)) |>
   fn_apply_med_inex_criteria(
     project_stage = "process_baseline_meds",
@@ -165,7 +128,15 @@ dataset_process_baseline_meds_6_exclusions_applied <-
   ) |>
   select(-bnf_chapter_code)
 
-dataset_baseline_meds_processed <- dataset_process_baseline_meds_6_exclusions_applied
+# Reattach patients with no medications via left join --------------------
+dataset_process_baseline_meds_6_no_meds_reattached <- all_patient_ids |>
+  left_join(
+    dataset_process_baseline_meds_5_exclusions_applied,
+    by = "patient_id"
+  ) |>
+  arrange(patient_id, med_index)
+
+dataset_baseline_meds_processed <- dataset_process_baseline_meds_6_no_meds_reattached
 
 # Write data descriptions and flow table ---------------------------------
 message("Write/save outputs:")
@@ -181,24 +152,22 @@ message(
 )
 bnf_imputation_summary <- bind_rows(
   # Number and percentage of prescriptions where BNF code imputed
-  dataset_baseline_meds_processed |>
-    filter(!is.na(bnf_substance_code)) |>
+  dataset_process_baseline_meds_5_exclusions_applied |>
     summarise(
       metric = "prescriptions_with_imputed_bnf_code",
-      n = fn_apply_sdc(sum(bnf_imputed, na.rm = TRUE)),
+      n = sum(bnf_imputed),
       n_total = n(),
-      pct = round(n / n_total * 100, 1)
+      pct = round(n / n_total * 100, 2)
     ),
   # Number and percentage of patients with at least one prescription where BNF code imputed
-  dataset_baseline_meds_processed |>
-    filter(!is.na(bnf_substance_code)) |>
+  dataset_process_baseline_meds_5_exclusions_applied |>
     group_by(patient_id) |>
     summarise(any_imputed = any(bnf_imputed), .groups = "drop") |>
     summarise(
       metric = "patients_with_any_imputed_prescription",
-      n = fn_apply_sdc(sum(any_imputed)),
+      n = sum(any_imputed),
       n_total = nrow(all_patient_ids),
-      pct = round(n / n_total * 100, 1)
+      pct = round(n / n_total * 100, 2)
     )
 )
 
