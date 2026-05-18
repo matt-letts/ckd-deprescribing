@@ -1,15 +1,15 @@
 ##########################################################################
 # fn_flag_chronic_meds()
 #
-# Ascribes an 'is_chronic' flag to each medication if meets criteria to
-# be defined as chronically prescribed based on prescription history
+# Gives an 'is_chronic_[def]' flag to each medication if meets criteria to
+# be defined as chronically prescribed based on chronic prescription [def]
 #
 # Groups at patient/bnf_substance_code level. This means that:
 #  - combination meds are counted as one
-#  - >1 dose of a medicines (e.g. levothyroxine 50mcg+25mcg) is one
+#  - >1 dose of a medicine (e.g. levothyroxine 50mcg+25mcg) is one
 #
 # Arguments:
-#   data : tibble; one row per prescription. Must contain
+#   data : one row per prescription. Must contain
 #     patient_id, bnf_substance_code, med_date.
 #   config : list with named elements:
 #      min_prescriptions  — minimum number of prescriptions required
@@ -19,22 +19,27 @@
 #      per_half — if TRUE, requires >=1 prescription in each half of the
 #                 lookback window (FALSE for base analyses)
 #   index_date : index_date
+#   config_name : optional string; if provided, the is_chronic flag is
+#                 renamed to is_chronic_{config_name} in the output
 #
 # Returns:
 #   Tibble with one row per (patient_id, bnf_substance_code). Contains
-#   is_chronic flag plus intermediate columns (n_scripts, days_to_last,
-#   span_days, has_recent_half, has_early_half) for inspection.
+#   is_chronic (or is_chronic_{config_name}) flag plus intermediate
+#   columns (n_scripts, days_before_index_most_recent_prescription,
+#   in_window_days_spanning_first_and_last, has_recent_half,
+#   has_earlier_half) for inspection.
 ##########################################################################
 
 fn_flag_chronic_meds <- function(
   data,
   config,
-  index_date
+  index_date,
+  config_name = NULL
 ) {
   window_start <- index_date - config$lookback_days
   halfway_point <- index_date - (config$lookback_days / 2)
 
-  data |>
+  result <- data |>
     filter(
       med_date >= window_start,
       med_date <= index_date
@@ -59,4 +64,13 @@ fn_flag_chronic_meds <- function(
         in_window_days_spanning_first_and_last >= config$prior_fill_gap &
         (!config$per_half | (has_recent_half & has_earlier_half))
     )
+
+  if (!is.null(config_name)) {
+    names(result)[names(result) == "is_chronic"] <- paste0(
+      "is_chronic_",
+      config_name
+    )
+  }
+
+  return(result)
 }
