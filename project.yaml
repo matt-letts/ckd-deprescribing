@@ -34,21 +34,21 @@ actions:
         cleaning_inex_med_count_summary: output/data_descriptions/cleaning_inex/med_count_summary.csv
 
   
-  generate_dataset_inex_meds:
+  generate_dataset_baseline_meds:
     run: >
-      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_inex_meds.py
+      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_baseline_meds.py
       --dummy-tables dummy_tables/
-      --output output/dataset_inex_meds.arrow
-    # --test-data-file analysis/dataset_definition/test_dataset_definition_inex_meds.py
+      --output output/dataset_baseline_meds.arrow
+    # --test-data-file analysis/dataset_definition/test_dataset_definition_baseline_meds.py
     needs: [study_dates, dataset_cleaning_inex]
     outputs:
       highly_sensitive:
-        dataset_inex_meds: output/dataset_inex_meds.arrow
+        dataset_baseline_meds: output/dataset_baseline_meds.arrow
 
-  
+
   dataset_process_baseline_meds:
     run: r:v2 analysis/dataset_processing/dataset_process_baseline_meds.r
-    needs: [generate_dataset_inex_meds, study_dates]
+    needs: [generate_dataset_baseline_meds, study_dates]
     outputs:
       highly_sensitive:
         dataset_baseline_meds_processed: output/data/dataset_baseline_meds_processed.arrow
@@ -58,3 +58,21 @@ actions:
         process_baseline_meds_dmd_not_in_lookup: output/data_descriptions/process_baseline_meds/dmd_not_in_lookup.csv
         process_baseline_meds_dmd_unmapped_to_bnf: output/data_descriptions/process_baseline_meds/dmd_unmapped_to_bnf.csv
         process_baseline_meds_route_classification_patient_summary: output/data_descriptions/process_baseline_meds/route_classification_patient_summary.csv
+        process_baseline_meds_bnf_imputation_summary: output/data_descriptions/process_baseline_meds/bnf_imputation_summary.csv
+
+
+  analyse_baseline_meds:
+    run: r:v2 analysis/dataset_analysis/analyse_baseline_meds.r
+    needs: [dataset_process_baseline_meds, study_dates]
+    outputs:
+      highly_sensitive:
+        dataset_baseline_meds_analysed: output/data/dataset_baseline_meds_analysed.arrow
+        analyse_baseline_meds_data_descriptions: output/data_descriptions/analyse_baseline_meds/*.txt
+      moderately_sensitive:
+        analyse_baseline_meds_data_flow: output/data_descriptions/analyse_baseline_meds/data_flow.csv
+        counts_days_before_index: output/data_descriptions/analyse_baseline_meds/counts_days_before_index.csv
+        chronic_meds_summary_sens_analysis: output/data_descriptions/analyse_baseline_meds/chronic_meds_summary.csv
+        chronic_meds_frequency_sens_analysis: output/data_descriptions/analyse_baseline_meds/chronic_meds_frequency.csv
+        meds_prevalence_substance: output/data_descriptions/analyse_baseline_meds/meds_prevalence_substance.csv
+        meds_prevalence_subparagraph: output/data_descriptions/analyse_baseline_meds/meds_prevalence_subparagraph.csv
+        meds_prevalence_paragraph: output/data_descriptions/analyse_baseline_meds/meds_prevalence_paragraph.csv
