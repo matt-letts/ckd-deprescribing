@@ -4,6 +4,7 @@
 # Lookup tables and their build functions live in:
 # local_processing/medication_lookup_tables/
 ##########################################################################################
+source(here::here("analysis", "r_functions", "utilities", "fn_disclosure_control.r"))
 
 #######################################################################################
 # fn_write_unmapped_codes() - diagnostics
