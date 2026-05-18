@@ -87,7 +87,3 @@ def add_prescription_columns(dataset, index_date, max_meds=10, days_before_index
         ).items():
         dataset.add_column(name, expr)
 
-    dataset.add_column("med_num_count", count_recent_meds(
-        index_date,
-        days_before_index=days_before_index)
-        )

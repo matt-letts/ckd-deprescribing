@@ -90,7 +90,7 @@ dataset_process_baseline_meds_2_preprocessed <-
 
 patients_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
   filter(.no_meds) |>
-  select(patient_id, med_num_count)
+  select(patient_id)
 
 dataset_process_baseline_meds_3_remove_no_meds <- dataset_process_baseline_meds_2_preprocessed |>
   filter(!.no_meds) |>
@@ -121,7 +121,6 @@ dataset_process_baseline_meds_4_dmd_converted <- fn_dmd_to_bnf(
 patients_no_meds <- patients_no_meds |>
   transmute(
     patient_id,
-    med_num_count,
     med_index = NA_integer_,
     dmd_code = NA_character_,
     med_date = as.Date(NA),
