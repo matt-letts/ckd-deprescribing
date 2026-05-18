@@ -1,6 +1,6 @@
 ##########################################################################################
 # These functions run locally (outside the OpenSAFELY pipeline) using source files
-# from docs/. Diagnostic CSVs are written to output/local_outputs/.
+# from docs/. Diagnostic CSVs are written to local_processing/outputs/.
 #
 # Run build_medication_lookup_tables.r to run functions and save outputs.
 ##########################################################################################
@@ -164,7 +164,7 @@ fn_build_dmd_bnf_lookup <- function(
 #
 # Returns:
 #   dmd_lookup with route_cat (factor) and route_uncertain (logical) added
-#   two diagnostic CSVs are also output to output/local_outputs/:
+#   two diagnostic CSVs are also output to local_processing/outputs/:
 #     *route_by_bnf_chapter.csv : route classification by BNF chapter
 #     *route_unclassified_detail.csv : details of unclassified products
 #######################################################################################
@@ -247,8 +247,8 @@ fn_classify_med_route <- function(
   write_csv(
     bnf_chapter_route_summary,
     here::here(
-      "output",
-      "local_outputs",
+      "local_processing",
+      "outputs",
       paste0(project_stage, "-dmd_lookup_route_by_bnf_chapter_summary.csv")
     )
   )
@@ -263,8 +263,8 @@ fn_classify_med_route <- function(
   write_csv(
     unclassified_detail,
     here::here(
-      "output",
-      "local_outputs",
+      "local_processing",
+      "outputs",
       paste0(project_stage, "-dmd_lookup_route_unclassified_detail.csv")
     )
   )

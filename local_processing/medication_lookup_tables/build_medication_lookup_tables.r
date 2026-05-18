@@ -10,7 +10,7 @@
 # The resulting .rds files are used in:
 # 1. analysis/dataset_processing/dataset_process_baseline_meds.r
 #
-# Diagnostic CSVs are written to output/local_outputs/
+# Diagnostic CSVs are written to local_processing/outputs/
 ##################################################################################
 
 # Import libraries and functions -----------------------------------------
@@ -31,7 +31,7 @@ source(here::here(
 ))
 
 # Create output folders --------------------------------------------------
-dir_create(here::here("output", "local_outputs"))
+dir_create(here::here("local_processing", "outputs"))
 
 # Build lookup tables ----------------------------------------------------
 dmd_lookup <- fn_build_dmd_bnf_lookup(impute_bnf_from_vtm = TRUE)

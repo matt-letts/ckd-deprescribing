@@ -207,8 +207,8 @@ fn_classify_route_from_trud <- function(
   write_csv(
     bnf_chapter_route_summary,
     here::here(
-      "output",
-      "local_outputs",
+      "local_processing",
+      "outputs",
       paste0(project_stage, "-trud_route_by_bnf_chapter_summary.csv")
     )
   )
@@ -223,8 +223,8 @@ fn_classify_route_from_trud <- function(
   write_csv(
     unclassified_detail,
     here::here(
-      "output",
-      "local_outputs",
+      "local_processing",
+      "outputs",
       paste0(project_stage, "-trud_route_unclassified_detail.csv")
     )
   )
@@ -233,8 +233,8 @@ fn_classify_route_from_trud <- function(
   write_csv(
     vmps_no_route,
     here::here(
-      "output",
-      "local_outputs",
+      "local_processing",
+      "outputs",
       paste0(project_stage, "-trud_vmps_no_route.csv")
     )
   )
@@ -243,8 +243,8 @@ fn_classify_route_from_trud <- function(
   write_csv(
     multiple_route_detail,
     here::here(
-      "output",
-      "local_outputs",
+      "local_processing",
+      "outputs",
       paste0(project_stage, "-trud_multiple_route_detail.csv")
     )
   )
