@@ -228,7 +228,8 @@ chronic_meds_frequency_table <- counts_long |>
   pivot_wider(
     names_from = analysis,
     values_from = n_patients,
-    names_prefix = "n_patients_"
+    names_prefix = "n_patients_",
+    values_fill = 0L
   )
 # extend: counts_long picks up new analyses automatically via starts_with("n_chronic")
 
