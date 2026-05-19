@@ -32,7 +32,7 @@ fn_dem_inex_criteria <- function(
   message("Registered <1 yr: ", counts$n_not_registered_1yr)
 
   # Apply demographic filters lazily
-  arrow_data_dem_inex_applied <- arrow_data %>%
+  arrow_data_dem_inex_applied <- arrow_data |>
     filter(
       inex_dem_bin_alive,
       inex_dem_bin_age_include,
