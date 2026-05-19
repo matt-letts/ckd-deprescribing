@@ -24,9 +24,18 @@ fn_egfr_ckdepi2009 <- function(
   age,
   sex
 ) {
-  kappa <- ifelse(sex == "female", 61.9, 79.6)
-  alpha <- ifelse(sex == "female", -0.329, -0.411)
-  female_multiplier <- ifelse(sex == "female", 1.018, 1.0)
+  kappa <- case_when(
+    sex == "female" ~ 61.9,
+    sex == "male" ~ 79.6
+  )
+  alpha <- case_when(
+    sex == "female" ~ -0.329,
+    sex == "male" ~ -0.411
+  )
+  female_multiplier <- case_when(
+    sex == "female" ~ 1.018,
+    sex == "male" ~ 1.0
+  )
 
   ratio <- creat_umol / kappa
 
