@@ -22,16 +22,18 @@ See [project_pipeline.md](./project_pipeline.md) for a diagram of the analysis f
 
 ```
 analysis/
+  config/                   # Config file to set study-wide parameters
+  dataset_analysis/         # Data analysis scripts (R)
   dataset_definition/       # Scripts for data extraction (ehrQL and python)
   dataset_processing/       # Data cleaning and processing scripts (R)
   r_functions/              # R functions sourced by processing scripts
-codelists/                  # Codelists sourced from [OpenCodelists](https://www.opencodelists.org/)
+codelists/                  # Codelists sourced from https://www.opencodelists.org/
 docs/                       # Reference files and pipeline diagram
-protocols/                  # Study protocol
 dummy_tables/               # Tables used for local testing only
 local_processing/ 
   generate_dummy_tables/    # Functions to create dummy tables - local testing only
-  medication_lookup_tables/ # Functions/scripts and resulting data files used for medication mapping
+  medication_lookup_tables/ # Scripts and lookups used for medication mapping
+protocols/                  # Study protocol
 ```
 
 # About the OpenSAFELY framework
