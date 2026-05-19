@@ -108,21 +108,13 @@ dataset_process_baseline_meds_4_dmd_converted <- fn_dmd_to_bnf(
 )
 
 # Apply minimal medication exclusion criteria ----------------------------
-# Remove BNF chapters that will never be analysed:
-#  14: immunological products (immunoglobulins and vaccines)
-#  15: anaesthesia
-#  18: preparations used in diagnosis
-#  19: other drugs and preparations
-#  20: dressings
-#  21: appliances
-#  22: incontinence appliances
-#  23: stoma appliances
+# Exclude BNF chapters that will never be analysed; no route exclusions
 dataset_process_baseline_meds_5_exclusions_applied <-
   dataset_process_baseline_meds_4_dmd_converted |>
   mutate(bnf_chapter_code = substr(bnf_substance_code, 1, 2)) |>
   fn_apply_med_inex_criteria(
     project_stage = "process_baseline_meds",
-    exclude_bnf_chapters = c("14", "15", "18", "19", "20", "21", "22", "23"),
+    exclude_bnf_chapters = exclude_bnf_chapters$base,
     exclude_route_cats = NULL
   ) |>
   select(-bnf_chapter_code)
