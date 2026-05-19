@@ -137,7 +137,7 @@ message(sprintf(
 ##########################################################################
 
 message("Build patient-level oral substance dataset")
-dataset_baseline_meds_analysed <- chronic_flags_oral_base |>
+dataset_analyse_baseline_meds_2_chronic_oral <- chronic_flags_oral_base |>
   filter(is_chronic_base) |>
   select(
     patient_id,
@@ -145,6 +145,8 @@ dataset_baseline_meds_analysed <- chronic_flags_oral_base |>
     days_before_index_most_recent_prescription
   ) |>
   add_count(patient_id, name = "med_count")
+
+dataset_baseline_meds_analysed <- dataset_analyse_baseline_meds_2_chronic_oral
 
 # Binned frequency table to look at how recent the most recent
 # prescriptions were
@@ -167,6 +169,7 @@ counts_days_before_index <- dataset_baseline_meds_analysed |>
 ##########################################################################
 # Analysis A: medications per patient
 # How many chronic medications is each patient on at baseline?
+# How varied are patients' baseline medications (breadth of BNF chapters)?
 ##########################################################################
 
 # One left_join per sensitivity analysis.
@@ -232,6 +235,19 @@ chronic_meds_frequency_table <- counts_long |>
     values_fill = 0L
   )
 # extend: counts_long picks up new analyses automatically via starts_with("n_chronic")
+
+message("Build BNF chapter breadth frequency table")
+bnf_chapters_frequency_table <- all_patient_ids |>
+  left_join(
+    dataset_baseline_meds_analysed |>
+      mutate(bnf_chapter_code = substr(bnf_substance_code, 1, 2)) |>
+      group_by(patient_id) |>
+      summarise(n_chapters = n_distinct(bnf_chapter_code), .groups = "drop"),
+    by = "patient_id"
+  ) |>
+  mutate(n_chapters = replace_na(n_chapters, 0L)) |>
+  count(n_chapters, name = "n_patients") |>
+  mutate(n_patients = fn_apply_sdc(n_patients))
 
 ##########################################################################
 # Analysis B: patients per medication
@@ -345,6 +361,18 @@ write_csv(
     "chronic_meds_frequency.csv"
   )
 )
+
+message("--- BNF chapter breadth frequency table")
+write_csv(
+  bnf_chapters_frequency_table,
+  here::here(
+    "output",
+    "data_descriptions",
+    "analyse_baseline_meds",
+    "bnf_chapters_frequency.csv"
+  )
+)
+
 
 message("--- Medication prevalence tables")
 write_csv(
