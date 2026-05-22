@@ -19,9 +19,9 @@ csl: "https://www.zotero.org/styles/vancouver"
 
 ---
 
-| Version | Description |
-|---------|-------------|
-| 1.0 | Initial protocol developed and structured according to RECORD-PE [@Brown2024] |
+| Version | Description | Date |
+|---------|-------------|------|
+| 1.0 | Initial protocol developed and structured according to RECORD-PE [@Brown2024] | 22/05/2026 |
 
 ---
 
@@ -37,9 +37,10 @@ Research has shown that a small number of people with advanced kidney disease ar
 
 Other factors that make this an important area to study include:
 
-- Supported by policy, and lack of research into deprescribing - current NIHR call
+- Supported by policy - Department of Health and Social Care report on reducing overprescribing [@DHSC2021],
+- Call for more research into deprescribing - current NIHR call, HDR UK Medicines in acute and Chronic disease driver programme
 - Importance to patients, prescribers, and health and care services
-- Relevant as a James Lind Alliance priority for medicines in older life.
+- James Lind Alliance priority for understanding medicines in older life.
 
 # Objectives
 
@@ -62,7 +63,7 @@ We will analyse the primary care record data of people living in England that is
 - Office for National Statistics (ONS) data on registered deaths
 - NHS Secondary Uses Service data, which is used to derive ethnicity information and to help identify individuals in receipt of KRT
 
-## Study participants
+## Study population
 
 This retrospective cohort study will analyse the cohort of individuals living with advanced kidney disease on 01/03/2022, and then follow up their prescriptions for the following 4 years.
 
@@ -70,17 +71,17 @@ This retrospective cohort study will analyse the cohort of individuals living wi
 
 Individuals will be included in the cohort if on 01/03/2022 they meet all the following criteria:
 
-1. Alive
-2. Age ≥18 and ≤110 years
-3. Continuous registration at a single GP practice that uses TPP software for at least one year prior to the index date.
-4. Evidence of advanced chronic kidney disease, confirmed by the presence of one or both of the following [@Sparks2025]: 
-    a. The two most recent serum creatinine measurements that are >90 days apart consistent with an estimated glomerular filtration rate (eGFR) <30 mls/min/1.73m^2^ (calculated using the 2009 CKD-EPI equation as recommended by the [UK Kidney Association](https://www.ukkidney.org/health-professionals/information-resources/uk-eckd-guide/measurement-kidney-function)).
-    b. SNOMED codes for CKD 4 and 5 as published on [OpenCodelists](https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2/).
+- Alive
+- Aged ≥18 and ≤110 years
+- Continuous registration at a single GP practice that uses TPP software for at least the one year prior.
+- Evidence of advanced chronic kidney disease, confirmed by the presence of one or both of the following [@Sparks2025]: 
+    - The two most recent serum creatinine measurements that are >90 days apart are consistent with an estimated glomerular filtration rate (eGFR) <30 mls/min/1.73m^2^ (calculated using the 2009 CKD-EPI equation as recommended by the [UK Kidney Association](https://www.ukkidney.org/health-professionals/information-resources/uk-eckd-guide/measurement-kidney-function)).
+    - SNOMED codes for CKD 4 and 5 as published on [OpenCodelists](https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2/).
 
 
 ### Exclusion criteria
 
-1. People who have been coded to receive kidney replacement therapy (KRT) of any sort (dialysis or transplant) prior to the index date, or on the index date itself. KRT will be defined using established primary and secondary care [codes](https://www.opencodelists.org/codelist/opensafely/renal-replacement-therapy/2020-04-14/#full-list) that have been shown to be sensitive for identifying the prevalent KRT population in England [@Santhakumaran2024]. 
+- People who have been coded to receive kidney replacement therapy (KRT) of any sort (dialysis or transplant) prior to the index date, or on the index date itself. KRT will be defined using established primary and secondary care [codes](https://www.opencodelists.org/codelist/opensafely/renal-replacement-therapy/2020-04-14/#full-list) that have been shown to be sensitive for identifying the prevalent KRT population in England [@Santhakumaran2024]. 
 
 ### Follow up
 
@@ -96,97 +97,87 @@ Study participants will be followed up from the index date until the earliest of
 Individuals will only be included if they meet all the following criteria:
 
 - Known sex that is exactly 'male' or 'female'
-- Known age between 18 and 110 at index date
+- Known date of birth
 - Known IMD
 - Known ethnicity
 - Known STP
 
-## Medication variables
+## Medication data
 
 In this analysis we will study baseline prescribing on the index date, and the trends of medication discontinuation over time.
 
-### Medication data
-
-The medication table within OpenSAFELY-TPP contains information for every medication that is prescribed in primary care. This information is recorded as 'date' of prescription and 'dictionary of medicines and devices (dm+d) code' corresponding to the prescription. In OpenSAFELY, each dm+d code corresponds to the name (e.g. atorvastatin), strength (e.g. 40mg) and formulation (e.g. tablet) of a prescribed drug, but not the dosing recommendation (e.g. take 1 tablet once a day), nor the amount of medication prescribed (e.g. 28 tablets). Data on whether a prescription was issued, or whether the patient took the medication as prescribed are also not available.
+The medication table within OpenSAFELY-TPP contains information for every medication that is prescribed in primary care. This information is recorded as 'date' of prescription and 'dictionary of medicines and devices (dm+d) code' corresponding to the prescription. Dm+d codes are the preferred mechanism through which medicinal product identification and communication occurs within the NHS. In OpenSAFELY, each dm+d code corresponds to the name (e.g. atorvastatin), strength (e.g. 40mg) and formulation (e.g. tablet) of a prescribed drug. Data on the dosing recommendation (e.g. take 1 tablet once a day), the amount of medication prescribed (e.g. 28 tablets), whether a prescription was issued, or whether the patient took the medication as prescribed are not available.
 
 ### Medication data handling
 
-Each medication will have its dm+d code mapped to its corresponding British National Formulary (BNF) substance code using publicly available [mapping data](https://www.nhsbsa.nhs.uk/prescription-data/understanding-our-data/bnf-snomed-mapping). BNF codes follow a clear hierarchical structure and allow for clinically meaningful grouped analyses.
+Each medication will have its dm+d code mapped to its corresponding British National Formulary (BNF) substance code using publicly available [mapping data](https://www.nhsbsa.nhs.uk/prescription-data/understanding-our-data/bnf-snomed-mapping). BNF codes follow a clear hierarchical structure and allow for clinically meaningful analysis. Each dm+d code has one or more official routes of administration, which themselves are coded using unique SNOMED identifiers. Mapping of these routes will be performed using publicly available data from [NHS TRUD](https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/6) (Technology Reference data Update Distribution). Each of the 79 official routes of administration will be mapped to one of the following categories: oral, topical, inhaled, eye/ear/nasal, oromucosal, rectal/vaginal, transdermal, intramuscular, intravenous, subcutaneous and other. Those with multiple licensed routes will be attributed 'multiple routes', and those with no licensed routes will be attributed 'unknown'.
 
-When considering which medications to include we have used previously described methods [@Goedken2016]:
+## Baseline medications
+When considering which baseline medications to include in our analyses we have used previously described methods. These suggest categorising medications for based on their *scope, uniqueness and timeframe* [@Goedken2016].
 
-#### Scope
-Medication exclusions will be applied at the BNF chapter level, and based on medication route information.
---- EXPAND ---
+### Scope
+In the primary analysis, drugs within scope will be defined as:
+- Drug type - those within BNF chapters 1 to 13. BNF chapters 14 to 23 will be excluded as they represent specialist medicinal products and medical devices.
+- Route - those that are orally administered. This is because oral medications are the most likely to be deprescribed in this population.
 
-#### Uniqueness
+In sensitivity analyses, we will explore the effect of including drugs that are administered through other routes.
+Importantly, it will not be possible to distinguish PRN (as required) prescriptions from regular prescriptions, and so all medications will be assumed regular. 
 
-#### Timeframe
+### Uniqueness
+Combination products have distinct BNF substance codes and so will be counted as a single drug, which reflects their singular contribution towards pill count. 
 
-### Defining a chronic prescription
+### Timeframe
+We will analyse medicines that we define as being *chronic*, as these are more eligible for discontinuation. Chronic prescriptions are those that a person is prescribed at the study entry and have been prescribed *regularly* prior to this. There is no consensus regarding how to define a chronic prescription within electronic health record data. OpenSAFELY-TPP lacks data to show the clinician-intended duration for each prescription, however for five common medicines, 92% of prescriptions appeared to be intended for 28 or 56 days, with the remainder being for 7 or 84 days [@Mackenna2025]. In our primary analysis, considering this variability and to be pragmatic, we will define a medication as chronic (and include it in our analyses) if it is prescribed:
 
-In this study, we will analyse only medicines that we consider to be eligible for deprescribing — 'chronic'. These chronic prescriptions are those that are still prescribed at study entry and have been prescribed *regularly* prior to this. There is no consensus regarding how to define a chronic prescription within electronic health record data.
+- Two or more times within the 180 days prior to study entry, and
+- At least once within the most recent 90 days.
 
-Specifically, OpenSAFELY-TPP also lacks data to show the clinician-intended duration for each prescription. However, prior work looking at gaps between prescriptions in the same setting has shown that for five common medicines, 92% of prescriptions appeared to be for 28 or 56 days, with the remainder being for 7 or 84 days [@Mackenna2025]. In this study, considering this variability, we will define a medication as chronic (and include it in our analyses) if it is prescribed:
+Additionally, within those 180 days there must be >=21 days between the first and last prescriptions
+This effect of this definition on results will be explored through sensitivity analyses.
 
-- At least once in the 90 days prior to study entry, and
-- At least once in the 14–90 days prior to the most recent prescription before study entry.
+## Medication discontinuation
+Medications prescribed at baseline will be followed longitudinally for up to 4 years to examine patterns of discontinuation. In line with previous publications [@Bayliss2025], discontinuation will be defined by a gap in prescribing of a chronic medicine. Initially a gap of ≥90 days will be used, but sensitivity analyses will explore the effect of using gaps of: ≥30 days, ≥60 days and ≥180 days. The discontinuation date will be defined as the date after the end of the gap following the last prescription.
 
-This definition assumes that the maximum gap between prescriptions will be 90 days and allows for a short window around 84-day supplies to reflect real-world delays in prescription issuing.
+--- dose reduction? ---
+--- modelling prior gaps? ---
 
-The effect of varying this definition will be explored through sensitivity analyses.
+## Covariates
 
-Alternatives:
-
-Firstly:
-
-- At least once in the 90 days prior to study entry, and
-- At least *twice* in the 14–90 days prior to the most recent prescription before study entry.
-
-Secondly:
-
-- 2+ prescriptions in the 180 days prior to study entry, and
-- 14+ days between first and last, and
-- Most recent prescription within the last 90 days.
-
-### Definition of deprescribing
-
-In line with previous publications [@Bayliss2025], deprescribing will be defined by a gap in prescribing of a chronic medicine, or a reduction in the dose of a medicine. Initially a gap of ≥90 days will be used, but sensitivity analyses will explore the effect of using gaps of: ≥30 days, ≥60 days and ≥180 days. The deprescribing date will be defined as the date at which a prescription ended followed by the subsequent gap, or the date of a dose reduction.
-
-### Covariates
-
-The effect of various participant characteristics [at baseline]{.underline} on medication discontinuation will be explored. These characteristics have been chosen for two different reasons:
+The effect of various participant characteristics on prescribing at study entry and medication discontinuation will be explored. The characteristics have been chosen for two different reasons:
 
 - It is hypothesised that they will likely have an impact on medication discontinuation.
 - To promote analytical inclusivity, by exploring variations by protected characteristics.
 
-The characteristics to be explored are:
+Covariates, which will be defined on the index date are:
 
-1. Age
-2. Sex
-3. Ethnicity
-4. eGFR
-5. Number of chronic prescriptions
+- Age
+- Sex
+- Ethnicity
+- eGFR
+- Number of chronic prescriptions
+- Risk of mortality (see below)
+- Frailty (see below)
+- Presence or absence of comorbidities
 
-**[Risk of mortality]{.underline}**
+--- clinical events? e.g. falls/hospitalisations - probably would need to be examined longitudinally
 
-Estimated 4-yr risk of mortality will be estimated using the mortality prediction tool [CKD G4+](https://ckdpcrisk.org/lowgfrevents/) [@Grams2018] referenced in the 2024 KDIGO CKD clinical practice guideline [@Stevens2024]. This tool requires the following clinical and demographic data:
+### Risk of mortality
+The estimated 4-yr risk of mortality at baseline will be estimated using the mortality prediction tool [CKD G4+](https://ckdpcrisk.org/lowgfrevents/) [@Grams2018] referenced in the 2024 KDIGO CKD clinical practice guideline [@Stevens2024]. This tool requires the following clinical and demographic data:
 
 a. Age (values between 30 and 85)
-b. Sex (M/F)
-c. Race (B/W)
+b. Sex (male or female)
+c. Race (black or white)
 d. Proteinuria quantification (uPCR or uACR)
 e. Smoking status (current vs never/ex)
-f. Diabetes status (Y/N)
-g. History of cardiovascular disease (Y/N)
+f. Diabetes status (yes or no)
+g. History of cardiovascular disease (yes or no)
 h. eGFR (values between 15 and 30)
 i. Systolic BP (values between 90–180)
 
 Four strata will be viewed: <25%, 25–49%, 50–74%, ≥75%
 
-**[Frailty — in those 65+ years old]{.underline}**
-
-Frailty will be characterised using the electronic frailty index (eFI — ideally eFI2 [@Best2025]) a widely recommended metric for identifying frailty within electronic health records. Looks like should be computationally straightforward as variable already exists in TPP schema. Using eFI (or similar) to identify potentially frail people in primary care in England is a GP contractual obligation, and those identified as severely frail are recommended for annual structured medication review according to NHS England.
+### Frailty
+Frailty at baseline will be characterised using the electronic frailty index (eFI — ideally eFI2 [@Best2025]) a widely utilised metric for identifying frailty within electronic health records. Using eFI (or similar) to identify potentially frail people in primary care in England is a GP contractual obligation, and those identified as severely frail are recommended for annual structured medication review according to NHS England.
 
 Four strata will be viewed: non-frail, mildly frail, moderately frail, severely frail.
 

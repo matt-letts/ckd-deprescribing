@@ -16,3 +16,5 @@ local_processing/outputs/
 docs/nhsbsa_dmd*
 /ehrql-dummy-data*
 *claude*
+/.quarto/
+**/*.quarto_ipynb
