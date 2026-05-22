@@ -1,10 +1,9 @@
 ##########################################################################
 # This script defines helper functions and the main covariate extraction
 # function for dataset_definition_baseline_covariates.py:
-# 1. count_recent_meds() - counts prescriptions within a lookback window
-# 2. get_latest_ethnicity() - most recent ethnicity (primary care or SUS)
-# 3. get_imd() - categorises IMD into quintiles from address-linked data
-# 4. add_baseline_covariate_variables() - adds all covariate columns to
+# 1. get_latest_ethnicity() - most recent ethnicity (primary care or SUS)
+# 2. get_imd() - categorises IMD into quintiles from address-linked data
+# 3. add_baseline_covariate_variables() - adds all covariate columns to
 #    the dataset (ethnicity, IMD, smoking, diabetes, CVD, BP, proteinuria)
 ##########################################################################
 
@@ -18,29 +17,9 @@ from ehrql.tables.tpp import (
     clinical_events,
     ethnicity_from_sus,
     addresses,
-    medications,
 )
 
 from codelists import *
-
-######################################################################################
-# count_recent_meds()
-# this function returns the number of rows in the medications table for a given person
-# between the index date and a specified number of days before the index date.
-# Warning: if two rows contain the same date and same dmd code (i.e. duplicates) then 
-# they will be counted twice.
-#######################################################################################
-
-def count_recent_meds(index_date, days_before_index=90):
-
-    wanted_medications = medications.where(
-        medications.date.is_on_or_before(index_date) &
-        medications.date.is_on_or_after(index_date - days(days_before_index))
-    )
-
-    count = wanted_medications.count_for_patient()
-
-    return count
 
 #########################################################################################
 # get_latest_ethnicity()

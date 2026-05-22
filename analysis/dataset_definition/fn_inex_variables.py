@@ -9,22 +9,22 @@
 #####################################################################
 
 from ehrql.tables.tpp import (
-    patients, 
-    practice_registrations, 
-    clinical_events, 
-    ons_deaths, 
-    apcs
+    patients,
+    practice_registrations,
+    clinical_events,
+    ons_deaths,
+    apcs,
+    medications
 )
 from ehrql import (
-    months, 
-    days, 
-    case, 
+    months,
+    days,
+    case,
     when
 )
 from fn_baseline_covariate_variables import (
     get_imd,
     get_latest_ethnicity,
-    count_recent_meds
 )
 from codelists import *
 
@@ -309,6 +309,15 @@ def add_krt_inex_variables(
 
 
 # SIMPLE PRE-INDEX DATE MEDICATION COUNTS -----------------------------
+
+def count_recent_meds(index_date, days_before_index=90):
+    # Warning: duplicate rows (same date + dmd code) are counted twice
+    wanted_medications = medications.where(
+        medications.date.is_on_or_before(index_date) &
+        medications.date.is_on_or_after(index_date - days(days_before_index))
+    )
+    return wanted_medications.count_for_patient()
+
 
 def add_medication_inex_variables(
     index_date
