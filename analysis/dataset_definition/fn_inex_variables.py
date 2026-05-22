@@ -92,7 +92,7 @@ def add_ckd_inex_variables(
         clinical_events
         .where(clinical_events.snomedct_code.is_in(creatinine_codes))
         .where(clinical_events.numeric_value.is_not_null())
-        .where(clinical_events.date < index_date)
+        .where(clinical_events.date.is_on_or_before(index_date))
     )
 
     # Most recent creatinine per patient
@@ -125,7 +125,7 @@ def add_ckd_inex_variables(
     coded_ckd45 = (
         clinical_events
         .where(clinical_events.snomedct_code.is_in(primary_care_ckd45_codes))
-        .where(clinical_events.date < index_date)
+        .where(clinical_events.date.is_on_or_before(index_date))
     )
 
     # binary flag if a person has a CKD 4/5 code
@@ -188,7 +188,7 @@ def add_krt_inex_variables(
     primary_care_krt_code = (
         clinical_events
         .where(clinical_events.ctv3_code.is_in(primary_care_krt_codes_all))
-        .where(clinical_events.date < index_date)
+        .where(clinical_events.date.is_on_or_before(index_date))
     )
 
     # binary flag if a person has a secondary care krt code prior to index date
@@ -225,7 +225,7 @@ def add_krt_inex_variables(
             apcs.all_diagnoses.contains_any_of(secondary_care_krt_codes_icd10)
             | apcs.all_procedures.contains_any_of(secondary_care_krt_codes_opcs4)
         )
-        .where(apcs.admission_date < index_date)
+        .where(apcs.admission_date.is_on_or_before(index_date))
     )
 
     # binary flag if a person has a secondary care krt code
