@@ -11,7 +11,6 @@
 ##########################################################################
 
 from ehrql import create_dataset, table_from_file
-from ehrql.tables.tpp import medications, patients
 from fn_baseline_meds_variables import add_prescription_columns
 
 # define the project-relevant dates

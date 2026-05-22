@@ -144,7 +144,7 @@ def get_imd(
 # COMBINE ALL COVARIATE VARIABLES INTO ONE FUNCTION
 #####################################################################
 
-def add_baseline_covariate_variables(dataset, index_date):
+def add_baseline_covariates(dataset, index_date):
 
     columns = {
         "basecov_cat_ethnicity": None,
