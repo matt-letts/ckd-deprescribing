@@ -8,7 +8,7 @@
 #   - Serum creatinine (SNOMED)
 #   - Kidney replacement therapy: dialysis and transplant (SNOMED)
 #   - Ethnicity (6-category)
-#   - Medications: statins (DMD)
+#   - Baseline covariates: smoking, diabetes, CVD, systolic BP, uACR, uPCR
 ##########################################################################
 
 from ehrql import codelist_from_csv
@@ -101,3 +101,5 @@ ethnicity_snomed = codelist_from_csv(
     column="code",
     category_column="Grouping_6"
 )
+
+# baseline covariate codelists -----------------------------------------------------------

@@ -21,7 +21,7 @@ from ehrql import (
     case, 
     when
 )
-from fn_misc_variables import (
+from fn_baseline_covariate_variables import (
     get_imd,
     get_latest_ethnicity,
     count_recent_meds

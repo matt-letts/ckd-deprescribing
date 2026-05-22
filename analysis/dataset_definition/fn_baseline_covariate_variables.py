@@ -1,12 +1,11 @@
 ##########################################################################
-# This script defines functions for miscellaneous variables used 
-# various dataset definitions:
-# 1. count_recent_meds() - counts prescriptions issued within a
-#    lookback window before index date
-# 2. get_latest_ethnicity() - returns the most recent ethnicity
-#    category from primary care codes or SUS, with 6- or 16-group options
-# 3. get_imd() - categorises IMD into groups (e.g. quintiles)
-#    based on address-linked IMD at index date
+# This script defines helper functions and the main covariate extraction
+# function for dataset_definition_baseline_covariates.py:
+# 1. count_recent_meds() - counts prescriptions within a lookback window
+# 2. get_latest_ethnicity() - most recent ethnicity (primary care or SUS)
+# 3. get_imd() - categorises IMD into quintiles from address-linked data
+# 4. add_baseline_covariate_variables() - adds all covariate columns to
+#    the dataset (ethnicity, IMD, smoking, diabetes, CVD, BP, proteinuria)
 ##########################################################################
 
 from ehrql import (
@@ -21,6 +20,8 @@ from ehrql.tables.tpp import (
     addresses,
     medications,
 )
+
+from codelists import *
 
 ######################################################################################
 # count_recent_meds()
@@ -158,4 +159,27 @@ def get_imd(
     )
 
     return imd_grouped
-    
+
+
+#####################################################################
+# COMBINE ALL COVARIATE VARIABLES INTO ONE FUNCTION
+#####################################################################
+
+def add_baseline_covariate_variables(dataset, index_date):
+
+    columns = {
+        "basecov_cat_ethnicity": None,
+        "basecov_cat_imd": None,
+        "basecov_cat_smoking_status": None,
+        "basecov_bin_diabetes": None,
+        "basecov_bin_cvd": None,
+        "basecov_num_sbp": None,
+        "basecov_date_sbp": None,
+        "basecov_num_uacr": None,
+        "basecov_date_uacr": None,
+        "basecov_num_upcr": None,
+        "basecov_date_upcr": None,
+    }
+
+    for name, expr in columns.items():
+        dataset.add_column(name, expr)
