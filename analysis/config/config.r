@@ -52,11 +52,34 @@ exclude_bnf_chapters <- list(
 
 # How to define whether a medicine is chronically prescribed -------------
 chronic_med_definitions <- list(
+  # Base: >=2 prescriptions within 180 days, have to have one in the 0-90
+  # window and one in the 91-180 day window and AND >=21 days between oldest
+  # and most recent.
   base = list(
     min_prescriptions = 2,
     lookback_days = 180,
     allowable_index_gap = 90,
     prior_fill_gap = 21,
+    per_half = TRUE
+  ),
+
+  # Sensitivity 1: slightly more relaxed — still 2 scripts >=21 days apart,
+  # but now does not require prescription in 90-180 days before index
+  sens_1 = list(
+    min_prescriptions = 2,
+    lookback_days = 180,
+    allowable_index_gap = 90,
+    prior_fill_gap = 21,
     per_half = FALSE
+  ),
+
+  # Sensitivity 2: slightly stricter — now needs 3 scripts >21 days apart,
+  # within 0-90 day and 90-180 day window
+  sens_2 = list(
+    min_prescriptions = 3,
+    lookback_days = 180,
+    allowable_index_gap = 90,
+    prior_fill_gap = 21,
+    per_half = TRUE
   )
 )

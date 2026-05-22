@@ -114,21 +114,33 @@ message(sprintf(
   nrow(chronic_flags_all_route_base)
 ))
 
-# Sensitivity 3: oral, alternative chronic definition, BNF imputation included
-# chronic_med_definitions$[other] needs defining in config.r:
-#
-# message("Flag chronic medications: sensitivity 3 (alternative definition)")
-# chronic_flags_oral_[other] <- fn_flag_chronic_meds(
-#   data = dataset_analyse_baseline_meds_1_input |>
-#     filter(route_cat == "oral"),
-#   config = chronic_med_definitions$[other],
-#   index_date = study_dates$index_date,
-#   config_name = "[other]"
-# )
-# message(sprintf(
-#   "--- oral | [other] definition | imputation included: %d rows",
-#   nrow(chronic_flags_oral_[other])
-# ))
+# Sensitivity 3: oral, sens_1, BNF imputation included --------------------
+message("Flag chronic medications: sensitivity 3 (chronic def = sens_1)")
+chronic_flags_oral_sens_1 <- fn_flag_chronic_meds(
+  data = dataset_analyse_baseline_meds_1_input |>
+    filter(route_cat == "oral"),
+  config = chronic_med_definitions$sens_1,
+  index_date = study_dates$index_date,
+  config_name = "sens_1"
+)
+message(sprintf(
+  "--- oral | sens_1 definition | imputation included: %d rows",
+  nrow(chronic_flags_oral_sens_1)
+))
+
+# Sensitivity 4: oral, sens_2, BNF imputation included --------------------
+message("Flag chronic medications: sensitivity 4 (chronic def = sens_2)")
+chronic_flags_oral_sens_2 <- fn_flag_chronic_meds(
+  data = dataset_analyse_baseline_meds_1_input |>
+    filter(route_cat == "oral"),
+  config = chronic_med_definitions$sens_2,
+  index_date = study_dates$index_date,
+  config_name = "sens_2"
+)
+message(sprintf(
+  "--- oral | sens_2 definition | imputation included: %d rows",
+  nrow(chronic_flags_oral_sens_2)
+))
 
 ##########################################################################
 # Main dataset to carry forward for downstream analysis
@@ -176,6 +188,7 @@ counts_days_before_index <- dataset_baseline_meds_analysed |>
 # Patients with no chronic medications get NA from count(), replaced with 0.
 message("Build patient-level chronic medication counts")
 dataset_baseline_meds_counts <- all_patient_ids |>
+  # main analysis
   left_join(
     chronic_flags_oral_base |>
       filter(is_chronic_base) |>
@@ -183,6 +196,7 @@ dataset_baseline_meds_counts <- all_patient_ids |>
     by = "patient_id"
   ) |>
   mutate(n_chronic_oral_base = replace_na(n_chronic_oral_base, 0L)) |>
+  # no BNF imputation
   left_join(
     chronic_flags_oral_base_no_imputed |>
       filter(is_chronic_base) |>
@@ -195,14 +209,30 @@ dataset_baseline_meds_counts <- all_patient_ids |>
       0L
     )
   ) |>
+  # no restriction to just the oral route
   left_join(
     chronic_flags_all_route_base |>
       filter(is_chronic_base) |>
       count(patient_id, name = "n_chronic_all_route_base"),
     by = "patient_id"
   ) |>
-  mutate(n_chronic_all_route_base = replace_na(n_chronic_all_route_base, 0L))
-# extend: |> left_join(...) |> mutate(n_chronic_[other] = replace_na(..., 0L))
+  mutate(n_chronic_all_route_base = replace_na(n_chronic_all_route_base, 0L)) |>
+  # more lenient definition of chronic
+  left_join(
+    chronic_flags_oral_sens_1 |>
+      filter(is_chronic_sens_1) |>
+      count(patient_id, name = "n_chronic_oral_sens_1"),
+    by = "patient_id"
+  ) |>
+  mutate(n_chronic_oral_sens_1 = replace_na(n_chronic_oral_sens_1, 0L)) |>
+  # more restrictive definition of chronic
+  left_join(
+    chronic_flags_oral_sens_2 |>
+      filter(is_chronic_sens_2) |>
+      count(patient_id, name = "n_chronic_oral_sens_2"),
+    by = "patient_id"
+  ) |>
+  mutate(n_chronic_oral_sens_2 = replace_na(n_chronic_oral_sens_2, 0L))
 
 # Pivot to long format — shared input for summary stats and frequency table
 counts_long <- dataset_baseline_meds_counts |>
