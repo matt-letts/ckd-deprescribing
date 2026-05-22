@@ -22,7 +22,7 @@ from ehrql import (
     case,
     when
 )
-from fn_baseline_covariate_variables import (
+from fn_baseline_covariates import (
     get_imd,
     get_latest_ethnicity,
 )
