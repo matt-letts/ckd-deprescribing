@@ -24,11 +24,29 @@
       "downloaded_at": "2026-03-02 15:37:47.048403Z",
       "sha": "2d43044b3056c2e5fe706bbb1dadb252c90259f2"
     },
+    "user-mletts92-coronary-artery-interventions.csv": {
+      "id": "user/mletts92/coronary-artery-interventions/7c89d0e4",
+      "url": "https://www.opencodelists.org/codelist/user/mletts92/coronary-artery-interventions/7c89d0e4/",
+      "downloaded_at": "2026-05-27 15:06:45.374531Z",
+      "sha": "ef79bdeb46374bf110c08016ae1a2dc867ada905"
+    },
     "nhsd-primary-care-domain-refsets-cre_cod.csv": {
       "id": "nhsd-primary-care-domain-refsets/cre_cod/20250912",
       "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/cre_cod/20250912/",
       "downloaded_at": "2026-02-23 13:58:55.472565Z",
       "sha": "c6f53558c19c41b025c564d408d03eaad883345b"
+    },
+    "nhsd-primary-care-domain-refsets-sysbp_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/sysbp_cod/20250912",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/sysbp_cod/20250912/",
+      "downloaded_at": "2026-05-27 13:50:01.010755Z",
+      "sha": "dcbafbb414ecd966403ba25645a42feeb30b83c5"
+    },
+    "nhsd-primary-care-domain-refsets-mi_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/mi_cod/20250912",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/mi_cod/20250912/",
+      "downloaded_at": "2026-05-27 14:21:42.217730Z",
+      "sha": "032c31381c68f95a3261c3ff7f0b55dd01f4ce66"
     },
     "opensafely-kidney-transplant.csv": {
       "id": "opensafely/kidney-transplant/21865860",
@@ -53,6 +71,12 @@
       "url": "https://www.opencodelists.org/codelist/opensafely/ethnicity-snomed-0removed/22911876/",
       "downloaded_at": "2026-02-26 11:24:00.790709Z",
       "sha": "d95a2f826299563aa57f6fa99009e6e13a65151b"
+    },
+    "reducehf-myocardial-infarction-icd10.csv": {
+      "id": "reducehf/myocardial-infarction-icd10/6b463edb",
+      "url": "https://www.opencodelists.org/codelist/reducehf/myocardial-infarction-icd10/6b463edb/",
+      "downloaded_at": "2026-05-27 14:21:42.555752Z",
+      "sha": "5ea7124adc5bcfed66cabd98e0a57c98b20af016"
     },
     "ukrr-dialysis-opcs-4.csv": {
       "id": "ukrr/dialysis-opcs-4/505bef04",
