@@ -13,9 +13,11 @@
 
 from ehrql import codelist_from_csv
 
-#### codelists to determinine level of kidney function ####
+##########################################################################
+# KIDNEY FUNCTION CODELISTS
+##########################################################################
 
-# CKD codes ---------------------------------------------------------------------
+#  CKD codes ---------------------------------------------------------------------
 primary_care_ckd4_codes = codelist_from_csv(
     "codelists/user-mletts92-chronic-kidney-disease-stage-4.csv",
     column="code"
@@ -24,11 +26,12 @@ primary_care_ckd5_codes = codelist_from_csv(
     "codelists/user-mletts92-chronic-kidney-disease-stage-5-not-receiving-kidney-replacement-therapy.csv",
     column="code"
 )
-# kd4 and ckd5 codelists combined
+# ckd4 and ckd5 codelists combined
 primary_care_ckd45_codes = codelist_from_csv(
     "codelists/user-mletts92-chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy.csv",
     column="code"
 )
+
 
 # creatinine values -------------------------------------------------------------
 creatinine_codes = codelist_from_csv(
@@ -36,7 +39,9 @@ creatinine_codes = codelist_from_csv(
     column="code"
 )
 
-# Codelists to determine if someone has received kidney replacement therapy ----- 
+##########################################################################
+# KIDNEY REPLACEMENT THERAPY CODELISTS
+##########################################################################
 # Same methods as in this paper: https://bmjmedicine.bmj.com/content/3/1/e000807
 
 ## primary care KRT codes (all CTV3)
@@ -59,6 +64,7 @@ primary_care_krt_codes_all = (
     + primary_care_ktx_codes 
     + primary_care_krt_codes
 )
+
 
 ## secondary care KRT codes (ICD10 and OPCS-4)
 # icd10 - dialysis, ktx then all krt
@@ -95,11 +101,36 @@ secondary_care_krt_codes_opcs4 = (
     + secondary_care_unclear_krt_codes_opcs4  
 )
 
-# ethnicity codelists --------------------------------------------------------------------
-ethnicity_snomed = codelist_from_csv(
+
+##########################################################################
+# COVARIATE CODELISTS
+##########################################################################
+# ethnicity codelist --------------------------------------------------------------------
+ethnicity_codes = codelist_from_csv(
     "codelists/opensafely-ethnicity-snomed-0removed.csv",
     column="code",
     category_column="Grouping_6"
 )
 
-# baseline covariate codelists -----------------------------------------------------------
+# systolic blood pressure codelist
+sbp_codes = codelist_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-sysbp_cod.csv",
+    column="code"
+)
+
+# Myocardial infarction codelists
+mi_codes_snomed = codelist_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-mi_cod.csv",
+    column="code"
+)
+
+mi_codes_icd10 = codelist_from_csv(
+    "codelists/reducehf-myocardial-infarction-icd10.csv",
+    column="code"
+)
+
+# Coronary revascularisation codelist
+coronary_revasc_codes = codelist_from_csv(
+    "codelists/user-mletts92-coronary-artery-interventions.csv",
+    column="code"
+)

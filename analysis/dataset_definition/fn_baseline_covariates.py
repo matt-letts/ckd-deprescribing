@@ -1,10 +1,9 @@
 ##########################################################################
-# This script defines helper functions and the main covariate extraction
-# function for dataset_definition_baseline_covariates.py:
-# 1. get_latest_ethnicity() - most recent ethnicity (primary care or SUS)
-# 2. get_imd() - categorises IMD into quintiles from address-linked data
-# 3. add_baseline_covariate_variables() - adds all covariate columns to
-#    the dataset (ethnicity, IMD, smoking, diabetes, CVD, BP, proteinuria)
+# This script defines functions to extract baseline covariates
+# add_baseline_covariates() then defines the function to add them to
+# dataset (dataset_definition_baseline_covariates.py)
+
+# See protocols/protocol.md for full list of included covariates
 ##########################################################################
 
 from ehrql import (
@@ -17,13 +16,36 @@ from ehrql.tables.tpp import (
     clinical_events,
     ethnicity_from_sus,
     addresses,
+    apcs
 )
 
 from codelists import *
 
-#########################################################################################
-# get_latest_ethnicity()
-##########################################################################################
+import json
+with open("output/study_dates.json") as f:
+    index_date = json.load(f)["index_date"]
+
+##########################################################################
+# Age
+##########################################################################
+# Defined in dataset_inex_cleaned - pulled through with table_from_file
+# Age as integer, in whole elapsed calendar years
+
+
+##########################################################################
+# Sex
+##########################################################################
+# Defined in dataset_inex_cleaned - pulled through with table_from_file
+# male/female only (others excluded in inex stage) as string
+
+
+##########################################################################
+# Ethnicity
+##########################################################################
+# get_latest_ethnicity() checks clinical_events table for ethnicity 
+# snomed codes. If absent then checks for ethnicity codes within 
+# ethnicity_from_sus table. 
+# 'grouping' returns results as either a 6 or 16 category breakdown
 
 def get_latest_ethnicity(
         index_date, codelist, grouping=6
@@ -105,10 +127,27 @@ def get_latest_ethnicity(
         return ethnicity_combined
 
 
-#########################################################################################
-# get_imd categorises IMD into groups (e.g. quintiles, deciles) 
-# based on the distribution of IMD in the dataset
-##########################################################################################
+##########################################################################
+# eGFR
+##########################################################################
+# Defined in dataset_inex_cleaned - pulled through with table_from_file
+# most recent eGFR calculated from SCr - float, with corresponding date
+# most recent coded ckd stage, string
+
+
+##########################################################################
+# Number of chronic prescriptions
+##########################################################################
+# Defined in dataset_baseline_meds_analysed - will combine at later stage
+
+
+##########################################################################
+# IMD
+##########################################################################
+# get_imd() uses addresses.imd_rounded which maps each LSOA's IMD rank
+# to the nearest 100 (values >=0 and <=32800). 1 is most deprived.
+# Categorises IMD into n equal sized groups (groups = n) and returns 
+# their ordinal value and a label
 
 def get_imd(
     index_date, groups=5, max_imd=32844
@@ -139,26 +178,99 @@ def get_imd(
 
     return imd_grouped
 
+#####################################################################   
+# Risk of mortality
+#####################################################################
+# Using the CKD prognosis consortium advanced CKD risk tool
+# https://ckdpcrisk.org/lowgfrevents/ 
+# 
+# Needs 8 variables: 
+# - age (int), already imported from dataset_inex_cleaned
+# - sex (M/F), already imported from dataset_inex_cleaned
+# - race (black/non-black), this distinction is contested, and US  
+#   groups may not reflect UK groups. Plan to treat all as non-black 
+#   initially with sensitivity analyses exploring alternatives
+# - eGFR (int), already imported from dataset_inex_cleaned
+# - systolic BP (int)
+# - history of cardiovascular disease, 
+# - diabetes, 
+# - uACR, 
+# - smoking history.
+
+# Systolic BP
+most_recent_sbp = (
+    clinical_events
+        .where(clinical_events.snomedct_code.is_in(sbp_codes))
+        .where(clinical_events.numeric_value.is_not_null())
+        .where(clinical_events.date.is_on_or_before(index_date))
+        .sort_by(clinical_events.date)
+        .last_for_patient()
+    )
+
+# History of CV disease: previous MI, coronary revascularisation, 
+# heart failure, stroke 
+
+# previous MI or coronary revascularisation
+mi_primary_care = (
+    clinical_events
+        .where(clinical_events.snomedct_code.is_in(mi_codes_snomed))
+        .where(clinical_events.date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+mi_secondary_care = (
+    apcs
+        .where(apcs.all_diagnoses.contains_any_of(mi_codes_icd10))
+        .where(apcs.admission_date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+coronary_revasc = (
+    apcs
+        .where(apcs.all_procedures.contains_any_of(coronary_revasc_codes))
+        .where(apcs.admission_date.is_on_or_before(index_date))
+        .exists_for_patient()
+)
+
+mi_or_coronary_revasc = mi_primary_care | mi_secondary_care | coronary_revasc
+
+# previous stroke
+
+# previous HF diagnosis
+
+# general conversion of uPCR to uACR - dividing by 2.655 for men and 1.7566 for women
+# this division conversion applied to mg/g or mg/mmol.
+
+
+# Frailty (see below)
+# Presence or absence of comorbidities
+# Clinical events e.g. falls/hospitalisations
+
 
 #####################################################################
 # COMBINE ALL COVARIATE VARIABLES INTO ONE FUNCTION
 #####################################################################
 
-def add_baseline_covariates(dataset, index_date):
+def add_baseline_covariates(dataset, dataset_inex_cleaned):
 
     columns = {
-        "basecov_cat_ethnicity": None,
-        "basecov_cat_imd": None,
-        "basecov_cat_smoking_status": None,
-        "basecov_bin_diabetes": None,
-        "basecov_bin_cvd": None,
-        "basecov_num_sbp": None,
-        "basecov_date_sbp": None,
-        "basecov_num_uacr": None,
-        "basecov_date_uacr": None,
-        "basecov_num_upcr": None,
-        "basecov_date_upcr": None,
+        # rename columns from dataset_inex_cleaned
+        "basecov_num_age": dataset_inex_cleaned.inex_dem_num_age,
+        "basecov_cat_sex": dataset_inex_cleaned.inex_dem_cat_sex,
+        "basecov_num_egfr_1": dataset_inex_cleaned.inex_num_egfr_1,
+        "basecov_date_egfr_1": dataset_inex_cleaned.inex_ckd_date_scr_date_1,
+        "basecov_cat_coded_ckd_stage": dataset_inex_cleaned.inex_ckd_cat_ckd_code_stage,
+
+        # new columns to be added
+        "basecov_cat_ethnicity": get_latest_ethnicity(index_date, ethnicity_codes, grouping=6),
+        "basecov_cat_imd": get_imd(index_date, groups=5, max_imd=32844),
+        "basecov_num_sbp": most_recent_sbp.numeric_value,
+        "basecov_date_sbp": most_recent_sbp.date,
+        "basecov_bin_mi_or_revasc": mi_or_coronary_revasc
     }
 
     for name, expr in columns.items():
         dataset.add_column(name, expr)
+
+
+

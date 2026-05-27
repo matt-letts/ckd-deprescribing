@@ -34,16 +34,16 @@ actions:
         cleaning_inex_med_count_summary: output/data_descriptions/cleaning_inex/med_count_summary.csv
 
   
-  # generate_dataset_baseline_covariates:
-  #   run: >
-  #     ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_baseline_covariates.py
-  #     --dummy-tables dummy_tables/
-  #     --output output/dataset_baseline_covariates.arrow
-  #     --test-data-file analysis/dataset_definition/test_dataset_definition_baseline_covariates.py
-  #   needs: [study_dates, dataset_cleaning_inex]
-  #   outputs:
-  #     highly_sensitive:
-  #       dataset_baseline_covariates: output/dataset_baseline_covariates.arrow
+  generate_dataset_baseline_covariates:
+    run: >
+      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_baseline_covariates.py
+      --dummy-tables dummy_tables/
+      --output output/dataset_baseline_covariates.arrow
+    #  --test-data-file analysis/dataset_definition/test_dataset_definition_baseline_covariates.py
+    needs: [study_dates, dataset_cleaning_inex]
+    outputs:
+      highly_sensitive:
+        dataset_baseline_covariates: output/dataset_baseline_covariates.arrow
 
 
   generate_dataset_baseline_meds:
