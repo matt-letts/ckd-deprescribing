@@ -179,26 +179,9 @@ def get_imd(
 
     return imd_grouped
 
-#####################################################################   
-# Risk of mortality
-#####################################################################
-# Using the CKD prognosis consortium advanced CKD risk tool
-# https://ckdpcrisk.org/lowgfrevents/ 
-# 
-# Needs 8 variables: 
-# - age (int), already imported from dataset_inex_cleaned
-# - sex (M/F), already imported from dataset_inex_cleaned
-# - race (black/non-black), this distinction is contested, and US  
-#   groups may not reflect UK groups. Plan to treat all as non-black 
-#   initially with sensitivity analyses exploring alternatives
-# - eGFR (int), already imported from dataset_inex_cleaned
-# - systolic BP (int)
-# - history of cardiovascular disease, 
-# - diabetes, 
-# - uACR, 
-# - smoking history.
-
+##########################################################################
 # Systolic BP
+##########################################################################
 most_recent_sbp = (
     clinical_events
         .where(clinical_events.snomedct_code.is_in(sbp_codes))
@@ -208,10 +191,11 @@ most_recent_sbp = (
         .last_for_patient()
     )
 
+##########################################################################
 # History of CV disease: previous MI, coronary revascularisation, 
 # heart failure, stroke 
-
-# previous MI or coronary revascularisation
+##########################################################################
+# Previous MI or coronary revascularisation
 mi_primary_care = (
     clinical_events
         .where(clinical_events.snomedct_code.is_in(mi_codes_snomed))
@@ -235,7 +219,7 @@ coronary_revasc = (
 
 mi_or_coronary_revasc = mi_primary_care | mi_secondary_care | coronary_revasc
 
-# previous stroke
+# Previous stroke
 cva_primary_care = (
     clinical_events
         .where(clinical_events.snomedct_code.is_in(cva_codes_snomed))
@@ -252,7 +236,7 @@ cva_secondary_care = (
 
 prior_cva = cva_primary_care | cva_secondary_care
 
-# previous HF diagnosis
+# Previous HF diagnosis
 hf_primary_care = (
     clinical_events
         .where(clinical_events.snomedct_code.is_in(hf_codes_snomed))
@@ -269,20 +253,23 @@ hf_secondary_care = (
 
 prior_hf = hf_primary_care | hf_secondary_care
 
+##########################################################################
 # Diabetes Y/N 
-
-# CKD PC defined depending on the cohort as:
+##########################################################################
+# https://www.kidney-international.org/article/S0085-2538(18)30097-8/fulltext 
+# CKD PC defined diabetes in various ways depending on which cohort used:
 # - fasting glucose ≥7.0 mmol/l (126 mg/dl),
 # - nonfasting glucose ≥11.1 mmol/l (200 mg/dl),
 # - hemoglobin A1c ≥6.5%, 
 # - use of glucose-lowering drugs,
 # - or self-reported diabetes
 
-# Decided against using OpenSAFELY diabetes-algo action
+# For our study decided against using OpenSAFELY diabetes-algo action
 # as distinction between different types of diabetes not required
 # https://actions.opensafely.org/actions/diabetes-algo/v0.0.13/
 
-# Operationalised with snomed/icd10 codes, meds and hba1c:
+# Operationalised here with snomed/icd10 codes, meds and hba1c:
+
 t1dm_diagnosis = (
     clinical_events
         .where(clinical_events.snomedct_code.is_in(dm1_codes_snomed))
@@ -315,15 +302,27 @@ diabetes_drugs = (
 
 diabetes = t1dm_diagnosis | other_dm_diagnosis | (recent_hba1c >= 48) | diabetes_drugs 
 
-
+##########################################################################
+# Urinary protein/albumin excretion
+##########################################################################
 # general conversion of uPCR to uACR - dividing by 2.655 for men and 1.7566 for women
 # this division conversion applied to mg/g or mg/mmol.
 
+##########################################################################
+# Smoking status
+##########################################################################
 
-# Frailty (see below)
+##########################################################################
+# Frailty
+##########################################################################
+
+##########################################################################
 # Presence or absence of comorbidities
-# Clinical events e.g. falls/hospitalisations
+##########################################################################
 
+##########################################################################
+# Clinical events e.g. falls/hospitalisations
+##########################################################################
 
 #####################################################################
 # COMBINE ALL COVARIATE VARIABLES INTO ONE FUNCTION
