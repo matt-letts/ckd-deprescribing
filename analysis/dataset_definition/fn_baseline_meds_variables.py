@@ -72,9 +72,8 @@ def add_recent_prescriptions(index_date, max_meds=10, days_before_index=90):
 #############################################################################
 # add_prescription_columns
 #############################################################################
-# this simply adds the columns defined in add_recent_prescriptions() to the 
-# dataset, and also adds a column counting the number of prescriptions in the 
-# specified time window (note count_recent_meds does not collapse duplicates)
+# this simply adds the columns defined in add_recent_prescriptions() to the
+# dataset.
 #############################################################################
 
 def add_prescription_columns(dataset, index_date, max_meds=10, days_before_index=90):
