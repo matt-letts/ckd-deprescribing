@@ -30,6 +30,18 @@
       "downloaded_at": "2026-05-27 15:06:45.374531Z",
       "sha": "ef79bdeb46374bf110c08016ae1a2dc867ada905"
     },
+    "user-mletts92-stroke-secondary-care-codes.csv": {
+      "id": "user/mletts92/stroke-secondary-care-codes/0754d0bd",
+      "url": "https://www.opencodelists.org/codelist/user/mletts92/stroke-secondary-care-codes/0754d0bd/",
+      "downloaded_at": "2026-05-29 10:45:27.012221Z",
+      "sha": "b46619bccdcc512fdcf4e78deedf1f229fbea78d"
+    },
+    "user-mletts92-definite-diabetes-drugs-dmd.csv": {
+      "id": "user/mletts92/definite-diabetes-drugs-dmd/3c26771d",
+      "url": "https://www.opencodelists.org/codelist/user/mletts92/definite-diabetes-drugs-dmd/3c26771d/",
+      "downloaded_at": "2026-05-29 13:22:19.855768Z",
+      "sha": "9a0095e6e3484c801a015dcdeb6ff2f08d467e71"
+    },
     "nhsd-primary-care-domain-refsets-cre_cod.csv": {
       "id": "nhsd-primary-care-domain-refsets/cre_cod/20250912",
       "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/cre_cod/20250912/",
@@ -47,6 +59,24 @@
       "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/mi_cod/20250912/",
       "downloaded_at": "2026-05-27 14:21:42.217730Z",
       "sha": "032c31381c68f95a3261c3ff7f0b55dd01f4ce66"
+    },
+    "nhsd-primary-care-domain-refsets-strk_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/strk_cod/20250912",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/strk_cod/20250912/",
+      "downloaded_at": "2026-05-29 10:19:15.589973Z",
+      "sha": "14a9a227bebbe509459f1bbedd9ceb903a50d4d7"
+    },
+    "nhsd-primary-care-domain-refsets-dmtype1_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/dmtype1_cod/20250912",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/dmtype1_cod/20250912/",
+      "downloaded_at": "2026-05-29 12:46:59.734843Z",
+      "sha": "658987e223c4d523959971d390f18eacc8a49b51"
+    },
+    "nhsd-primary-care-domain-refsets-dmnontype1_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/dmnontype1_cod/20250912",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/dmnontype1_cod/20250912/",
+      "downloaded_at": "2026-05-29 12:43:10.829560Z",
+      "sha": "3c541a505f781a55a144a47a42b8a1e1416b3ba1"
     },
     "opensafely-kidney-transplant.csv": {
       "id": "opensafely/kidney-transplant/21865860",
@@ -72,11 +102,29 @@
       "downloaded_at": "2026-02-26 11:24:00.790709Z",
       "sha": "d95a2f826299563aa57f6fa99009e6e13a65151b"
     },
+    "opensafely-glycated-haemoglobin-hba1c-tests-numerical-value.csv": {
+      "id": "opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926",
+      "url": "https://www.opencodelists.org/codelist/opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926/",
+      "downloaded_at": "2026-05-29 12:52:22.859362Z",
+      "sha": "bc7e48efd370be65686755f0a843058f1ec767e0"
+    },
     "reducehf-myocardial-infarction-icd10.csv": {
       "id": "reducehf/myocardial-infarction-icd10/6b463edb",
       "url": "https://www.opencodelists.org/codelist/reducehf/myocardial-infarction-icd10/6b463edb/",
       "downloaded_at": "2026-05-27 14:21:42.555752Z",
       "sha": "5ea7124adc5bcfed66cabd98e0a57c98b20af016"
+    },
+    "reducehf-heart-failure-primary-outcome-icd.csv": {
+      "id": "reducehf/heart-failure-primary-outcome-icd/7b34dfb4",
+      "url": "https://www.opencodelists.org/codelist/reducehf/heart-failure-primary-outcome-icd/7b34dfb4/",
+      "downloaded_at": "2026-05-29 12:03:38.396707Z",
+      "sha": "c37e01077eb020563b3c73a21f9ce87f98d40ee2"
+    },
+    "pincer-hf.csv": {
+      "id": "pincer/hf/6c696a17",
+      "url": "https://www.opencodelists.org/codelist/pincer/hf/6c696a17/",
+      "downloaded_at": "2026-05-29 11:05:53.175559Z",
+      "sha": "977f8b25f800edc8dbd679407826e20cec7e0f11"
     },
     "ukrr-dialysis-opcs-4.csv": {
       "id": "ukrr/dialysis-opcs-4/505bef04",

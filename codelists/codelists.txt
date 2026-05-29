@@ -3,18 +3,26 @@ user/mletts92/chronic-kidney-disease-stage-4/3e8d63c4
 user/mletts92/chronic-kidney-disease-stage-5-not-receiving-kidney-replacement-therapy/579cd6f9
 user/mletts92/kidney-transplant-opcs4/1486bd3c
 user/mletts92/coronary-artery-interventions/7c89d0e4
+user/mletts92/stroke-secondary-care-codes/0754d0bd
+user/mletts92/definite-diabetes-drugs-dmd/3c26771d
 
 nhsd-primary-care-domain-refsets/cre_cod/20250912
 nhsd-primary-care-domain-refsets/sysbp_cod/20250912
 nhsd-primary-care-domain-refsets/mi_cod/20250912
 nhsd-primary-care-domain-refsets/strk_cod/20250912
+nhsd-primary-care-domain-refsets/dmtype1_cod/20250912/
+nhsd-primary-care-domain-refsets/dmnontype1_cod/20250912
 
 opensafely/kidney-transplant/21865860 
 opensafely/dialysis/3ce108ac
 opensafely/renal-replacement-therapy/5b5ed963
 opensafely/ethnicity-snomed-0removed/22911876
+opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926
 
 reducehf/myocardial-infarction-icd10/6b463edb
+reducehf/heart-failure-primary-outcome-icd/7b34dfb4
+
+pincer/hf/6c696a17
 
 ukrr/dialysis-opcs-4/505bef04
 ukrr/dialysis-icd10/2a5cf9a2

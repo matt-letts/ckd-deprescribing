@@ -118,7 +118,8 @@ sbp_codes = codelist_from_csv(
     column="code"
 )
 
-# Myocardial infarction codelists
+# Myocardial infarction codelists 
+# Primary + secondary care as MI mainly hospital-based diagnosis
 mi_codes_snomed = codelist_from_csv(
     "codelists/nhsd-primary-care-domain-refsets-mi_cod.csv",
     column="code"
@@ -132,5 +133,52 @@ mi_codes_icd10 = codelist_from_csv(
 # Coronary revascularisation codelist
 coronary_revasc_codes = codelist_from_csv(
     "codelists/user-mletts92-coronary-artery-interventions.csv",
+    column="code"
+)
+
+# Stroke codelists
+# Primary + secondary care as CVA mainly hospital-based diagnosis
+cva_codes_snomed = codelist_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-strk_cod.csv",
+    column="code"
+)
+cva_codes_icd10 = codelist_from_csv(
+    "codelists/user-mletts92-stroke-secondary-care-codes.csv",
+    column="code"
+)
+
+# Heart failure codelists
+# Primary + secondary care as HF often diagnosed in hospital
+hf_codes_snomed = codelist_from_csv(
+    "codelists/pincer-hf.csv",
+    column="code"
+)
+
+hf_codes_icd10 = codelist_from_csv(
+    "codelists/reducehf-heart-failure-primary-outcome-icd.csv",
+    column="code"
+)
+
+# Diabetes codelists
+# Primary care dm codes only - diabetes activity coded well in primary care
+dm_not1_codes_snomed = codelist_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-dmnontype1_cod.csv",
+    column="code"
+)
+
+dm1_codes_snomed = codelist_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-dmtype1_cod.csv",
+    column="code"
+)
+
+# hba1c codes, just the IFCC standardised units code 
+hba1c_codes_snomed = codelist_from_csv(
+    "codelists/opensafely-glycated-haemoglobin-hba1c-tests-numerical-value.csv",
+    column="code"
+)
+
+# diabetes drugs
+dm_drug_codes_dmd = codelist_from_csv(
+    "codelists/user-mletts92-definite-diabetes-drugs-dmd.csv",
     column="code"
 )

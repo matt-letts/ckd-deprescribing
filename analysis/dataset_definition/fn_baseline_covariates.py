@@ -16,7 +16,8 @@ from ehrql.tables.tpp import (
     clinical_events,
     ethnicity_from_sus,
     addresses,
-    apcs
+    apcs,
+    medications
 )
 
 from codelists import *
@@ -230,13 +231,90 @@ coronary_revasc = (
         .where(apcs.all_procedures.contains_any_of(coronary_revasc_codes))
         .where(apcs.admission_date.is_on_or_before(index_date))
         .exists_for_patient()
-)
+    )
 
 mi_or_coronary_revasc = mi_primary_care | mi_secondary_care | coronary_revasc
 
 # previous stroke
+cva_primary_care = (
+    clinical_events
+        .where(clinical_events.snomedct_code.is_in(cva_codes_snomed))
+        .where(clinical_events.date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+cva_secondary_care = (
+    apcs
+        .where(apcs.all_diagnoses.contains_any_of(cva_codes_icd10))
+        .where(apcs.admission_date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+prior_cva = cva_primary_care | cva_secondary_care
 
 # previous HF diagnosis
+hf_primary_care = (
+    clinical_events
+        .where(clinical_events.snomedct_code.is_in(hf_codes_snomed))
+        .where(clinical_events.date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+hf_secondary_care = (
+    apcs
+        .where(apcs.all_diagnoses.contains_any_of(hf_codes_icd10))
+        .where(apcs.admission_date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+prior_hf = hf_primary_care | hf_secondary_care
+
+# Diabetes Y/N 
+
+# CKD PC defined depending on the cohort as:
+# - fasting glucose ≥7.0 mmol/l (126 mg/dl),
+# - nonfasting glucose ≥11.1 mmol/l (200 mg/dl),
+# - hemoglobin A1c ≥6.5%, 
+# - use of glucose-lowering drugs,
+# - or self-reported diabetes
+
+# Decided against using OpenSAFELY diabetes-algo action
+# as distinction between different types of diabetes not required
+# https://actions.opensafely.org/actions/diabetes-algo/v0.0.13/
+
+# Operationalised with snomed/icd10 codes, meds and hba1c:
+t1dm_diagnosis = (
+    clinical_events
+        .where(clinical_events.snomedct_code.is_in(dm1_codes_snomed))
+        .where(clinical_events.date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+other_dm_diagnosis = (
+    clinical_events
+        .where(clinical_events.snomedct_code.is_in(dm_not1_codes_snomed))
+        .where(clinical_events.date.is_on_or_before(index_date))
+        .exists_for_patient()
+    )
+
+recent_hba1c = (
+    clinical_events
+        .where(clinical_events.snomedct_code.is_in(hba1c_codes_snomed))
+        .where(clinical_events.date.is_on_or_before(index_date))
+        .sort_by(clinical_events.date)
+        .last_for_patient()
+        .numeric_value
+)
+
+diabetes_drugs = (
+    medications
+        .where(medications.dmd_code.is_in(dm_drug_codes_dmd))
+        .where(medications.date.is_on_or_before(index_date))
+        .exists_for_patient()
+)
+
+diabetes = t1dm_diagnosis | other_dm_diagnosis | (recent_hba1c >= 48) | diabetes_drugs 
+
 
 # general conversion of uPCR to uACR - dividing by 2.655 for men and 1.7566 for women
 # this division conversion applied to mg/g or mg/mmol.
@@ -266,7 +344,10 @@ def add_baseline_covariates(dataset, dataset_inex_cleaned):
         "basecov_cat_imd": get_imd(index_date, groups=5, max_imd=32844),
         "basecov_num_sbp": most_recent_sbp.numeric_value,
         "basecov_date_sbp": most_recent_sbp.date,
-        "basecov_bin_mi_or_revasc": mi_or_coronary_revasc
+        "basecov_bin_mi_or_revasc": mi_or_coronary_revasc,
+        "basecov_bin_cva": prior_cva,
+        "basecov_bin_hf": prior_hf,
+        "basecov_bin_dm": diabetes
     }
 
     for name, expr in columns.items():
