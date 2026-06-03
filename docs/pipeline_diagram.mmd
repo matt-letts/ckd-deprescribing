@@ -6,41 +6,68 @@ config:
     nodePlacementStrategy: LINEAR_SEGMENTS
 ---
 flowchart TD
-    %% define nodes
-    a1("study_dates.r"):::R
-    a2("dataset_definition_inex.py"):::ehrql
-    %% p1("openSAFELY-TPP backend"):::openSAFELY
-    d1("dataset_inex.arrow"):::data
-    a3("dataset_cleaning_inex.r"):::R
-    d2("dataset_inex_cleaned.arrow"):::data
-    o1("cleaning_inex-*.csv, cleaning_inex-*.txt, plot_med_count_distribution.png"):::output
-    a4("dataset_definition_inex_meds.py"):::ehrql
-    %% p2("openSAFELY-TPP backend"):::openSAFELY
-    d3("dataset_inex_meds.arrow"):::data
-    a5("dataset_process_baseline_meds.r"):::R
-    e3("bnf_dmd_mapping_file.xlsx"):::external
-    e4("bnf_hierarchy_file.csv"):::external
-    d4("dataset_baseline_meds_processed.arrow"):::data
-    o2("process_baseline_meds_*.txt, process_baseline_meds_*.csv"):::output
 
-    %% a = analysis, d = data, o = output, p = patients, e = external file
-    %% connect nodes
+    %% Local processing 
+    %% Runs once outside the OpenSAFELY pipeline to build medication lookups
+    subgraph LP["Local processing"]
+        e_1("NHSBSA & BNF files"):::external
+        r_lp1("build_medication_lookup_tables.r"):::R
+        d_lp1("dmd_lookup.rds"):::data
+        d_lp2("bnf_hierarchy.rds"):::data
+        e_1 --> r_lp1
+        r_lp1 --> d_lp1 & d_lp2
+    end
+
+    %% Population inclusion/exclusion
+    subgraph INEX["Population inclusion/exclusion"]
+        p_inex_def("dataset_definition_inex.py"):::ehrql
+        d_inex("dataset_inex.arrow"):::data
+        r_inex_clean("dataset_cleaning_inex.r"):::R
+        d_inex_clean("dataset_inex_cleaned.arrow"):::data
+        o_inex("output/data_descriptions/cleaning_inex/"):::output
+        p_inex_def --> d_inex --> r_inex_clean
+        r_inex_clean --> d_inex_clean & o_inex
+    end
+
+    %% Baseline medications
+    subgraph BM["Baseline medications"]
+        p_bm_def("dataset_definition_baseline_meds.py"):::ehrql
+        d_bm("dataset_baseline_meds.arrow"):::data
+        r_bm_proc("dataset_process_baseline_meds.r"):::R
+        d_bm_proc("dataset_baseline_meds_processed.arrow"):::data
+        o_bm_proc("output/data_descriptions/process_baseline_meds/"):::output
+        r_bm_an("analyse_baseline_meds.r"):::R
+        d_bm_an("dataset_baseline_meds_analysed.arrow"):::data
+        o_bm_an("output/data_descriptions/analyse_baseline_meds/"):::output
+        p_bm_def --> d_bm --> r_bm_proc
+        r_bm_proc --> d_bm_proc & o_bm_proc
+        d_bm_proc --> r_bm_an
+        r_bm_an --> d_bm_an & o_bm_an
+    end
+
+    %% Cross-subgraph connections 
+    d_inex_clean --> p_bm_def
+    d_lp1 --> r_bm_proc
+    d_lp2 --> r_bm_an
+
+    %% Legend 
+    subgraph KEY["Legend"]
+        direction LR
+        k_e("External files"):::external
+        k_p("ehrQL script"):::ehrql
+        k_r("R script"):::R
+        k_d("Data file"):::data
+        k_o("Output"):::output
+    end
     
-    %% p1 & 
-    a1 & a2 --> d1
-    d1 --> a3 --> o1 & d2
-    %% p2 &
-    d2 --> a4 --> d3 
-    d3 & e3 & e4 --> a5
-    a5 --> d4 & o2
+    %% invisible link anchors legend underneath the baseline medications subgraph
+    d_bm_proc ~~~ k_e
 
-    %% colour scheme
-    %% classDef openSAFELY color:#FFFFFF, fill:#212121, stroke:#212121
+    %% Colour scheme
     classDef ehrql color:#000000, fill:#FFD600, stroke:#FFD600
     classDef R color:#FFFFFF, fill:#E65100, stroke:#E65100
     classDef data color:#FFFFFF, fill:#1565C0, stroke:#1565C0
     classDef output color:#FFFFFF, fill:#00C853, stroke:#00C853
     classDef external color:#FFFFFF, fill:#FFA500, stroke:#FFA500
 
-%% to render this type into powershell terminal
-%% mmdc -i docs/pipeline_diagram.mmd -o docs/pipeline_diagram.svg
+%% to render: mmdc -i docs/pipeline_diagram.mmd -o docs/pipeline_diagram.svg

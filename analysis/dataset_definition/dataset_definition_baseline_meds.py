@@ -6,13 +6,13 @@
 #    columns for up to max_med prescriptions in the days_before_index 
 #    window before index date.
 #
-# Output: dataset_inex_meds.arrow (see yaml: generate_dataset_inex_meds)
-# Test: test_dataset_definition_inex_meds.py
+# Output: dataset_baseline_meds.arrow (see yaml: generate_dataset_baseline_meds)
+# Test: test_dataset_definition_baseline_meds.py
 ##########################################################################
 
 from ehrql import create_dataset, table_from_file
 from ehrql.tables.tpp import medications, patients
-from fn_inex_meds_variables import add_prescription_columns
+from fn_baseline_meds_variables import add_prescription_columns
 
 # define the project-relevant dates
 import json

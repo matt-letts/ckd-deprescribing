@@ -31,7 +31,7 @@ fn_qa <- function(
   message("Missing deprivation level: ", counts$n_missing_imd)
 
   # Apply QA filters lazily
-  arrow_data_qa_applied <- arrow_data %>%
+  arrow_data_qa_applied <- arrow_data |>
     filter(
       inex_qa_bin_sex,
       inex_qa_bin_region,

@@ -6,11 +6,20 @@ library(arrow)
 library(tictoc)
 
 # A broad set of real DMD VMP/AMP codes covering common drug classes
+# Edge cases are:
+# Those without BNF mapping
+# With BNF but no VTM (e.g. ileostomy bag)
+# With neither BNF nor VTM (e.g. hydrocolloid dressing)
+# Fake code
+# Combination products
+# Same drug but different strengths
+
 COMMON_DMD_CODES <- c(
   # Statins
   "4466911000001104",
   "5509611000001104", # lacking BNF map
   "30132511000001101",
+  "42382011000001103", # simvastatin and ezetimibe combination
   # ACE inhibitors / ARBs
   "414411000001109",
   "15107811000001101",
@@ -51,9 +60,10 @@ COMMON_DMD_CODES <- c(
   "5603811000001107", # lacking BNF map
   "29975611000001108",
   "42353711000001101",
-  # Thyroid
-  "8584011000001100",
-  "8802011000001106",
+  # Thyroid - including two of the same drug as per clinical practice
+  "8584011000001100", # levothyroxine 100 solution
+  "8584811000001106", # levothyroxine 150 solution
+  "8802011000001106", # carbimazole
   # Inhalers (SABA)
   "9207411000001106",
   "45111000001100",

@@ -14,13 +14,13 @@ library(fs)
 library(here)
 library(arrow)
 library(tidyverse)
-source(here::here("analysis", "r_functions", "fn_preprocess.r"))
-source(here::here("analysis", "r_functions", "fn_modify_dummy_data.r"))
-source(here::here("analysis", "r_functions", "fn_data_describing.r"))
-source(here::here("analysis", "r_functions", "fn_disclosure_control.r"))
-source(here::here("analysis", "r_functions", "fn_qa.r"))
-source(here::here("analysis", "r_functions", "fn_dem_inex_criteria.r"))
-source(here::here("analysis", "r_functions", "fn_ckd_inex_criteria.r"))
+source(here::here("analysis", "r_functions", "utilities",     "fn_preprocess.r"))
+source(here::here("analysis", "r_functions", "utilities",     "fn_modify_dummy_data.r"))
+source(here::here("analysis", "r_functions", "utilities",     "fn_data_describing.r"))
+source(here::here("analysis", "r_functions", "utilities",     "fn_disclosure_control.r"))
+source(here::here("analysis", "r_functions", "inex_criteria", "fn_qa.r"))
+source(here::here("analysis", "r_functions", "inex_criteria", "fn_dem_inex_criteria.r"))
+source(here::here("analysis", "r_functions", "inex_criteria", "fn_ckd_inex_criteria.r"))
 
 # Create output folders --------------------------------------------------
 message("Create output folders")
@@ -30,7 +30,7 @@ dir_create(here::here("output", "figures", "cleaning_inex"))
 
 # Import dates -----------------------------------------------------------
 message("Import dates")
-source(here::here("analysis", "dataset_definition", "study_dates.r"))
+source(here::here("analysis", "config", "config.r"))
 study_dates <- lapply(study_dates, function(x) as.Date(x))
 
 # Load dataset, keeping in arrow format for speed ------------------------

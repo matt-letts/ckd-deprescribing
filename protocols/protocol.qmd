@@ -1,0 +1,205 @@
+---
+title: "Protocol: Descriptive Analysis of Deprescribing Patterns for People Living with Advanced Chronic Kidney Disease"
+date: today
+date-format: "D MMMM YYYY"
+author: "Matthew Letts^1,2^, Robert Porteous^1^, Rachel Denholm^1^, Rupert Payne^3^, Jonathan Sterne^1^, Fergus Caskey^2^"
+number-sections: true
+format:
+  gfm: default
+  docx: default
+bibliography: references.bib
+csl: "https://www.zotero.org/styles/vancouver"
+---
+
+^1^ Electronic Health Records Group, Population Health Sciences, Bristol Medical School, University of Bristol, Bristol, UK
+
+^2^ Bristol Renal, Population Health Sciences, Bristol Medical School, University of Bristol, Bristol, UK
+
+^3^ Exeter Collaboration for Academic Primary Care, University of Exeter, Exeter, UK
+
+---
+
+| Version | Description |
+|---------|-------------|
+| 1.0 | Initial protocol developed and structured according to RECORD-PE [@Brown2024] |
+
+---
+
+# Background
+
+Ninety-eight percent of people living with advanced chronic kidney disease (CKD) — stages 4 and 5, not receiving kidney replacement therapy (KRT) — live with multiple long-term conditions [@Hawthorne2023]. Resultantly, polypharmacy is highly prevalent [@vanOosten2021]. Polypharmacy is well linked to avoidable harm [@Fried2014], hence it is a key action area in the World Health Organisation's current Global Patient Safety Challenge: *Medication Without Harm* [@WHO2023]. For people with reduced kidney function, the risk of harm is augmented by unpredictable drug handling and excretion and therefore they are a high priority group to study [@Mohottige2021].
+
+Added to this, people with reduced kidney function are systematically excluded from studies in which the safety and efficacy of drugs is assessed [@Colombijn2024] and so we actually have limited evidence to guide prescribing in this group.
+
+Deprescribing — the systematic process of stopping or reducing medicines — is a proposed way of reducing the harms associated with polypharmacy. However, despite recent KDIGO (Kidney Disease | Improving Global Outcomes) CKD practice guidelines containing a new section on *Medication management and Drug Stewardship*, there is acknowledgment from the authors that evidence to guide deprescribing is limited [@Stevens2024]. 
+
+Research has shown that a small number of people with advanced kidney disease are having medications such as statins and proton pump inhibitors deprescribed in their last years of life [@Letts2024], but information about patterns and predictors of deprescribing at a population level are lacking.
+
+Other factors that make this an important area to study include:
+
+- Supported by policy, and lack of research into deprescribing - current NIHR call
+- Importance to patients, prescribers, and health and care services
+- Relevant as a James Lind Alliance priority for medicines in older life.
+
+# Objectives
+
+1. To establish the patterns of discontinuation of long-term medicines in people in England living with advanced CKD.
+2. To identify the clinical and sociodemographic factors associated with variances in these patterns.
+3. To operationalise an appropriate definition of medication discontinuation.
+
+In routine healthcare data, deprescribing is largely observable as medication [discontinuation]{.underline}, which will therefore be the primary focus of this study.
+
+# Methods
+
+## Study design
+
+We will conduct cross-sectional and longitudinal analyses of a retrospective cohort of individuals living with advanced kidney disease living in England.
+
+## Data sources
+
+We will analyse the primary care record data of people living in England that is stored and managed by The Phoenix Partnership (TPP), specifically through utilisation of the OpenSAFELY-TPP secure analytical database. We will utilise OpenSAFELY-TPP's established linkages to:
+
+- Office for National Statistics (ONS) data on registered deaths
+- NHS Secondary Uses Service data, which is used to derive ethnicity information and to help identify individuals in receipt of KRT
+
+## Study participants
+
+This retrospective cohort study will analyse the cohort of individuals living with advanced kidney disease on 01/03/2022, and then follow up their prescriptions for the following 4 years.
+
+### Inclusion criteria
+
+Individuals will be included in the cohort if on 01/03/2022 they meet all the following criteria:
+
+1. Alive
+2. Age ≥18 and ≤110 years
+3. Continuous registration at a single GP practice that uses TPP software for at least one year prior to the index date.
+4. Evidence of advanced chronic kidney disease, confirmed by the presence of one or both of the following [@Sparks2025]: 
+    a. The two most recent serum creatinine measurements that are >90 days apart consistent with an estimated glomerular filtration rate (eGFR) <30 mls/min/1.73m^2^ (calculated using the 2009 CKD-EPI equation as recommended by the [UK Kidney Association](https://www.ukkidney.org/health-professionals/information-resources/uk-eckd-guide/measurement-kidney-function)).
+    b. SNOMED codes for CKD 4 and 5 as published on [OpenCodelists](https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2/).
+
+
+### Exclusion criteria
+
+1. People who have been coded to receive kidney replacement therapy (KRT) of any sort (dialysis or transplant) prior to the index date, or on the index date itself. KRT will be defined using established primary and secondary care [codes](https://www.opencodelists.org/codelist/opensafely/renal-replacement-therapy/2020-04-14/#full-list) that have been shown to be sensitive for identifying the prevalent KRT population in England [@Santhakumaran2024]. 
+
+### Follow up
+
+Study participants will be followed up from the index date until the earliest of:
+
+- End of maximum follow up period (4 years)
+- Death
+- Initiation of kidney replacement therapy (dialysis or transplant)
+- End of registration with GP practice that uses TPP software
+
+### Data quality assurance criteria
+
+Individuals will only be included if they meet all the following criteria:
+
+- Known sex that is exactly 'male' or 'female'
+- Known age between 18 and 110 at index date
+- Known IMD
+- Known ethnicity
+- Known STP
+
+## Medication variables
+
+In this analysis we will study baseline prescribing on the index date, and the trends of medication discontinuation over time.
+
+### Medication data
+
+The medication table within OpenSAFELY-TPP contains information for every medication that is prescribed in primary care. This information is recorded as 'date' of prescription and 'dictionary of medicines and devices (dm+d) code' corresponding to the prescription. In OpenSAFELY, each dm+d code corresponds to the name (e.g. atorvastatin), strength (e.g. 40mg) and formulation (e.g. tablet) of a prescribed drug, but not the dosing recommendation (e.g. take 1 tablet once a day), nor the amount of medication prescribed (e.g. 28 tablets). Data on whether a prescription was issued, or whether the patient took the medication as prescribed are also not available.
+
+### Medication data handling
+
+Each medication will have its dm+d code mapped to its corresponding British National Formulary (BNF) substance code using publicly available [mapping data](https://www.nhsbsa.nhs.uk/prescription-data/understanding-our-data/bnf-snomed-mapping). BNF codes follow a clear hierarchical structure and allow for clinically meaningful grouped analyses.
+
+When considering which medications to include we have used previously described methods [@Goedken2016]:
+
+#### Scope
+Medication exclusions will be applied at the BNF chapter level, and based on medication route information.
+--- EXPAND ---
+
+#### Uniqueness
+
+#### Timeframe
+
+### Defining a chronic prescription
+
+In this study, we will analyse only medicines that we consider to be eligible for deprescribing — 'chronic'. These chronic prescriptions are those that are still prescribed at study entry and have been prescribed *regularly* prior to this. There is no consensus regarding how to define a chronic prescription within electronic health record data.
+
+Specifically, OpenSAFELY-TPP also lacks data to show the clinician-intended duration for each prescription. However, prior work looking at gaps between prescriptions in the same setting has shown that for five common medicines, 92% of prescriptions appeared to be for 28 or 56 days, with the remainder being for 7 or 84 days [@Mackenna2025]. In this study, considering this variability, we will define a medication as chronic (and include it in our analyses) if it is prescribed:
+
+- At least once in the 90 days prior to study entry, and
+- At least once in the 14–90 days prior to the most recent prescription before study entry.
+
+This definition assumes that the maximum gap between prescriptions will be 90 days and allows for a short window around 84-day supplies to reflect real-world delays in prescription issuing.
+
+The effect of varying this definition will be explored through sensitivity analyses.
+
+Alternatives:
+
+Firstly:
+
+- At least once in the 90 days prior to study entry, and
+- At least *twice* in the 14–90 days prior to the most recent prescription before study entry.
+
+Secondly:
+
+- 2+ prescriptions in the 180 days prior to study entry, and
+- 14+ days between first and last, and
+- Most recent prescription within the last 90 days.
+
+### Definition of deprescribing
+
+In line with previous publications [@Bayliss2025], deprescribing will be defined by a gap in prescribing of a chronic medicine, or a reduction in the dose of a medicine. Initially a gap of ≥90 days will be used, but sensitivity analyses will explore the effect of using gaps of: ≥30 days, ≥60 days and ≥180 days. The deprescribing date will be defined as the date at which a prescription ended followed by the subsequent gap, or the date of a dose reduction.
+
+### Covariates
+
+The effect of various participant characteristics [at baseline]{.underline} on medication discontinuation will be explored. These characteristics have been chosen for two different reasons:
+
+- It is hypothesised that they will likely have an impact on medication discontinuation.
+- To promote analytical inclusivity, by exploring variations by protected characteristics.
+
+The characteristics to be explored are:
+
+1. Age
+2. Sex
+3. Ethnicity
+4. eGFR
+5. Number of chronic prescriptions
+
+**[Risk of mortality]{.underline}**
+
+Estimated 4-yr risk of mortality will be estimated using the mortality prediction tool [CKD G4+](https://ckdpcrisk.org/lowgfrevents/) [@Grams2018] referenced in the 2024 KDIGO CKD clinical practice guideline [@Stevens2024]. This tool requires the following clinical and demographic data:
+
+a. Age (values between 30 and 85)
+b. Sex (M/F)
+c. Race (B/W)
+d. Proteinuria quantification (uPCR or uACR)
+e. Smoking status (current vs never/ex)
+f. Diabetes status (Y/N)
+g. History of cardiovascular disease (Y/N)
+h. eGFR (values between 15 and 30)
+i. Systolic BP (values between 90–180)
+
+Four strata will be viewed: <25%, 25–49%, 50–74%, ≥75%
+
+**[Frailty — in those 65+ years old]{.underline}**
+
+Frailty will be characterised using the electronic frailty index (eFI — ideally eFI2 [@Best2025]) a widely recommended metric for identifying frailty within electronic health records. Looks like should be computationally straightforward as variable already exists in TPP schema. Using eFI (or similar) to identify potentially frail people in primary care in England is a GP contractual obligation, and those identified as severely frail are recommended for annual structured medication review according to NHS England.
+
+Four strata will be viewed: non-frail, mildly frail, moderately frail, severely frail.
+
+## Statistical methods
+
+## Tables and figures
+
+## Study limitations
+
+# Other information
+
+## Funding
+
+## PPIE
+
+# References {.unnumbered}

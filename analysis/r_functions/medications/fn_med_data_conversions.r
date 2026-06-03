@@ -1,9 +1,15 @@
 ##########################################################################################
 # Functions for joining patient medication data to pre-built lookup tables
-
 # Lookup tables and their build functions live in:
 # local_processing/medication_lookup_tables/
 ##########################################################################################
+
+source(here::here(
+  "analysis",
+  "r_functions",
+  "utilities",
+  "fn_disclosure_control.r"
+))
 
 #######################################################################################
 # fn_write_unmapped_codes() - diagnostics
@@ -112,8 +118,7 @@ fn_dmd_to_bnf <- function(
       names_pattern = "^(med_dmd_code|med_date)_(\\d+)$"
     ) |>
     rename(
-      dmd_code = med_dmd_code,
-      med_date = med_date
+      dmd_code = med_dmd_code
     ) |>
     mutate(med_index = as.integer(med_index)) |>
     filter(!is.na(dmd_code), dmd_code != "", dmd_code != "NA")

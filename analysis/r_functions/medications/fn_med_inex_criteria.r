@@ -6,15 +6,10 @@
 # Arguments:
 #   patient_data : data frame - one row per medication per patient
 #   project_stage : string label used for outputs
-#   exclude_bnf_chapters : BNF chapter codes to remove. Default excludes:
-#                          "14" immunological products, "15" anaesthesia, (16 and 17
-#                          are not actual chapters), "18" preparations used in diagnosis,
-#                          "19" other drugs and preparations,
-#                          "20" dressings, "21" appliances,
-#                          "22" incontinence appliances, "23" stoma appliances.
-#                          NULL = no chapter filtering.
+#   exclude_bnf_chapters : BNF chapter codes to remove.
+#                          Default NULL = no chapter filtering.
 #   exclude_route_cats : route_cat values to exclude.
-#                       Default NULL = no route filtering.
+#                        Default NULL = no route filtering.
 #
 # Returns: filtered long-format data frame
 #######################################################################################
@@ -22,7 +17,7 @@
 fn_apply_med_inex_criteria <- function(
   patient_data,
   project_stage,
-  exclude_bnf_chapters = c("14", "15", "18", "19", "20", "21", "22", "23"),
+  exclude_bnf_chapters = NULL,
   exclude_route_cats = NULL
 ) {
   require(tidyverse)
