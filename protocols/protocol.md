@@ -2,7 +2,56 @@
 Matthew Letts<sup>1,2</sup>, Robert Porteous<sup>1</sup>, Rachel
 Denholm<sup>1</sup>, Rupert Payne<sup>3</sup>, Jonathan
 Sterne<sup>1</sup>, Fergus Caskey<sup>2</sup>
-22 May 2026
+23 June 2026
+
+- [<span class="toc-section-number">1</span> Background](#background)
+- [<span class="toc-section-number">2</span> Objectives](#objectives)
+- [<span class="toc-section-number">3</span> Methods](#methods)
+  - [<span class="toc-section-number">3.1</span> Study
+    design](#study-design)
+  - [<span class="toc-section-number">3.2</span> Data
+    sources](#data-sources)
+  - [<span class="toc-section-number">3.3</span> Study
+    population](#study-population)
+    - [<span class="toc-section-number">3.3.1</span> Inclusion
+      criteria](#inclusion-criteria)
+    - [<span class="toc-section-number">3.3.2</span> Exclusion
+      criteria](#exclusion-criteria)
+    - [<span class="toc-section-number">3.3.3</span> Follow
+      up](#follow-up)
+    - [<span class="toc-section-number">3.3.4</span> Data quality
+      assurance criteria](#data-quality-assurance-criteria)
+  - [<span class="toc-section-number">3.4</span> Medication
+    data](#medication-data)
+    - [<span class="toc-section-number">3.4.1</span> Medication data
+      handling](#medication-data-handling)
+  - [<span class="toc-section-number">3.5</span> Medication inclusion /
+    exclusion](#medication-inclusion--exclusion)
+    - [<span class="toc-section-number">3.5.1</span> Scope](#scope)
+    - [<span class="toc-section-number">3.5.2</span>
+      Uniqueness](#uniqueness)
+    - [<span class="toc-section-number">3.5.3</span>
+      Timeframe](#timeframe)
+  - [<span class="toc-section-number">3.6</span> Medication
+    discontinuation](#medication-discontinuation)
+  - [<span class="toc-section-number">3.7</span>
+    Covariates](#covariates)
+    - [<span class="toc-section-number">3.7.1</span> Risk of
+      mortality](#risk-of-mortality)
+    - [<span class="toc-section-number">3.7.2</span> Frailty](#frailty)
+  - [<span class="toc-section-number">3.8</span> Statistical
+    methods](#statistical-methods)
+    - [<span class="toc-section-number">3.8.1</span> Sensitivity
+      analysis](#sensitivity-analysis)
+  - [<span class="toc-section-number">3.9</span> Tables and
+    figures](#tables-and-figures)
+  - [<span class="toc-section-number">3.10</span> Study
+    limitations](#study-limitations)
+- [<span class="toc-section-number">4</span> Other
+  information](#other-information)
+  - [<span class="toc-section-number">4.1</span> Funding](#funding)
+  - [<span class="toc-section-number">4.2</span> PPIE](#ppie)
+- [References](#references)
 
 <sup>1</sup> Electronic Health Records Group, Population Health
 Sciences, Bristol Medical School, University of Bristol, Bristol, UK
@@ -24,32 +73,35 @@ of Exeter, Exeter, UK
 # Background
 
 Ninety-eight percent of people living with advanced chronic kidney
-disease (CKD) — stages 4 and 5, not receiving kidney replacement therapy
-(KRT) — live with multiple long-term conditions (2). Resultantly,
-polypharmacy is highly prevalent (3). Polypharmacy is well linked to
-avoidable harm (4), hence it is a key action area in the World Health
-Organisation’s current Global Patient Safety Challenge: *Medication
-Without Harm* (5). For people with reduced kidney function, the risk of
-harm is augmented by unpredictable drug handling and excretion and
-therefore they are a high priority group to study (6).
+disease (CKD) - stages 4 and 5, not receiving kidney replacement therapy
+(KRT) - live with multiple long-term conditions (2). Resultantly,
+polypharmacy is highly prevalent, and this gruop are prescribed on
+average 8-9 medicines per day (\>100 pills per week) (3). Polypharmacy
+is well linked to avoidable harm (4), hence addressing it is a key
+action area in the World Health Organisation’s current Global Patient
+Safety Challenge: *Medication Without Harm* (5). For people with reduced
+kidney function, the risk of harm is augmented by unpredictable drug
+handling and excretion - 1 in 5 experience a medication-related harm
+each year \[REF\] - and therefore they are a high priority group to
+study (6).
 
-Added to this, people with reduced kidney function are systematically
-excluded from studies in which the safety and efficacy of drugs is
-assessed (7) and so we actually have limited evidence to guide
-prescribing in this group.
+Added to this, clinical trials that establish the safety and
+effectiveness of medicines rarely include people living with advanced
+kidney disease, and instead include populations that do not reflect
+their comorbidity and diversity (7).
 
-Deprescribing — the systematic process of stopping or reducing medicines
-— is a proposed way of reducing the harms associated with polypharmacy.
-However, despite recent KDIGO (Kidney Disease \| Improving Global
-Outcomes) CKD practice guidelines containing a new section on
-*Medication management and Drug Stewardship*, there is acknowledgment
-from the authors that evidence to guide deprescribing is limited (8).
+Deprescribing - the systematic process of stopping or reducing
+medicines - is a proposed way of reducing the harms associated with
+polypharmacy. However, despite a new chapter in the recent KDIGO (Kidney
+Disease \| Improving Global Outcomes) CKD practice guidelines update
+entitled *Medication management and Drug Stewardship*, there is an
+acknowledgment that evidence to guide deprescribing is limited (8).
 
 Research has shown that a small number of people with advanced kidney
 disease are having medications such as statins and proton pump
-inhibitors deprescribed in their last years of life (9), but information
-about patterns and predictors of deprescribing at a population level are
-lacking.
+inhibitors discontinued in their last years of life (9), but information
+about patterns and predictors of discontinuation at a population level
+are lacking.
 
 Other factors that make this an important area to study include:
 
@@ -61,14 +113,19 @@ Other factors that make this an important area to study include:
 - James Lind Alliance priority for understanding medicines in older
   life.
 
+We therefore aim to describe the current patterns of discontinuation of
+common medicines in people living with advanced CKD in England, and
+evaluate the clinical and sociodemographic factors that lead to
+variances in these patterns.
+
 # Objectives
 
-1.  To establish the patterns of discontinuation of long-term medicines
-    in people in England living with advanced CKD.
-2.  To identify the clinical and sociodemographic factors associated
+1.  To describe patterns of prescribing at a national level for people
+    living with advanced CKD
+2.  To establish the patterns of discontinuation of medicines in people
+    in England living with advanced CKD.
+3.  To identify the clinical and sociodemographic factors associated
     with variances in these patterns.
-3.  To operationalise an appropriate definition of medication
-    discontinuation.
 
 In routine healthcare data, deprescribing is largely observable as
 medication <u>discontinuation</u>, which will therefore be the primary
@@ -90,8 +147,8 @@ specifically through utilisation of the OpenSAFELY-TPP secure analytical
 database. We will utilise OpenSAFELY-TPP’s established linkages to:
 
 - Office for National Statistics (ONS) data on registered deaths
-- NHS Secondary Uses Service data, which is used to derive ethnicity
-  information and to help identify individuals in receipt of KRT
+- NHS Secondary Uses Service data, which includes information regarding
+  hospital admissions, and is used to derive each individual’s ethnicity
 
 ## Study population
 
@@ -115,18 +172,18 @@ all the following criteria:
     (eGFR) \<30 mls/min/1.73m<sup>2</sup> (calculated using the 2009
     CKD-EPI equation as recommended by the [UK Kidney
     Association](https://www.ukkidney.org/health-professionals/information-resources/uk-eckd-guide/measurement-kidney-function)).
-  - SNOMED codes for CKD 4 and 5 as published on
-    [OpenCodelists](https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2/).
+  - A SNOMED code indicating a diagnosis of CKD 4 and 5
+    ([OpenCodelists](https://www.opencodelists.org/codelist/user/mletts92/chronic-kidney-disease-stage-4-and-5-but-not-receiving-kidney-replacement-therapy/49c071e2/))
+    on any prior date.
 
 ### Exclusion criteria
 
-- People who have been coded to receive kidney replacement therapy (KRT)
-  of any sort (dialysis or transplant) prior to the index date, or on
-  the index date itself. KRT will be defined using established primary
-  and secondary care
-  [codes](https://www.opencodelists.org/codelist/opensafely/renal-replacement-therapy/2020-04-14/#full-list)
-  that have been shown to be sensitive for identifying the prevalent KRT
-  population in England (12).
+- People in receipt of kidney replacement therapy (KRT). This is defined
+  as a
+  [code](https://www.opencodelists.org/codelist/opensafely/renal-replacement-therapy/2020-04-14/#full-list)
+  indicating dialysis or transplant prior to the index date, or on the
+  index date itself. This method has been shown to be sensitive for
+  identifying the prevalent KRT population in England (12).
 
 ### Follow up
 
@@ -145,9 +202,10 @@ criteria:
 
 - Known sex that is exactly ‘male’ or ‘female’
 - Known date of birth
-- Known IMD
+- (Known IMD
 - Known ethnicity
-- Known STP
+- Known STP) - *I’m not sure about these bottom three - they may well
+  exclude people unnecessarily*
 
 ## Medication data
 
@@ -155,56 +213,59 @@ In this analysis we will study baseline prescribing on the index date,
 and the trends of medication discontinuation over time.
 
 The medication table within OpenSAFELY-TPP contains information for
-every medication that is prescribed in primary care. This information is
-recorded as ‘date’ of prescription and ‘dictionary of medicines and
-devices (dm+d) code’ corresponding to the prescription. Dm+d codes are
-the preferred mechanism through which medicinal product identification
-and communication occurs within the NHS. In OpenSAFELY, each dm+d code
-corresponds to the name (e.g. atorvastatin), strength (e.g. 40mg) and
-formulation (e.g. tablet) of a prescribed drug. Data on the dosing
-recommendation (e.g. take 1 tablet once a day), the amount of medication
-prescribed (e.g. 28 tablets), whether a prescription was issued, or
-whether the patient took the medication as prescribed are not available.
+every medication that is prescribed in primary care. Each prescription
+is recorded using its corresponding NHS dictionary of medicines and
+devices (dm+d) code and corresponding date. [dm+d
+codes](https://digital.nhs.uk/data-and-information/information-standards/governance/latest-activity/standards-and-collections/scci0052-dictionary-of-medicines-and-devices-dm-d/)
+are the preferred mechanism through which medicinal product
+identification and communication occurs within the NHS. In OpenSAFELY,
+each dm+d code corresponds to the name (e.g. atorvastatin), strength
+(e.g. 40mg) and formulation (e.g. tablet) of a prescribed drug. Data on
+the dosing recommendation (e.g. take 1 tablet once a day), the quantity
+of a medication prescribed (e.g. 28 tablets), whether a prescription was
+dispensed, or whether the patient adhered to the medication as
+prescribed are not available.
 
 ### Medication data handling
 
-Each medication will have its dm+d code mapped to its corresponding
+Each dm+d code has one or more official routes of administration and
+these will be mapped to the study data using publicly available [NHS
+TRUD](https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/6)
+(Technology Reference data Update Distribution) reference files. Each of
+the 79 official routes of administration will be mapped according to
+author consensus to one of the following categories: oral, topical,
+inhaled, eye/ear/nasal, oromucosal, rectal/vaginal, transdermal,
+intramuscular, intravenous, subcutaneous and other. If a dm+d code has
+multiple licensed routes it will be classified ‘multiple routes’, and if
+no licensed routes, ‘unknown’.
+
+Each medication will then have its dm+d code mapped to its corresponding
 British National Formulary (BNF) substance code using publicly available
 [mapping
 data](https://www.nhsbsa.nhs.uk/prescription-data/understanding-our-data/bnf-snomed-mapping).
 BNF codes follow a clear hierarchical structure and allow for clinically
-meaningful analysis. Each dm+d code has one or more official routes of
-administration, which themselves are coded using unique SNOMED
-identifiers. Mapping of these routes will be performed using publicly
-available data from [NHS
-TRUD](https://isd.digital.nhs.uk/trud/users/guest/filters/0/categories/6)
-(Technology Reference data Update Distribution). Each of the 79 official
-routes of administration will be mapped to one of the following
-categories: oral, topical, inhaled, eye/ear/nasal, oromucosal,
-rectal/vaginal, transdermal, intramuscular, intravenous, subcutaneous
-and other. Those with multiple licensed routes will be attributed
-‘multiple routes’, and those with no licensed routes will be attributed
-‘unknown’.
+meaningful analysis.
 
-## Baseline medications
+## Medication inclusion / exclusion
 
-When considering which baseline medications to include in our analyses
-we have used previously described methods. These suggest categorising
-medications for based on their *scope, uniqueness and timeframe* (13).
+Medicines will be included / excluded in our analysis by considering
+their *scope, uniqueness and timeframe* (13).
 
 ### Scope
 
-In the primary analysis, drugs within scope will be defined as: - Drug
-type - those within BNF chapters 1 to 13. BNF chapters 14 to 23 will be
-excluded as they represent specialist medicinal products and medical
-devices. - Route - those that are orally administered. This is because
-oral medications are the most likely to be deprescribed in this
-population.
+We will include medications based on their drug type and route.
 
-In sensitivity analyses, we will explore the effect of including drugs
-that are administered through other routes. Importantly, it will not be
-possible to distinguish PRN (as required) prescriptions from regular
-prescriptions, and so all medications will be assumed regular.
+- Drug type. We will include medications within BNF chapters 1 to 13.
+  BNF chapters 14 to 23 will be excluded as they represent specialist
+  products that are unlikely to be common and not targets for
+  discontinuation, and medical devices.
+- Route. We will include medications that are orally administered. This
+  is because oral medications are the most likely to be deprescribed in
+  this population.
+
+It will not be possible to distinguish PRN (as required) prescriptions
+from regular prescriptions, and so all medications will be assumed
+regular.
 
 ### Uniqueness
 
@@ -306,6 +367,11 @@ Four strata will be viewed: non-frail, mildly frail, moderately frail,
 severely frail.
 
 ## Statistical methods
+
+### Sensitivity analysis
+
+In sensitivity analyses, we will explore the effect of including drugs
+that are administered through other routes.
 
 ## Tables and figures
 
