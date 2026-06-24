@@ -2,56 +2,7 @@
 Matthew Letts<sup>1,2</sup>, Robert Porteous<sup>1</sup>, Rachel
 Denholm<sup>1</sup>, Rupert Payne<sup>3</sup>, Jonathan
 Sterne<sup>1</sup>, Fergus Caskey<sup>2</sup>
-23 June 2026
-
-- [<span class="toc-section-number">1</span> Background](#background)
-- [<span class="toc-section-number">2</span> Objectives](#objectives)
-- [<span class="toc-section-number">3</span> Methods](#methods)
-  - [<span class="toc-section-number">3.1</span> Study
-    design](#study-design)
-  - [<span class="toc-section-number">3.2</span> Data
-    sources](#data-sources)
-  - [<span class="toc-section-number">3.3</span> Study
-    population](#study-population)
-    - [<span class="toc-section-number">3.3.1</span> Inclusion
-      criteria](#inclusion-criteria)
-    - [<span class="toc-section-number">3.3.2</span> Exclusion
-      criteria](#exclusion-criteria)
-    - [<span class="toc-section-number">3.3.3</span> Follow
-      up](#follow-up)
-    - [<span class="toc-section-number">3.3.4</span> Data quality
-      assurance criteria](#data-quality-assurance-criteria)
-  - [<span class="toc-section-number">3.4</span> Medication
-    data](#medication-data)
-    - [<span class="toc-section-number">3.4.1</span> Medication data
-      handling](#medication-data-handling)
-  - [<span class="toc-section-number">3.5</span> Medication inclusion /
-    exclusion](#medication-inclusion--exclusion)
-    - [<span class="toc-section-number">3.5.1</span> Scope](#scope)
-    - [<span class="toc-section-number">3.5.2</span>
-      Uniqueness](#uniqueness)
-    - [<span class="toc-section-number">3.5.3</span>
-      Timeframe](#timeframe)
-  - [<span class="toc-section-number">3.6</span> Medication
-    discontinuation](#medication-discontinuation)
-  - [<span class="toc-section-number">3.7</span>
-    Covariates](#covariates)
-    - [<span class="toc-section-number">3.7.1</span> Risk of
-      mortality](#risk-of-mortality)
-    - [<span class="toc-section-number">3.7.2</span> Frailty](#frailty)
-  - [<span class="toc-section-number">3.8</span> Statistical
-    methods](#statistical-methods)
-    - [<span class="toc-section-number">3.8.1</span> Sensitivity
-      analysis](#sensitivity-analysis)
-  - [<span class="toc-section-number">3.9</span> Tables and
-    figures](#tables-and-figures)
-  - [<span class="toc-section-number">3.10</span> Study
-    limitations](#study-limitations)
-- [<span class="toc-section-number">4</span> Other
-  information](#other-information)
-  - [<span class="toc-section-number">4.1</span> Funding](#funding)
-  - [<span class="toc-section-number">4.2</span> PPIE](#ppie)
-- [References](#references)
+24 June 2026
 
 <sup>1</sup> Electronic Health Records Group, Population Health
 Sciences, Bristol Medical School, University of Bristol, Bristol, UK
@@ -72,51 +23,39 @@ of Exeter, Exeter, UK
 
 # Background
 
-Ninety-eight percent of people living with advanced chronic kidney
-disease (CKD) - stages 4 and 5, not receiving kidney replacement therapy
-(KRT) - live with multiple long-term conditions (2). Resultantly,
-polypharmacy is highly prevalent, and this gruop are prescribed on
-average 8-9 medicines per day (\>100 pills per week) (3). Polypharmacy
-is well linked to avoidable harm (4), hence addressing it is a key
-action area in the World Health Organisation’s current Global Patient
-Safety Challenge: *Medication Without Harm* (5). For people with reduced
-kidney function, the risk of harm is augmented by unpredictable drug
-handling and excretion - 1 in 5 experience a medication-related harm
-each year \[REF\] - and therefore they are a high priority group to
-study (6).
-
-Added to this, clinical trials that establish the safety and
-effectiveness of medicines rarely include people living with advanced
-kidney disease, and instead include populations that do not reflect
-their comorbidity and diversity (7).
+Ninety-eight percent of people living with chronic kidney disease stages
+4 and 5 not receiving kidney replacement therapy - CKD 4/5 - live with
+multiple long-term conditions (2). Resultantly, polypharmacy is highly
+prevalent - this group are prescribed on average 8-9 medicines per day
+(and \>100 pills per week) (3). Polypharmacy is well linked to avoidable
+harms such as falls and hospitalisations (4) so managing it safely is a
+key action area within the World Health Organisation’s active global
+patient safety challenge: *Medication Without Harm* (5). For people with
+CKD 4/5, the risk of medication-related harm is augmented by
+unpredictable drug handling and excretion - 1 in 5 experience a
+medication-related harm each year (6), making them a high priority group
+to study (7). Added to this, clinical trials that establish the safety
+and effectiveness of medicines often exclude people living with CKD 4/5,
+and do not reflect their comorbidity and diversity (8).
 
 Deprescribing - the systematic process of stopping or reducing
 medicines - is a proposed way of reducing the harms associated with
-polypharmacy. However, despite a new chapter in the recent KDIGO (Kidney
-Disease \| Improving Global Outcomes) CKD practice guidelines update
-entitled *Medication management and Drug Stewardship*, there is an
-acknowledgment that evidence to guide deprescribing is limited (8).
+polypharmacy. Within the recently updated KDIGO (Kidney Disease \|
+Improving Global Outcomes) CKD practice guideline there is a new chapter
+entitled *Medication management and Drug Stewardship*, however this
+includes an acknowledgment that evidence to guide deprescribing is
+limited (9). We have shown that a proportion of people with advanced
+kidney disease are having medications such as statins discontinued in
+their last years of life (10), but wider-scale information is lacking.
+Currently there is little guidance for clinicians about what medicines
+can be deprescribed and when.
 
-Research has shown that a small number of people with advanced kidney
-disease are having medications such as statins and proton pump
-inhibitors discontinued in their last years of life (9), but information
-about patterns and predictors of discontinuation at a population level
-are lacking.
-
-Other factors that make this an important area to study include:
-
-- Supported by policy - Department of Health and Social Care report on
-  reducing overprescribing (10),
-- Call for more research into deprescribing - current NIHR call, HDR UK
-  Medicines in acute and Chronic disease driver programme
-- Importance to patients, prescribers, and health and care services
-- James Lind Alliance priority for understanding medicines in older
-  life.
-
-We therefore aim to describe the current patterns of discontinuation of
-common medicines in people living with advanced CKD in England, and
-evaluate the clinical and sociodemographic factors that lead to
-variances in these patterns.
+We aim to describe the current patterns of discontinuation of common
+medicines in people living with advanced CKD in England, and evaluate
+the clinical and sociodemographic factors that lead to variances in
+these patterns. In routine healthcare data, deprescribing is largely
+observable as medication *discontinuation*, which will therefore be the
+primary focus of this study.
 
 # Objectives
 
@@ -126,10 +65,6 @@ variances in these patterns.
     in England living with advanced CKD.
 3.  To identify the clinical and sociodemographic factors associated
     with variances in these patterns.
-
-In routine healthcare data, deprescribing is largely observable as
-medication <u>discontinuation</u>, which will therefore be the primary
-focus of this study.
 
 # Methods
 
@@ -143,23 +78,24 @@ living in England.
 
 We will analyse the primary care record data of people living in England
 that is stored and managed by The Phoenix Partnership (TPP),
-specifically through utilisation of the OpenSAFELY-TPP secure analytical
-database. We will utilise OpenSAFELY-TPP’s established linkages to:
+specifically through the OpenSAFELY-TPP secure analytical platform. We
+will utilise OpenSAFELY-TPP’s established linkages to:
 
 - Office for National Statistics (ONS) data on registered deaths
 - NHS Secondary Uses Service data, which includes information regarding
   hospital admissions, and is used to derive each individual’s ethnicity
+- Data on Index of Multiple Deprivation (IMD)
 
 ## Study population
 
 This retrospective cohort study will analyse the cohort of individuals
-living with advanced kidney disease on 01/03/2022, and then follow up
-their prescriptions for the following 4 years.
+living with CKD 4/5 on 01/03/2022 (the **‘index date’**), and then
+follow up their prescriptions for the following 4 years.
 
 ### Inclusion criteria
 
-Individuals will be included in the cohort if on 01/03/2022 they meet
-all the following criteria:
+Individuals will be included in the cohort if on the index date they
+meet all the following criteria:
 
 - Alive
 - Aged ≥18 and ≤110 years
@@ -201,13 +137,15 @@ Individuals will only be included if they meet all the following
 criteria:
 
 - Known sex that is exactly ‘male’ or ‘female’
-- Known date of birth
+- Known year of birth
 - (Known IMD
 - Known ethnicity
 - Known STP) - *I’m not sure about these bottom three - they may well
   exclude people unnecessarily*
 
-## Medication data
+## Prescribing
+
+### Prescribing data
 
 In this analysis we will study baseline prescribing on the index date,
 and the trends of medication discontinuation over time.
@@ -226,7 +164,7 @@ of a medication prescribed (e.g. 28 tablets), whether a prescription was
 dispensed, or whether the patient adhered to the medication as
 prescribed are not available.
 
-### Medication data handling
+### Prescribing data handling
 
 Each dm+d code has one or more official routes of administration and
 these will be mapped to the study data using publicly available [NHS
@@ -246,12 +184,12 @@ data](https://www.nhsbsa.nhs.uk/prescription-data/understanding-our-data/bnf-sno
 BNF codes follow a clear hierarchical structure and allow for clinically
 meaningful analysis.
 
-## Medication inclusion / exclusion
+### Medication inclusion / exclusion criteria
 
 Medicines will be included / excluded in our analysis by considering
 their *scope, uniqueness and timeframe* (13).
 
-### Scope
+#### Scope
 
 We will include medications based on their drug type and route.
 
@@ -267,111 +205,217 @@ It will not be possible to distinguish PRN (as required) prescriptions
 from regular prescriptions, and so all medications will be assumed
 regular.
 
-### Uniqueness
+#### Uniqueness
 
-Combination products have distinct BNF substance codes and so will be
-counted as a single drug, which reflects their singular contribution
-towards pill count.
+Combination products have distinct dm+d and BNF substance codes and so
+will be counted as a single drug.
 
-### Timeframe
+#### Timeframe
 
-We will analyse medicines that we define as being *chronic*, as these
-are more eligible for discontinuation. Chronic prescriptions are those
-that a person is prescribed at the study entry and have been prescribed
-*regularly* prior to this. There is no consensus regarding how to define
-a chronic prescription within electronic health record data.
-OpenSAFELY-TPP lacks data to show the clinician-intended duration for
-each prescription, however for five common medicines, 92% of
-prescriptions appeared to be intended for 28 or 56 days, with the
-remainder being for 7 or 84 days (14). In our primary analysis,
-considering this variability and to be pragmatic, we will define a
-medication as chronic (and include it in our analyses) if it is
-prescribed:
+Conceptually, for a medicine to be discontinued, it must be first in
+*chronic* use, i.e. being used on the index date, and regularly prior to
+that. There is no consensus regarding how to define a chronic
+prescription within electronic health record data. OpenSAFELY-TPP lacks
+data to show the clinician-intended duration for each prescription, and
+therefore assumptions about the length of each prescription are required
+to establish what a person could have been taking on any given date. It
+has previously been shown that for five of the commonest medicines, 92%
+were prescribed for 28 or 56 days, with the remainder being prescribed
+for 7 or 84 days (14).
 
-- Two or more times within the 180 days prior to study entry, and
-- At least once within the most recent 90 days.
+Considering this variability, we will define a medication as chronic,
+and include it in our analyses, if all of the following are true:
 
-Additionally, within those 180 days there must be \>=21 days between the
-first and last prescriptions This effect of this definition on results
-will be explored through sensitivity analyses.
+- In the 180 days prior to the index date:
+  - It is prescribed two or more times (*regular*)
+  - There are \>=21 days between the oldest and the most recent
+    prescriptions (*sustained*)
+- In the 90 days prior to the index date:
+  - It is prescribed once or more (*recent*)
 
-## Medication discontinuation
+## Outcome - Medication Discontinuation
 
 Medications prescribed at baseline will be followed longitudinally for
-up to 4 years to examine patterns of discontinuation. In line with
-previous publications (15), discontinuation will be defined by a gap in
-prescribing of a chronic medicine. Initially a gap of ≥90 days will be
-used, but sensitivity analyses will explore the effect of using gaps of:
-≥30 days, ≥60 days and ≥180 days. The discontinuation date will be
-defined as the date after the end of the gap following the last
-prescription.
+up to 4 years to examine patterns of discontinuation.
 
-— dose reduction? — — modelling prior gaps? —
+Within OpenSAFELY-TPP the duration of each prescription is unknown. In
+line with previous publications (15), discontinuation will be defined as
+a gap of a prescription of a chronic medicine of 120 days or more. This
+will allow a window of time for re-prescription to occur even if the
+prescription was issued for 84 days (the maximum length in usual
+practice in England). The date of discontinuation will be defined as the
+date of the last prescription.
+
+*This needs discussion - could this be operationalised better? We could
+look at dose reduction, or something more complex modelling prior gaps*
 
 ## Covariates
 
-The effect of various participant characteristics on prescribing at
-study entry and medication discontinuation will be explored. The
-characteristics have been chosen for two different reasons:
+Covariates have been chosen for two different reasons:
 
 - It is hypothesised that they will likely have an impact on medication
   discontinuation.
 - To promote analytical inclusivity, by exploring variations by
   protected characteristics.
 
-Covariates, which will be defined on the index date are:
+Covariates, which will be defined on the index date, are described in
+the table below.
 
-- Age
-- Sex
-- Ethnicity
-- eGFR
-- Number of chronic prescriptions
-- Risk of mortality (see below)
-- Frailty (see below)
-- Presence or absence of comorbidities
+<table style="width:99%;">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 17%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th><strong>Covariate</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Definition</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Age</td>
+<td>Continuous</td>
+<td><p>Age in years calculated from year of birth Will be modelled using
+splines</p>
+<p>Strata: 18–49, 50–64, 65–74, 75–84, ≥85</p></td>
+</tr>
+<tr>
+<td>Sex</td>
+<td>Categorical</td>
+<td>Male or female</td>
+</tr>
+<tr>
+<td>Ethnicity</td>
+<td>Categorical</td>
+<td><p>Derived from GP record and NHS Secondary Uses Service data, using
+the most recent non-missing value. Strata:</p>
+<p>White<br />
+Mixed / Multiple ethnic<br />
+Asian / Asian British<br />
+Black / African / Caribbean / Black British<br />
+Other ethnic group<br />
+Not stated / Not known<br />
+</p></td>
+</tr>
+<tr>
+<td>Deprivation</td>
+<td>Categorical</td>
+<td>Deciles of Index of Multiple Deprivation (IMD) based on address on
+index date</td>
+</tr>
+<tr>
+<td>eGFR</td>
+<td>Continuous</td>
+<td>Estimated glomerular filtration rate on the index date, calculated
+from the most recent serum creatinine using the 2009 CKD-EPI
+equation.</td>
+</tr>
+<tr>
+<td>Number of chronic prescriptions</td>
+<td>Continuous</td>
+<td>Count of distinct included chronic medications on the index
+date,</td>
+</tr>
+<tr>
+<td>Region</td>
+<td>Categorical</td>
+<td>East of England<br />
+London<br />
+Midlands<br />
+North East and Yorkshire<br />
+North West<br />
+South East<br />
+South West<br />
+</td>
+</tr>
+<tr>
+<td>Frailty</td>
+<td>Categorical</td>
+<td><p>Characterised using the electronic frailty index (eFI, ideally
+eFI2 <span class="citation" data-cites="Best2025">(16)</span>), a widely
+used metric for identifying frailty in electronic health records.</p>
+<p>Strata: non-frail, mildly frail, moderately frail, severely
+frail</p></td>
+</tr>
+<tr>
+<td>Care home status</td>
+<td>Binary</td>
+<td>Using TPP’s algorithm to determine if a person is a likely care home
+resident</td>
+</tr>
+<tr>
+<td>Consultation rate</td>
+<td>Continuous</td>
+<td>Number of GP consultations 12 months prior to the index date</td>
+</tr>
+<tr>
+<td>Dementia</td>
+<td>Binary</td>
+<td>1 if diagnosis present; 0 otherwise</td>
+</tr>
+<tr>
+<td>Liver disease</td>
+<td>Binary</td>
+<td>1 if diagnosis present; 0 otherwise</td>
+</tr>
+<tr>
+<td>Cancer</td>
+<td>Categorical</td>
+<td>1 if diagnosis present; 0 otherwise</td>
+</tr>
+<tr>
+<td>Diabetes</td>
+<td>Binary</td>
+<td>1 if diagnosis present; 0 otherwise</td>
+</tr>
+<tr>
+<td>COPD</td>
+<td>Binary</td>
+<td>1 if diagnosis present; 0 otherwise</td>
+</tr>
+<tr>
+<td>Previous cardiovascular disease</td>
+<td>Binary</td>
+<td>fill in</td>
+</tr>
+</tbody>
+</table>
 
-— clinical events? e.g. falls/hospitalisations - probably would need to
-be examined longitudinally
+### Other covariates
 
-### Risk of mortality
-
-The estimated 4-yr risk of mortality at baseline will be estimated using
-the mortality prediction tool [CKD
-G4+](https://ckdpcrisk.org/lowgfrevents/) (16) referenced in the 2024
-KDIGO CKD clinical practice guideline (8). This tool requires the
-following clinical and demographic data:
-
-1.  Age (values between 30 and 85)
-2.  Sex (male or female)
-3.  Race (black or white)
-4.  Proteinuria quantification (uPCR or uACR)
-5.  Smoking status (current vs never/ex)
-6.  Diabetes status (yes or no)
-7.  History of cardiovascular disease (yes or no)
-8.  eGFR (values between 15 and 30)
-9.  Systolic BP (values between 90–180)
-
-Four strata will be viewed: \<25%, 25–49%, 50–74%, ≥75%
-
-### Frailty
-
-Frailty at baseline will be characterised using the electronic frailty
-index (eFI — ideally eFI2 (17)) a widely utilised metric for identifying
-frailty within electronic health records. Using eFI (or similar) to
-identify potentially frail people in primary care in England is a GP
-contractual obligation, and those identified as severely frail are
-recommended for annual structured medication review according to NHS
-England.
-
-Four strata will be viewed: non-frail, mildly frail, moderately frail,
-severely frail.
+Risk of mortality \| Continuous / \| Estimated 4-year risk of mortality
+\|  
+                           \| categorical \| using the CKD G4+
+prediction tool \|  
+                           \| \| (17). This tool is suggested for use
+\|  
+                           \| \| in the 2024 KDIGO CKD management
+guideline \|  
+                           \| \| (9). It requires 8 variables:Requires:
+age (30–85), \|  
+                           \| \| sex, race (black or white), \|  
+                           \| \| proteinuria (uPCR or uACR), smoking
+\|  
+                           \| \| status, diabetes status, history of
+\|  
+                           \| \| cardiovascular disease, eGFR (15–30),
+\|  
+                           \| \| systolic BP (90–180). \|  
+                           \| \| \|  
+                           \| \| Strata: \<25%, 25–49%, 50–74%, ≥75% \|
 
 ## Statistical methods
 
 ### Sensitivity analysis
 
 In sensitivity analyses, we will explore the effect of including drugs
-that are administered through other routes.
+that are administered through other routes. This effect of varying the
+definition of chronic medicines on results will be explored through
+sensitivity analyses. , but sensitivity analyses will explore the effect
+of using gaps of: ≥30 days, ≥60 days and ≥180 days.
 
 ## Tables and figures
 
@@ -441,9 +485,21 @@ Medication without harm: Policy brief. World Health Organization;
 
 </div>
 
-<div id="ref-Mohottige2021" class="csl-entry">
+<div id="ref-Laville2020" class="csl-entry">
 
 <span class="csl-left-margin">6.
+</span><span class="csl-right-inline"><span class="nocase">Laville SM,
+Gras-Champel V, Moragny J, Metzger M, Jacquelinet C, Combe C, et
+al.</span> Adverse drug reactions in patients with CKD \[Journal
+Article\]. Clinical Journal of the American Society of Nephrology.
+2020;15(8):1090–102.
+doi:[10.2215/cjn.01030120](https://doi.org/10.2215/cjn.01030120)</span>
+
+</div>
+
+<div id="ref-Mohottige2021" class="csl-entry">
+
+<span class="csl-left-margin">7.
 </span><span class="csl-right-inline">Mohottige D, Manley HJ, Hall RK.
 Less is more: Deprescribing medications in older adults with kidney
 disease: A review. Kidney360. 2021;2(9):1510–22.</span>
@@ -452,7 +508,7 @@ disease: A review. Kidney360. 2021;2(9):1510–22.</span>
 
 <div id="ref-Colombijn2024" class="csl-entry">
 
-<span class="csl-left-margin">7.
+<span class="csl-left-margin">8.
 </span><span class="csl-right-inline">Colombijn JMT, Idema DL, Van Beem
 S, Blokland AM, Van Der Braak K, Handoko ML, et al. Representation of
 patients with chronic kidney disease in clinical trials of
@@ -464,7 +520,7 @@ doi:[10.1001/jamanetworkopen.2024.0427](https://doi.org/10.1001/jamanetworkopen.
 
 <div id="ref-Stevens2024" class="csl-entry">
 
-<span class="csl-left-margin">8.
+<span class="csl-left-margin">9.
 </span><span class="csl-right-inline">Stevens PE, Ahmed SB, Carrero JJ,
 Foster B, Francis A, Hall RK, et al. KDIGO 2024 clinical practice
 guideline for the evaluation and management of chronic kidney disease.
@@ -475,22 +531,12 @@ doi:[10.1016/j.kint.2023.10.018](https://doi.org/10.1016/j.kint.2023.10.018)</sp
 
 <div id="ref-Letts2024" class="csl-entry">
 
-<span class="csl-left-margin">9.
+<span class="csl-left-margin">10.
 </span><span class="csl-right-inline">Letts M, Chesnaye NC, Pippias M,
 Caskey F, Jager KJ, Dekker FW, et al. Prescribing patterns in older
 people with advanced chronic kidney disease towards the end of life.
 Clinical Kidney Journal. 2024.
 doi:[10.1093/ckj/sfae301](https://doi.org/10.1093/ckj/sfae301)</span>
-
-</div>
-
-<div id="ref-DHSC2021" class="csl-entry">
-
-<span class="csl-left-margin">10.
-</span><span class="csl-right-inline">Health & Social Care UD of. Good
-for you, good for us, good for everybody \[Electronic Book\]
-\[Internet\]. 2021. Available from:
-<https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1019475/good-for-you-good-for-us-good-for-everybody.pdf></span>
 
 </div>
 
@@ -549,24 +595,24 @@ doi:[10.1002/pds.70142](https://doi.org/10.1002/pds.70142)</span>
 
 </div>
 
-<div id="ref-Grams2018" class="csl-entry">
-
-<span class="csl-left-margin">16.
-</span><span class="csl-right-inline"><span class="nocase">Grams ME et
-al.</span> Predicting timing of clinical outcomes in patients with
-chronic kidney disease and severely decreased glomerular filtration
-rate. Kidney International. 2018;93(6):1442–51.</span>
-
-</div>
-
 <div id="ref-Best2025" class="csl-entry">
 
-<span class="csl-left-margin">17.
+<span class="csl-left-margin">16.
 </span><span class="csl-right-inline">Best K, Shuweihdi F, Alvarez JCB,
 Relton S, Avgerinou C, Nimmons D, et al. Development and external
 validation of the electronic frailty index 2 using routine primary care
 electronic health record data. Age and Ageing. 2025;54(4).
 doi:[10.1093/ageing/afaf077](https://doi.org/10.1093/ageing/afaf077)</span>
+
+</div>
+
+<div id="ref-Grams2018" class="csl-entry">
+
+<span class="csl-left-margin">17.
+</span><span class="csl-right-inline"><span class="nocase">Grams ME et
+al.</span> Predicting timing of clinical outcomes in patients with
+chronic kidney disease and severely decreased glomerular filtration
+rate. Kidney International. 2018;93(6):1442–51.</span>
 
 </div>
 
