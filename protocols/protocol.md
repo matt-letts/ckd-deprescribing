@@ -143,7 +143,7 @@ criteria:
 - Known STP) - *I’m not sure about these bottom three - they may well
   exclude people unnecessarily*
 
-## Prescribing
+## Prescribing information
 
 ### Prescribing data
 
@@ -233,7 +233,7 @@ and include it in our analyses, if all of the following are true:
 - In the 90 days prior to the index date:
   - It is prescribed once or more (*recent*)
 
-## Outcome - Medication Discontinuation
+## Outcome - medication discontinuation
 
 Medications prescribed at baseline will be followed longitudinally for
 up to 4 years to examine patterns of discontinuation.
@@ -261,31 +261,34 @@ Covariates have been chosen for two different reasons:
 Covariates, which will be defined on the index date, are described in
 the table below.
 
-<table style="width:99%;">
+<table style="width:98%;">
 <colgroup>
-<col style="width: 31%" />
-<col style="width: 17%" />
-<col style="width: 50%" />
+<col style="width: 30%" />
+<col style="width: 16%" />
+<col style="width: 49%" />
+<col style="width: 1%" />
 </colgroup>
 <thead>
 <tr>
 <th><strong>Covariate</strong></th>
 <th><strong>Type</strong></th>
 <th><strong>Definition</strong></th>
+<th></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Age</td>
 <td>Continuous</td>
-<td><p>Age in years calculated from year of birth Will be modelled using
-splines</p>
-<p>Strata: 18–49, 50–64, 65–74, 75–84, ≥85</p></td>
+<td colspan="2">Age in years calculated from year of birth. Will be
+modelled using splines | | Strata: 18–49, 50–64, 65–74, 75–84, ≥85
+|</td>
 </tr>
 <tr>
 <td>Sex</td>
 <td>Categorical</td>
 <td>Male or female</td>
+<td></td>
 </tr>
 <tr>
 <td>Ethnicity</td>
@@ -299,25 +302,27 @@ Black / African / Caribbean / Black British<br />
 Other ethnic group<br />
 Not stated / Not known<br />
 </p></td>
+<td></td>
 </tr>
 <tr>
 <td>Deprivation</td>
 <td>Categorical</td>
 <td>Deciles of Index of Multiple Deprivation (IMD) based on address on
 index date</td>
+<td></td>
 </tr>
 <tr>
 <td>eGFR</td>
 <td>Continuous</td>
-<td>Estimated glomerular filtration rate on the index date, calculated
-from the most recent serum creatinine using the 2009 CKD-EPI
-equation.</td>
+<td colspan="2">Estimated glomerular filtration rate | on the index
+date, calculated from | the most recent serum creatinine | using the
+2009 CKD-EPI equation |</td>
 </tr>
 <tr>
 <td>Number of chronic prescriptions</td>
 <td>Continuous</td>
-<td>Count of distinct included chronic medications on the index
-date,</td>
+<td colspan="2">Count of distinct included chronic | medications on the
+index date |</td>
 </tr>
 <tr>
 <td>Region</td>
@@ -330,56 +335,85 @@ North West<br />
 South East<br />
 South West<br />
 </td>
+<td></td>
 </tr>
 <tr>
 <td>Frailty</td>
 <td>Categorical</td>
-<td><p>Characterised using the electronic frailty index (eFI, ideally
-eFI2 <span class="citation" data-cites="Best2025">(16)</span>), a widely
-used metric for identifying frailty in electronic health records.</p>
-<p>Strata: non-frail, mildly frail, moderately frail, severely
-frail</p></td>
+<td>Characterised using the electronic frailty index (eFI, ideally eFI2
+<span class="citation" data-cites="Best2025">(16)</span>), a widely used
+metric for identifying frailty in electronic health records. This is all
+tbc - watch the OS Slack Strata: non-frail, mildly frail, moderately
+frail, severely frail</td>
+<td></td>
 </tr>
 <tr>
 <td>Care home status</td>
 <td>Binary</td>
 <td>Using TPP’s algorithm to determine if a person is a likely care home
 resident</td>
+<td></td>
 </tr>
 <tr>
 <td>Consultation rate</td>
 <td>Continuous</td>
 <td>Number of GP consultations 12 months prior to the index date</td>
+<td></td>
 </tr>
 <tr>
 <td>Dementia</td>
 <td>Binary</td>
-<td>1 if diagnosis present; 0 otherwise</td>
+<td>1 if diagnosis present; 0 otherwise I could try to make this more
+granular?</td>
+<td></td>
 </tr>
 <tr>
 <td>Liver disease</td>
 <td>Binary</td>
 <td>1 if diagnosis present; 0 otherwise</td>
+<td></td>
 </tr>
 <tr>
 <td>Cancer</td>
 <td>Categorical</td>
 <td>1 if diagnosis present; 0 otherwise</td>
+<td></td>
 </tr>
 <tr>
 <td>Diabetes</td>
 <td>Binary</td>
 <td>1 if diagnosis present; 0 otherwise</td>
+<td></td>
 </tr>
 <tr>
 <td>COPD</td>
 <td>Binary</td>
 <td>1 if diagnosis present; 0 otherwise</td>
+<td></td>
 </tr>
 <tr>
 <td>Previous cardiovascular disease</td>
 <td>Binary</td>
 <td>fill in</td>
+<td></td>
+</tr>
+<tr>
+<td>Having had another medicine stopped in last 12 months</td>
+<td>Binary</td>
+<td>Is this possible?</td>
+<td></td>
+</tr>
+<tr>
+<td>Discharge from a hospital admission within last 6 months</td>
+<td>Binary</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>The effect of recent interaction with secondary care</td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>

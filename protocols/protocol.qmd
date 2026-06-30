@@ -95,7 +95,7 @@ Individuals will only be included if they meet all the following criteria:
 - Known ethnicity
 - Known STP) - *I'm not sure about these bottom three - they may well exclude people unnecessarily*
 
-## Prescribing
+## Prescribing information
 
 ### Prescribing data
 
@@ -134,7 +134,7 @@ Considering this variability, we will define a medication as chronic, and includ
 * In the 90 days prior to the index date:
   + It is prescribed once or more (*recent*)
 
-## Outcome - Medication Discontinuation
+## Outcome - medication discontinuation
 Medications prescribed at baseline will be followed longitudinally for up to 4 years to examine patterns of discontinuation. 
 
 Within OpenSAFELY-TPP the duration of each prescription is unknown. In line with previous publications [@Bayliss2025], discontinuation will be defined as a gap of a prescription of a chronic medicine of 120 days or more. This will allow a window of time for re-prescription to occur even if the prescription was issued for 84 days (the maximum length in usual practice in England). The date of discontinuation will be defined as the date of the last prescription.
@@ -142,7 +142,6 @@ Within OpenSAFELY-TPP the duration of each prescription is unknown. In line with
 *This needs discussion - could this be operationalised better? We could look at dose reduction, or something more complex modelling prior gaps*
 
 ## Covariates
-
 Covariates have been chosen for two different reasons:
 
 - It is hypothesised that they will likely have an impact on medication discontinuation.
@@ -153,7 +152,7 @@ Covariates, which will be defined on the index date, are described in the table 
 +----------------------------+---------------+----------------------------------------------+
 | **Covariate**              | **Type**      | **Definition**                               |
 +============================+===============+==============================================+
-| Age                        | Continuous    | Age in years calculated from year of birth   |
+| Age                        | Continuous    | Age in years calculated from year of birth.   |
 |                            |               | Will be modelled using splines               |
 |                            |               |                                              |
 |                            |               | Strata: 18–49, 50–64, 65–74, 75–84, ≥85      |
@@ -177,10 +176,10 @@ Covariates, which will be defined on the index date, are described in the table 
 | eGFR                       | Continuous    | Estimated glomerular filtration rate         |
 |                            |               | on the index date, calculated from           |
 |                            |               | the most recent serum creatinine             |
-|                            |               | using the 2009 CKD-EPI equation.             |
+|                            |               | using the 2009 CKD-EPI equation             |
 +----------------------------+---------------+----------------------------------------------+
 | Number of chronic          | Continuous    | Count of distinct included chronic           |
-| prescriptions              |               | medications on the index date,               |
+| prescriptions              |               | medications on the index date               |
 +----------------------------+---------------+----------------------------------------------+
 | Region                     | Categorical   | East of England\                             |
 |                            |               | London\                                      | 
@@ -195,7 +194,7 @@ Covariates, which will be defined on the index date, are described in the table 
 |                            |               | [@Best2025]), a widely used metric           |
 |                            |               | for identifying frailty in                   |
 |                            |               | electronic health records.                   |
-|                            |               |                                              |
+|                            |               | This is all tbc - watch the OS Slack         |
 |                            |               | Strata: non-frail, mildly frail,             |
 |                            |               | moderately frail, severely frail             |
 +----------------------------+---------------+----------------------------------------------+
@@ -206,6 +205,7 @@ Covariates, which will be defined on the index date, are described in the table 
 |                            |               | prior to the index date                      |
 +----------------------------+---------------+----------------------------------------------+
 | Dementia                   | Binary        | 1 if diagnosis present; 0 otherwise          |
+|                            |               | I could try to make this more granular?      |
 +----------------------------+---------------+----------------------------------------------+
 | Liver disease              | Binary        | 1 if diagnosis present; 0 otherwise          |
 +----------------------------+---------------+----------------------------------------------+
@@ -218,6 +218,20 @@ Covariates, which will be defined on the index date, are described in the table 
 | Previous cardiovascular    | Binary        | fill                                         |
 | disease                    |               | in                                           |
 +----------------------------+---------------+----------------------------------------------+
+| Having had another         | Binary        | Is this possible?                            |
+| medicine stopped in last   |               |                                              |
+| 12 months                  |               |                                              |
++----------------------------+---------------+----------------------------------------------+
+| Discharge from a hospital  | Binary        |                                              |
+| admission within last 6    |               |                                              |
+| months                     |               |                                              |
++----------------------------+---------------+----------------------------------------------+
+| The effect of recent       |               |                                              |
+| interaction with secondary |               |                                              |
+| care                       |               |                                              |
++----------------------------+---------------+----------------------------------------------+
+| Something about adverse    |               |                                              |
+| effects                    |               |                                              |
 
 ### Other covariates
 
