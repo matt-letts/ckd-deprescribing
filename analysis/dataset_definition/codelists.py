@@ -2,13 +2,6 @@
 # This script does the following:
 # 1. Loads clinical codelists from the codelists/ directory
 # 2. Stores them as variables for use in dataset definitions
-#
-# Codelists covered currently include:
-#   - CKD stage 4 and stage 5 (primary care SNOMED codes)
-#   - Serum creatinine (SNOMED)
-#   - Kidney replacement therapy: dialysis and transplant (SNOMED)
-#   - Ethnicity (6-category)
-#   - Baseline covariates: smoking, diabetes, CVD, systolic BP, uACR, uPCR
 ##########################################################################
 
 from ehrql import codelist_from_csv
@@ -105,6 +98,9 @@ secondary_care_krt_codes_opcs4 = (
 ##########################################################################
 # COVARIATE CODELISTS
 ##########################################################################
+# TODO: This is a work in progress. Filling in as go. Organise once complete
+# Scaffolds the green covariates in docs/deprescribing_factors.drawio.svg
+
 # ethnicity codelist --------------------------------------------------------------------
 ethnicity_codes = codelist_from_csv(
     "codelists/opensafely-ethnicity-snomed-0removed.csv",
@@ -171,14 +167,119 @@ dm1_codes_snomed = codelist_from_csv(
     column="code"
 )
 
-# hba1c codes, just the IFCC standardised units code 
-hba1c_codes_snomed = codelist_from_csv(
-    "codelists/opensafely-glycated-haemoglobin-hba1c-tests-numerical-value.csv",
-    column="code"
-)
-
 # diabetes drugs
 dm_drug_codes_dmd = codelist_from_csv(
     "codelists/user-mletts92-definite-diabetes-drugs-dmd.csv",
     column="code"
 )
+
+# # Clinical values (most-recent numeric before index) ---------------------
+# # Total cholesterol
+# cholesterol_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-total-cholesterol.csv",
+#     column="code"
+# )
+# # Body weight
+# weight_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-body-weight.csv",
+#     column="code"
+# )
+# # Body mass index
+# bmi_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-body-mass-index.csv",
+#     column="code"
+# )
+# # Urinary albumin:creatinine ratio (uACR)
+# uacr_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-urinary-albumin-creatinine-ratio.csv",
+#     column="code"
+# )
+# # Urinary protein:creatinine ratio (uPCR)
+# upcr_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-urinary-protein-creatinine-ratio.csv",
+#     column="code"
+# )
+# # hba1c codes, just the IFCC standardised units code 
+# hba1c_codes_snomed = codelist_from_csv(
+#     "codelists/opensafely-glycated-haemoglobin-hba1c-tests-numerical-value.csv",
+#     column="code"
+# )
+
+# # Smoking status --------------------------------------------------------
+# smoking_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-smoking-status.csv",
+#     column="code",
+#     #category_column="category"
+# )
+
+# # Comorbidities ---------------------------------------------------------
+# liver_disease_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-liver-disease.csv",
+#     column="code"
+# )
+# liver_disease_codes_icd10 = codelist_from_csv(
+#     #"codelists/user-mletts92-liver-disease-icd10.csv",
+#     column="code"
+# )
+# cancer_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-cancer.csv",
+#     column="code"
+# )
+# cancer_codes_icd10 = codelist_from_csv(
+#     #"codelists/user-mletts92-cancer-icd10.csv",
+#     column="code"
+# )
+# dementia_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-dementia.csv",
+#     column="code"
+# )
+# dementia_codes_icd10 = codelist_from_csv(
+#     #"codelists/user-mletts92-dementia-icd10.csv",
+#     column="code"
+# )
+# copd_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-copd.csv",
+#     column="code"
+# )
+# copd_codes_icd10 = codelist_from_csv(
+#     #"codelists/user-mletts92-copd-icd10.csv",
+#     column="code"
+# )
+
+
+# # Recent events (primary care SNOMED) ------------------------------------
+# structured_med_review_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-structured-medication-review.csv",
+#     column="code"
+# )
+# care_facility_move_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-care-home-admission.csv",
+#     column="code"
+# )
+# falls_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-falls.csv",
+#     column="code"
+# )
+# falls_codes_icd10 = codelist_from_csv(
+#     #"codelists/user-mletts92-falls-icd10.csv",
+#     column="code"
+# )
+
+# # GI bleeding:
+# gi_bleed_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-gi-bleeding.csv",
+#     column="code"
+# )
+# gi_bleed_codes_icd10 = codelist_from_csv(
+#     #"codelists/user-mletts92-gi-bleeding-icd10.csv",
+#     column="code"
+# )
+# # AKI / electrolyte disturbance (hyponatraemia, hypomagnesaemia)
+# electrolyte_codes_snomed = codelist_from_csv(
+#     #"codelists/user-mletts92-aki-electrolyte-disturbance.csv",
+#     column="code"
+# )
+# electrolyte_codes_icd10 = codelist_from_csv(
+#     #"codelists/user-mletts92-aki-electrolyte-disturbance-icd10.csv",
+#     column="code"
+# )
