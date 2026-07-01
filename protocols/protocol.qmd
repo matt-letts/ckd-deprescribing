@@ -152,7 +152,7 @@ Covariates, which will be defined on the index date, are described in the table 
 +----------------------------+---------------+----------------------------------------------+
 | **Covariate**              | **Type**      | **Definition**                               |
 +============================+===============+==============================================+
-| Age                        | Continuous    | Age in years calculated from year of birth.   |
+| Age                        | Continuous    | Age in years calculated from year of birth.  |
 |                            |               | Will be modelled using splines               |
 |                            |               |                                              |
 |                            |               | Strata: 18–49, 50–64, 65–74, 75–84, ≥85      |
@@ -176,10 +176,10 @@ Covariates, which will be defined on the index date, are described in the table 
 | eGFR                       | Continuous    | Estimated glomerular filtration rate         |
 |                            |               | on the index date, calculated from           |
 |                            |               | the most recent serum creatinine             |
-|                            |               | using the 2009 CKD-EPI equation             |
+|                            |               | using the 2009 CKD-EPI equation              |
 +----------------------------+---------------+----------------------------------------------+
 | Number of chronic          | Continuous    | Count of distinct included chronic           |
-| prescriptions              |               | medications on the index date               |
+| prescriptions              |               | medications on the index date                |
 +----------------------------+---------------+----------------------------------------------+
 | Region                     | Categorical   | East of England\                             |
 |                            |               | London\                                      | 
@@ -197,6 +197,9 @@ Covariates, which will be defined on the index date, are described in the table 
 |                            |               | This is all tbc - watch the OS Slack         |
 |                            |               | Strata: non-frail, mildly frail,             |
 |                            |               | moderately frail, severely frail             |
+|                            |               | https://github.com/opensafely/covid_collater |
+|                            |               | al_hf_update/blob/236c243cf4882e73393761083d |
+|                            |               | ee1be2340b8d6a/analysis/eFI_calc_hf.do       |
 +----------------------------+---------------+----------------------------------------------+
 | Care home status           | Binary        | Using TPP's algorithm to determine if a      |
 |                            |               | person is a likely care home resident        |
@@ -212,6 +215,12 @@ Covariates, which will be defined on the index date, are described in the table 
 | Cancer                     | Categorical   | 1 if diagnosis present; 0 otherwise          |
 +----------------------------+---------------+----------------------------------------------+
 | Diabetes                   | Binary        | 1 if diagnosis present; 0 otherwise          |
++----------------------------+---------------+----------------------------------------------+
+| Cambridge Multimorbidity   | Continuous    | https://github.com/opensafely/               |
+| Score                      |               | NeurodegenerativeDiseaseBurden/blob/         |
+|                            |               | 33c6a297c0e46a49643890363e4aca9191f87ed0/    |
+|                            |               | analysis/dataset_definition/                 |
+|                            |               | variable_helper_functions.py#L45-L96         |
 +----------------------------+---------------+----------------------------------------------+
 | COPD                       | Binary        | 1 if diagnosis present; 0 otherwise          |
 +----------------------------+---------------+----------------------------------------------+
@@ -232,28 +241,67 @@ Covariates, which will be defined on the index date, are described in the table 
 +----------------------------+---------------+----------------------------------------------+
 | Something about adverse    |               |                                              |
 | effects                    |               |                                              |
++----------------------------+---------------+----------------------------------------------+
+| Use drawio to decide rest  |               |                                              |
++----------------------------+---------------+----------------------------------------------+
 
 ### Other covariates
 
++----------------------------+---------------+----------------------------------------------+
 | Risk of mortality          | Continuous /  | Estimated 4-year risk of mortality           |
 |                            | categorical   | using the CKD G4+ prediction tool            |
 |                            |               | [@Grams2018]. This tool is suggested for use |
 |                            |               | in the 2024 KDIGO CKD management guideline   |
-|                            |               | [@Stevens2024]. It requires 8 variables:Requires: age (30–85),       |
+|                            |               | [@Stevens2024]. It requires 8 variables:     |
+|                            |               | Requires: age (30–85),                       |
 |                            |               | sex, race (black or white),                  |
 |                            |               | proteinuria (uPCR or uACR), smoking          |
 |                            |               | status, diabetes status, history of          |
 |                            |               | cardiovascular disease, eGFR (15–30),        |
 |                            |               | systolic BP (90–180).                        |
 |                            |               |                                              |
-|                            |               | Strata: <25%, 25–49%, 50–74%, ≥75%          |
+|                            |               | Strata: <25%, 25–49%, 50–74%, ≥75%           |
++----------------------------+---------------+----------------------------------------------+
 
 ## Statistical methods
 
-### Sensitivity analysis
-In sensitivity analyses, we will explore the effect of including drugs that are administered through other routes.
-This effect of varying the definition of chronic medicines on results will be explored through sensitivity analyses.
-, but sensitivity analyses will explore the effect of using gaps of: ≥30 days, ≥60 days and ≥180 days. 
+### Cohort characteristics
+We will produce a flowchart to show the numbers of individuals that are included / excluded at each stage of cohort development. Descriptive statistics will be used to describe this group's baseline characteristics: mean, median and measure of variance for continuous variables, and frequencies and proportions for categorical variables. 
+
+### Baseline prescribing
+We will present:
+
+1. The average total number of prescribed medications per person on the index date, and
+2. The proportions of the population prescribed each of the most common categories of medication (grouped by BNF subchapter).
+
+We will explore the associations between age, sex, ethnicity and deprivation and the total number of prescribed medications on the index date through individual x,y plots and then multivariable Poisson regression (*or negative binomial because prescribing data likely to be overdispersed?*)  
+
+### Medication discontinuation 
+Competing events:
+ 
+- Death (all-cause)
+- Initiation of kidney replacement therapy
+
+#### Cumulative incidence of discontinuation
+For each of the studied medication classes, cumulative incidence functions (CIFs) for medication discontinuation over the follow-up period will be plotted. These will model death and the initiation of KRT as competing events.
+
+Time to first discontinuation event
+
+What about people who start the medication after the index date - i.e. new initiators vs prevalent users?
+
+#### Predictors of discontinuation
+
+### Software
+All analyses will be conducted using R. OpenSAFELY analyses control the version of R (4.4.3) and the packages that can be used - and these are publicly available [here](https://github.com/opensafely-core/r-docker/blob/main/v2/packages.md).
+
+### Sensitivity analyses
+In sensitivity analyses, we will explore the effect of:
+
+- Including drugs that are administered through other routes.
+- Varying the definition of a chronic medicines (using different numbers/timeframes of prescriptions).
+- Defining discontinuation using a gap of: ≥30 days, ≥60 days and ≥180 days. 
+
+
 
 ## Tables and figures
 

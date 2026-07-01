@@ -261,34 +261,31 @@ Covariates have been chosen for two different reasons:
 Covariates, which will be defined on the index date, are described in
 the table below.
 
-<table style="width:98%;">
+<table style="width:99%;">
 <colgroup>
-<col style="width: 30%" />
-<col style="width: 16%" />
-<col style="width: 49%" />
-<col style="width: 1%" />
+<col style="width: 31%" />
+<col style="width: 17%" />
+<col style="width: 50%" />
 </colgroup>
 <thead>
 <tr>
 <th><strong>Covariate</strong></th>
 <th><strong>Type</strong></th>
 <th><strong>Definition</strong></th>
-<th></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Age</td>
 <td>Continuous</td>
-<td colspan="2">Age in years calculated from year of birth. Will be
-modelled using splines | | Strata: 18–49, 50–64, 65–74, 75–84, ≥85
-|</td>
+<td><p>Age in years calculated from year of birth. Will be modelled
+using splines</p>
+<p>Strata: 18–49, 50–64, 65–74, 75–84, ≥85</p></td>
 </tr>
 <tr>
 <td>Sex</td>
 <td>Categorical</td>
 <td>Male or female</td>
-<td></td>
 </tr>
 <tr>
 <td>Ethnicity</td>
@@ -302,27 +299,25 @@ Black / African / Caribbean / Black British<br />
 Other ethnic group<br />
 Not stated / Not known<br />
 </p></td>
-<td></td>
 </tr>
 <tr>
 <td>Deprivation</td>
 <td>Categorical</td>
 <td>Deciles of Index of Multiple Deprivation (IMD) based on address on
 index date</td>
-<td></td>
 </tr>
 <tr>
 <td>eGFR</td>
 <td>Continuous</td>
-<td colspan="2">Estimated glomerular filtration rate | on the index
-date, calculated from | the most recent serum creatinine | using the
-2009 CKD-EPI equation |</td>
+<td>Estimated glomerular filtration rate on the index date, calculated
+from the most recent serum creatinine using the 2009 CKD-EPI
+equation</td>
 </tr>
 <tr>
 <td>Number of chronic prescriptions</td>
 <td>Continuous</td>
-<td colspan="2">Count of distinct included chronic | medications on the
-index date |</td>
+<td>Count of distinct included chronic medications on the index
+date</td>
 </tr>
 <tr>
 <td>Region</td>
@@ -335,7 +330,6 @@ North West<br />
 South East<br />
 South West<br />
 </td>
-<td></td>
 </tr>
 <tr>
 <td>Frailty</td>
@@ -344,74 +338,81 @@ South West<br />
 <span class="citation" data-cites="Best2025">(16)</span>), a widely used
 metric for identifying frailty in electronic health records. This is all
 tbc - watch the OS Slack Strata: non-frail, mildly frail, moderately
-frail, severely frail</td>
-<td></td>
+frail, severely frail https://github.com/opensafely/covid_collater
+al_hf_update/blob/236c243cf4882e73393761083d
+ee1be2340b8d6a/analysis/eFI_calc_hf.do</td>
 </tr>
 <tr>
 <td>Care home status</td>
 <td>Binary</td>
 <td>Using TPP’s algorithm to determine if a person is a likely care home
 resident</td>
-<td></td>
 </tr>
 <tr>
 <td>Consultation rate</td>
 <td>Continuous</td>
 <td>Number of GP consultations 12 months prior to the index date</td>
-<td></td>
 </tr>
 <tr>
 <td>Dementia</td>
 <td>Binary</td>
 <td>1 if diagnosis present; 0 otherwise I could try to make this more
 granular?</td>
-<td></td>
 </tr>
 <tr>
 <td>Liver disease</td>
 <td>Binary</td>
 <td>1 if diagnosis present; 0 otherwise</td>
-<td></td>
 </tr>
 <tr>
 <td>Cancer</td>
 <td>Categorical</td>
 <td>1 if diagnosis present; 0 otherwise</td>
-<td></td>
 </tr>
 <tr>
 <td>Diabetes</td>
 <td>Binary</td>
 <td>1 if diagnosis present; 0 otherwise</td>
-<td></td>
+</tr>
+<tr>
+<td>Cambridge Multimorbidity Score</td>
+<td>Continuous</td>
+<td>https://github.com/opensafely/ NeurodegenerativeDiseaseBurden/blob/
+33c6a297c0e46a49643890363e4aca9191f87ed0/ analysis/dataset_definition/
+variable_helper_functions.py#L45-L96</td>
 </tr>
 <tr>
 <td>COPD</td>
 <td>Binary</td>
 <td>1 if diagnosis present; 0 otherwise</td>
-<td></td>
 </tr>
 <tr>
 <td>Previous cardiovascular disease</td>
 <td>Binary</td>
 <td>fill in</td>
-<td></td>
 </tr>
 <tr>
 <td>Having had another medicine stopped in last 12 months</td>
 <td>Binary</td>
 <td>Is this possible?</td>
-<td></td>
 </tr>
 <tr>
 <td>Discharge from a hospital admission within last 6 months</td>
 <td>Binary</td>
 <td></td>
-<td></td>
 </tr>
 <tr>
 <td>The effect of recent interaction with secondary care</td>
 <td></td>
+<td></td>
+</tr>
+<tr>
+<td>Something about adverse effects</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Use drawio to decide rest</td>
 <td></td>
 <td></td>
 </tr>
@@ -420,36 +421,90 @@ granular?</td>
 
 ### Other covariates
 
-Risk of mortality \| Continuous / \| Estimated 4-year risk of mortality
-\|  
-                           \| categorical \| using the CKD G4+
-prediction tool \|  
-                           \| \| (17). This tool is suggested for use
-\|  
-                           \| \| in the 2024 KDIGO CKD management
-guideline \|  
-                           \| \| (9). It requires 8 variables:Requires:
-age (30–85), \|  
-                           \| \| sex, race (black or white), \|  
-                           \| \| proteinuria (uPCR or uACR), smoking
-\|  
-                           \| \| status, diabetes status, history of
-\|  
-                           \| \| cardiovascular disease, eGFR (15–30),
-\|  
-                           \| \| systolic BP (90–180). \|  
-                           \| \| \|  
-                           \| \| Strata: \<25%, 25–49%, 50–74%, ≥75% \|
+<table style="width:99%;">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 17%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr>
+<td>Risk of mortality</td>
+<td>Continuous / categorical</td>
+<td><p>Estimated 4-year risk of mortality using the CKD G4+ prediction
+tool <span class="citation" data-cites="Grams2018">(17)</span>. This
+tool is suggested for use in the 2024 KDIGO CKD management guideline
+<span class="citation" data-cites="Stevens2024">(9)</span>. It requires
+8 variables: Requires: age (30–85), sex, race (black or white),
+proteinuria (uPCR or uACR), smoking status, diabetes status, history of
+cardiovascular disease, eGFR (15–30), systolic BP (90–180).</p>
+<p>Strata: &lt;25%, 25–49%, 50–74%, ≥75%</p></td>
+</tr>
+</tbody>
+</table>
 
 ## Statistical methods
 
-### Sensitivity analysis
+### Cohort characteristics
 
-In sensitivity analyses, we will explore the effect of including drugs
-that are administered through other routes. This effect of varying the
-definition of chronic medicines on results will be explored through
-sensitivity analyses. , but sensitivity analyses will explore the effect
-of using gaps of: ≥30 days, ≥60 days and ≥180 days.
+We will produce a flowchart to show the numbers of individuals that are
+included / excluded at each stage of cohort development. Descriptive
+statistics will be used to describe this group’s baseline
+characteristics: mean, median and measure of variance for continuous
+variables, and frequencies and proportions for categorical variables.
+
+### Baseline prescribing
+
+We will present:
+
+1.  The average total number of prescribed medications per person on the
+    index date, and
+2.  The proportions of the population prescribed each of the most common
+    categories of medication (grouped by BNF subchapter).
+
+We will explore the associations between age, sex, ethnicity and
+deprivation and the total number of prescribed medications on the index
+date through individual x,y plots and then multivariable Poisson
+regression (*or negative binomial because prescribing data likely to be
+overdispersed?*)
+
+### Medication discontinuation
+
+Competing events:
+
+- Death (all-cause)
+- Initiation of kidney replacement therapy
+
+#### Cumulative incidence of discontinuation
+
+For each of the studied medication classes, cumulative incidence
+functions (CIFs) for medication discontinuation over the follow-up
+period will be plotted. These will model death and the initiation of KRT
+as competing events.
+
+Time to first discontinuation event
+
+What about people who start the medication after the index date -
+i.e. new initiators vs prevalent users?
+
+#### Predictors of discontinuation
+
+### Software
+
+All analyses will be conducted using R. OpenSAFELY analyses control the
+version of R (4.4.3) and the packages that can be used - and these are
+publicly available
+[here](https://github.com/opensafely-core/r-docker/blob/main/v2/packages.md).
+
+### Sensitivity analyses
+
+In sensitivity analyses, we will explore the effect of:
+
+- Including drugs that are administered through other routes.
+- Varying the definition of a chronic medicines (using different
+  numbers/timeframes of prescriptions).
+- Defining discontinuation using a gap of: ≥30 days, ≥60 days and ≥180
+  days.
 
 ## Tables and figures
 
