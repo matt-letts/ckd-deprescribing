@@ -238,6 +238,13 @@ def ever_matching_med_dmd_before(codelist, index_date, where=True):
         .where(where)
     )
 
+def matching_med_dmd_between(codelist, start_date, end_date, where=True):
+    return (
+        medications
+        .where(medications.dmd_code.is_in(codelist))
+        .where(medications.date.is_on_or_between(start_date, end_date))
+        .where(where)
+    )
 
 def last_matching_med_dmd_between(codelist, start_date, end_date, where=True):
     return(
