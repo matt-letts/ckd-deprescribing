@@ -101,7 +101,7 @@ secondary_care_krt_codes_opcs4 = (
 # TODO: This is a work in progress. Filling in as go. Organise once complete
 # Scaffolds the green covariates in docs/deprescribing_factors.drawio.svg
 
-# ethnicity codelist --------------------------------------------------------------------
+# ethnicity codelist -----------------------------------------------------
 ethnicity_codes = codelist_from_csv(
     "codelists/opensafely-ethnicity-snomed-0removed.csv",
     column="code",
@@ -127,7 +127,7 @@ mi_codes_icd10 = codelist_from_csv(
 )
 
 # Coronary revascularisation codelist
-coronary_revasc_codes = codelist_from_csv(
+coronary_revasc_codes_opcs4 = codelist_from_csv(
     "codelists/user-mletts92-coronary-artery-interventions.csv",
     column="code"
 )
@@ -167,6 +167,12 @@ dm1_codes_snomed = codelist_from_csv(
     column="code"
 )
 
+# hba1c codes, just the IFCC standardised units code 
+hba1c_codes_snomed = codelist_from_csv(
+    "codelists/opensafely-glycated-haemoglobin-hba1c-tests-numerical-value.csv",
+    column="code"
+)
+
 # diabetes drugs
 dm_drug_codes_dmd = codelist_from_csv(
     "codelists/user-mletts92-definite-diabetes-drugs-dmd.csv",
@@ -179,16 +185,6 @@ dm_drug_codes_dmd = codelist_from_csv(
 #     #"codelists/user-mletts92-total-cholesterol.csv",
 #     column="code"
 # )
-# # Body weight
-# weight_codes_snomed = codelist_from_csv(
-#     #"codelists/user-mletts92-body-weight.csv",
-#     column="code"
-# )
-# # Body mass index
-# bmi_codes_snomed = codelist_from_csv(
-#     #"codelists/user-mletts92-body-mass-index.csv",
-#     column="code"
-# )
 # # Urinary albumin:creatinine ratio (uACR)
 # uacr_codes_snomed = codelist_from_csv(
 #     #"codelists/user-mletts92-urinary-albumin-creatinine-ratio.csv",
@@ -199,11 +195,7 @@ dm_drug_codes_dmd = codelist_from_csv(
 #     #"codelists/user-mletts92-urinary-protein-creatinine-ratio.csv",
 #     column="code"
 # )
-# # hba1c codes, just the IFCC standardised units code 
-# hba1c_codes_snomed = codelist_from_csv(
-#     "codelists/opensafely-glycated-haemoglobin-hba1c-tests-numerical-value.csv",
-#     column="code"
-# )
+
 
 # # Smoking status --------------------------------------------------------
 # smoking_codes_snomed = codelist_from_csv(
