@@ -46,6 +46,7 @@ write_json(
 #   21: appliances
 #   22: incontinence appliances
 #   23: stoma appliances
+# Rik vd Veen used ch 1-13 to determine 'total chronic prescription load'
 exclude_bnf_chapters <- list(
   base = c("14", "15", "18", "19", "20", "21", "22", "23")
 )
