@@ -32,7 +32,7 @@ from variable_helper_functions import (
     last_matching_event_clinical_snomed_before,
     ever_matching_event_apcs_icd10_before,
     ever_matching_procedure_apcs_opcs4_before,
-    ever_matching_med_dmd_before,
+    matching_med_dmd_between,
 )
 
 import json
@@ -99,10 +99,11 @@ region = (
 ##############################################################################
 # Derived from the addresses table rather than a codelist. Uses TPP's 
 # potential care-home match flag at index_date.
-care_home = (
-    addresses
-    .for_patient_on(index_date)
-    .care_home_is_potential_match
+care_home = case(
+    when(
+        addresses.for_patient_on(index_date).care_home_is_potential_match
+    ).then(True),
+    otherwise=False,
 )
 
 ##############################################################################
@@ -162,11 +163,18 @@ t1dm_diagnosis = ever_matching_event_clinical_snomed_before(dm1_codes_snomed, in
 
 other_dm_diagnosis = ever_matching_event_clinical_snomed_before(dm_not1_codes_snomed, index_date).exists_for_patient()
 
-recent_hba1c = last_matching_event_clinical_snomed_before(hba1c_codes_snomed, index_date).numeric_value
+recent_hba1c = last_matching_event_clinical_snomed_before(
+    hba1c_codes_snomed, index_date, where=clinical_events.numeric_value.is_not_null()
+).numeric_value
 
-diabetes_drugs = matching_med_dmd_between(dm_drug_codes_dmd, index_date - 365, index_date).exists_for_patient()
+diabetes_drugs = matching_med_dmd_between(dm_drug_codes_dmd, index_date - days(365), index_date).exists_for_patient()
 
-diabetes = t1dm_diagnosis | other_dm_diagnosis | (recent_hba1c >= 48) | diabetes_drugs
+diabetes = case(
+    when(
+        t1dm_diagnosis | other_dm_diagnosis | diabetes_drugs | (recent_hba1c >= 48)
+    ).then(True),
+    otherwise=False,
+)
 
 # ##############################################################################
 # # Urinary protein/albumin excretion
