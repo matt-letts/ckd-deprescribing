@@ -230,8 +230,10 @@ message(
   " as a leakage check — should never appear in downstream cohort outputs"
 )
 
-tic() # this function takes a while, longer now with higher polypharmacy/longer window
-medications <- generate_medications(
+# Full version — spans the whole study follow-up, for testing
+# post-baseline/discontinuation logic.
+tic()
+medications_full <- generate_medications(
   patients = patients,
   restrict_to_patient_ids = restrict_ids,
   start_date = as.Date("2020-06-01"),
@@ -241,7 +243,28 @@ medications <- generate_medications(
 toc()
 
 write.csv(
-  medications,
+  medications_full,
+  here::here("dummy_tables", "medications_full.csv"),
+  row.names = FALSE,
+  na = ""
+)
+
+# Short version — same patients, same polypharmacy level, but window
+# trimmed for computational speed and ehrQL not dying locally
+short_end_date <- study_dates$index_date + 30
+
+tic()
+medications_short <- generate_medications(
+  patients = patients,
+  restrict_to_patient_ids = restrict_ids,
+  start_date = as.Date("2021-06-01"),
+  end_date = short_end_date,
+  seed = 123
+)
+toc()
+
+write.csv(
+  medications_short,
   here::here("dummy_tables", "medications.csv"),
   row.names = FALSE,
   na = ""
