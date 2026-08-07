@@ -5,6 +5,9 @@ library(readr)
 library(arrow)
 library(tictoc)
 
+source(here::here("analysis", "config", "config.r"))
+study_dates <- lapply(study_dates, function(x) as.Date(x))
+
 # A broad set of real DMD VMP/AMP codes covering common drug classes
 # Edge cases are:
 # Those without BNF mapping
@@ -91,13 +94,15 @@ generate_medications <- function(
   patients,
   restrict_to_patient_ids = NULL,
   dmd_codes = COMMON_DMD_CODES,
-  start_date = as.Date("2021-06-01"),
+  start_date = as.Date("2020-06-01"),
   end_date = as.Date("2026-03-01"),
-  mean_meds = 3, # keeping it low as very intensive otherwise
-  sd_meds = 2,
-  issue_intervals = c(28, 84, 84), # 1 month and 3 month gaps (favour long gaps for efficiency)
-  interval_jitter = 5,
-  patient_interval_prob = 0.9, # 90% medicines prescribed at the issue_interval given above
+  mean_meds = 10, # true polypharmacy levels, up from 3 (was kept low for speed)
+  sd_meds = 3,
+  # 7/14/28/56/84 day gaps, weighted toward 28/56 to match typical UK
+  # primary-care repeat-prescribing practice
+  issue_intervals = c(7, 14, 28, 28, 56, 56, 84),
+  interval_jitter = 8, # a bit more real-world noise than before (was 5)
+  patient_interval_prob = 0.8, # 80% of a person's medicines prescribed at the same interval
   stop_prob = 0.03,
   new_med_prob = 0.2,
   seed = NULL
@@ -111,7 +116,9 @@ generate_medications <- function(
     message(nrow(patients), " patients after restricting to cleaned dataset")
   }
 
-  all_rows <- vector("list", nrow(patients) * 150) # pre-allocate memory generously to increase speed
+  # pre-allocate generously: up to 20 meds x ~44 issues over the full
+  # study window at these settings
+  all_rows <- vector("list", nrow(patients) * 1000)
   row_id <- 1 # start
 
   for (i in seq_len(nrow(patients))) {
@@ -136,8 +143,8 @@ generate_medications <- function(
     # Assign medicines and medication intervals
     codes <- sample(dmd_codes, n_meds, replace = FALSE)
 
-    # Medicines start on or shortly after study start (random offset up to 6 months)
-    patient_start <- start_date + sample(0:180, 1)
+    # Medicines start on or shortly after study start (random offset up to 1 year)
+    patient_start <- start_date + sample(0:360, 1)
     current_dates <- rep(patient_start, n_meds)
     active <- rep(TRUE, n_meds)
 
@@ -209,12 +216,26 @@ patients <- read_delim_arrow(
   delim = ","
 )
 
-tic() # this function takes ~10 mins
+# Restrict generation to the cleaned (post-inex) cohort for speed, but
+# inject one patient who exists in the full population and was excluded
+# by inex — a check that rich medication data for an excluded patient
+# never leaks into cohort-based outputs downstream.
+set.seed(123)
+excluded_patient_ids <- setdiff(patients$patient_id, cleaned$patient_id)
+check_excluded_id <- sample(excluded_patient_ids, 1)
+restrict_ids <- c(cleaned$patient_id, check_excluded_id)
+message(
+  "Injected excluded patient_id ",
+  check_excluded_id,
+  " as a leakage check — should never appear in downstream cohort outputs"
+)
+
+tic() # this function takes a while, longer now with higher polypharmacy/longer window
 medications <- generate_medications(
   patients = patients,
-  restrict_to_patient_ids = cleaned$patient_id,
-  start_date = as.Date("2021-06-01"),
-  end_date = as.Date("2022-04-01"),
+  restrict_to_patient_ids = restrict_ids,
+  start_date = as.Date("2020-06-01"),
+  end_date = study_dates$end_date,
   seed = 123
 )
 toc()
