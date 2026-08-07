@@ -46,27 +46,28 @@ actions:
         dataset_baseline_covariates_general: output/dataset_baseline_covariates_general.arrow
 
 
-  generate_dataset_baseline_covariates_med_specific_ppi:
-    run: >
-      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_baseline_covariates_med_specific.py
-      --dummy-tables dummy_tables/
-      --output output/dataset_baseline_covariates_med_specific_ppi.arrow
-      -- --medicine ppi
-    needs: [study_dates, dataset_cleaning_inex]
-    outputs:
-      highly_sensitive:
-        dataset_baseline_covariates_med_specific_ppi: output/dataset_baseline_covariates_med_specific_ppi.arrow
+  # generate_dataset_baseline_covariates_med_specific_ppi:
+  #   run: >
+  #     ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_baseline_covariates_med_specific.py
+  #     --dummy-tables dummy_tables/
+  #     --output output/dataset_baseline_covariates_med_specific_ppi.arrow
+  #     -- --medicine ppi
+  #   needs: [study_dates, dataset_cleaning_inex]
+  #   outputs:
+  #     highly_sensitive:
+  #       dataset_baseline_covariates_med_specific_ppi: output/dataset_baseline_covariates_med_specific_ppi.arrow
 
-  generate_dataset_baseline_covariates_med_specific_statin:
-    run: >
-      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_baseline_covariates_med_specific.py
-      --dummy-tables dummy_tables/
-      --output output/dataset_baseline_covariates_med_specific_statin.arrow
-      -- --medicine statin
-    needs: [study_dates, dataset_cleaning_inex]
-    outputs:
-      highly_sensitive:
-        dataset_baseline_covariates_med_specific_ppi: output/dataset_baseline_covariates_med_specific_statin.arrow
+
+  # generate_dataset_baseline_covariates_med_specific_statin:
+  #   run: >
+  #     ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_baseline_covariates_med_specific.py
+  #     --dummy-tables dummy_tables/
+  #     --output output/dataset_baseline_covariates_med_specific_statin.arrow
+  #     -- --medicine statin
+  #   needs: [study_dates, dataset_cleaning_inex]
+  #   outputs:
+  #     highly_sensitive:
+  #       dataset_baseline_covariates_med_specific_ppi: output/dataset_baseline_covariates_med_specific_statin.arrow
 
 
   generate_dataset_baseline_meds:

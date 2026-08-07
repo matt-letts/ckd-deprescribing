@@ -14,6 +14,7 @@ venv/
 local_processing/generate_dummy_tables/
 local_processing/outputs/
 docs/nhsbsa_dmd*
+docs/decisions.md
 /ehrql-dummy-data*
 *claude*
 /.quarto/
