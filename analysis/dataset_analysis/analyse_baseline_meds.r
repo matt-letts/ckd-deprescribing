@@ -22,7 +22,7 @@ source(here::here(
   "analysis",
   "r_functions",
   "medications",
-  "fn_flag_chronic_meds.r"
+  "fn_summarise_chronic_meds.r"
 ))
 source(here::here(
   "analysis",
@@ -67,8 +67,9 @@ bnf_hierarchy <- readRDS(here::here(
 
 ##########################################################################
 # Flag chronically prescribed medications
+
 # fn_flag_chronic_meds() collapses prescriptions to the unique
-# patient_id / bnf_substance_code level within a given lookback window
+# patient_id / bnf_substance_code level within a given lookback window.
 ##########################################################################
 
 # Main analysis: oral, base definition, BNF imputation included ----------
@@ -130,10 +131,36 @@ message(sprintf(
 #   nrow(chronic_flags_oral_[other])
 # ))
 
+############################################################################
+# Estimate prescribing gaps
+
+# fn_estimate_med_intervals() estimates each substance's typical
+# prescribing interval (7/14/28/56/84 days)
+##########################################################################
+message("Estimate prescribing intervals: main analysis only")
+med_intervals_oral <- fn_estimate_med_intervals(
+  data = dataset_analyse_baseline_meds_1_input |>
+    filter(route_cat == "oral"),
+  index_date = study_dates$index_date
+)
+chronic_flags_oral_base <- chronic_flags_oral_base |>
+  left_join(
+    med_intervals_oral |>
+      select(
+        patient_id,
+        bnf_substance_code,
+        estimated_gap_days,
+        estimated_gap_bucket
+      ),
+    by = c("patient_id", "bnf_substance_code")
+  )
+
 ##########################################################################
 # Main dataset to carry forward for downstream analysis
 # One row per (patient_id, bnf_substance_code), chronic medications only.
 # med_count gives the total number of chronic oral medications per patient.
+# estimated_gap_days/estimated_gap_bucket give a best-guess prescribing
+# interval per patient/substance, for future discontinuation-detection work.
 ##########################################################################
 
 message("Build patient-level oral substance dataset")
@@ -142,7 +169,8 @@ dataset_analyse_baseline_meds_2_chronic_oral <- chronic_flags_oral_base |>
   select(
     patient_id,
     bnf_substance_code,
-    days_before_index_most_recent_prescription
+    days_before_index_most_recent_prescription,
+    estimated_gap_bucket
   ) |>
   add_count(patient_id, name = "med_count")
 
