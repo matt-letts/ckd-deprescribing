@@ -33,4 +33,4 @@ dataset.define_population(dataset_inex_cleaned.exists_for_patient())
 
 # add wide format prescription columns for up to max_meds prescriptions
 # in the days_before_index window before index date
-add_prescription_columns(dataset, index_date, max_meds=15, days_before_index=180)
+add_prescription_columns(dataset, index_date, max_meds=90, days_before_index=180)
