@@ -337,9 +337,18 @@ message(
 )
 flow <- fn_describe_and_flow(project_stage = "analyse_baseline_meds")
 
-# Save outputs -----------------------------------------------------------
+############################################################################
+# Save outputs
+############################################################################
 message("Save outputs:")
 
+message("--- Main dataset to output/data/")
+dataset_baseline_meds_analysed |>
+  arrow::write_feather(
+    here::here("output", "data", "dataset_baseline_meds_analysed.arrow")
+  )
+
+# Save other outputs -----------------------------------------------------------
 message("--- Flow table")
 write_csv(
   flow,
@@ -350,12 +359,6 @@ write_csv(
     "data_flow.csv"
   )
 )
-
-message("--- Main dataset to output/data/")
-dataset_baseline_meds_analysed |>
-  arrow::write_feather(
-    here::here("output", "data", "dataset_baseline_meds_analysed.arrow")
-  )
 
 message("--- Binned frequency table for recency of prescriptions")
 write_csv(

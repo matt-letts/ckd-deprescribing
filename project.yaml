@@ -76,3 +76,12 @@ actions:
         meds_prevalence_substance: output/data_descriptions/analyse_baseline_meds/meds_prevalence_substance.csv
         meds_prevalence_subparagraph: output/data_descriptions/analyse_baseline_meds/meds_prevalence_subparagraph.csv
         meds_prevalence_paragraph: output/data_descriptions/analyse_baseline_meds/meds_prevalence_paragraph.csv
+
+
+  build_datasets_moi_at_baseline:
+    run: r:v2 analysis/dataset_processing/build_datasets_moi_at_baseline.r
+    needs: [analyse_baseline_meds]
+    outputs:
+      highly_sensitive:
+        dataset_statins_at_baseline: output/data/dataset_statins_at_baseline.arrow
+        # add one more line here per medication of interest
