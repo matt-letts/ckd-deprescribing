@@ -111,7 +111,7 @@ test_data = {
 
 
 
-    9: {    # duplicated date and code
+    7: {    # duplicated date and code
         
         "patients": { # one row per patient
             "date_of_birth": date(1910, 1, 1), # always first day of month, never NULL
@@ -145,7 +145,7 @@ test_data = {
 
 
 
-    10: {   # more realistic patient, shows that function is ordering dm+d codes lexicographically rather than numerically. 
+    9: {   # more realistic patient, shows that function is ordering dm+d codes lexicographically rather than numerically. 
             # ordering doesn't really matter as long as consistent
         
         "patients": { # one row per patient
@@ -206,7 +206,7 @@ test_data = {
     },
 
 
-    11: {   # tests max_meds=15 logic.
+    12: {   # tests max_meds=15 logic.
             # Exactly 16 distinct prescriptions — verifies all slots filled and slot 15 contains
             # the oldest prescription bar 1 
         "patients": { # one row per patient
