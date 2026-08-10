@@ -143,8 +143,8 @@ generate_medications <- function(
     # Assign medicines and medication intervals
     codes <- sample(dmd_codes, n_meds, replace = FALSE)
 
-    # Medicines start on or shortly after study start (random offset up to 1 year)
-    patient_start <- start_date + sample(0:360, 1)
+    # Medicines start on or shortly after study start (random offset up to 180 days)
+    patient_start <- start_date + sample(0:180, 1)
     current_dates <- rep(patient_start, n_meds)
     active <- rep(TRUE, n_meds)
 
