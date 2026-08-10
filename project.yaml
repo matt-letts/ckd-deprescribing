@@ -78,10 +78,23 @@ actions:
         meds_prevalence_paragraph: output/data_descriptions/analyse_baseline_meds/meds_prevalence_paragraph.csv
 
 
-  build_datasets_moi_at_baseline:
-    run: r:v2 analysis/dataset_processing/build_datasets_moi_at_baseline.r
+  build_moi_datasets_at_baseline:
+    run: r:v2 analysis/dataset_processing/build_moi_datasets_at_baseline.r
     needs: [analyse_baseline_meds]
     outputs:
       highly_sensitive:
         dataset_statins_at_baseline: output/data/dataset_statins_at_baseline.arrow
         # add one more line here per medication of interest
+
+  
+  generate_dataset_followup_meds_statins:
+    run: >
+      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_followup_meds.py
+      --dummy-tables dummy_tables/
+      --output output/dataset_followup_meds_statins.arrow
+      --
+      --medication statins
+    needs: [study_dates, build_moi_datasets_at_baseline]
+    outputs:
+      highly_sensitive:
+        dataset_followup_meds_statins: output/dataset_followup_meds_statins.arrow

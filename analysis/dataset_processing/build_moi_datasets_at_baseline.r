@@ -17,6 +17,7 @@ message("Import libraries")
 library(here)
 library(arrow)
 library(tidyverse)
+library(fs)
 
 # Create output folders -------------------------------------------------------
 message("Create output folders")
