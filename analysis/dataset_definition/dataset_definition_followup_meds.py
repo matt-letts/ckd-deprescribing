@@ -8,7 +8,7 @@
 
 # To add more medications:
 # - build a new dmd codelist and add to codelists/ 
-# - use local_processing/build_medication_of_interest_csv.r to add 
+# - use local_processing/build_expanded_moi_codelists.r to add
 #   a new row to config/medications_of_interest.csv. This automatically
 #     - adds to the python codelist dict being made in codelists.py
 #     - adds to build_moi_dataset_at_baseline.r loop

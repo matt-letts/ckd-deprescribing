@@ -80,11 +80,13 @@ actions:
 
   build_moi_datasets_at_baseline:
     run: r:v2 analysis/dataset_processing/build_moi_datasets_at_baseline.r
-    needs: [analyse_baseline_meds]
+    needs: [analyse_baseline_meds, dataset_process_baseline_meds]
     outputs:
       highly_sensitive:
         dataset_statins_at_baseline: output/data/dataset_statins_at_baseline.arrow
         # add one more line here per medication of interest
+      moderately_sensitive:
+        moi_pt_coverage_nhsbsa_vs_opencodelists: output/data_descriptions/build_moi_datasets_at_baseline/moi_pt_coverage_NHSBSA_vs_OpenCodelists.csv
 
   
   generate_dataset_followup_meds_statins:
