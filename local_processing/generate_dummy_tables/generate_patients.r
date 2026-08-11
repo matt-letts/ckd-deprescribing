@@ -126,7 +126,7 @@ generate_patients <- function(
   patients
 }
 
-patients <- generate_patients(n_patients = 10000, seed = 123)
+patients <- generate_patients(n_patients = 1000, seed = 123)
 
 write.csv(
   patients,
