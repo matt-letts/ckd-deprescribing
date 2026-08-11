@@ -280,7 +280,8 @@ fn_classify_med_route <- function(
 # https://opendata.nhsbsa.net/dataset/bnf-code-information-current-year
 # Returns a clean lookup of BNF substance codes to their readable names,
 # plus higher-level hierarchy names (chapter, section, paragraph, subparagraph).
-# Using February 2026 version 90.
+# Using February 2026 version 90. To update to a newer release: add the new
+# file to docs/ and change bnf_hierarchy_path below.
 #######################################################################################
 
 fn_build_bnf_hierarchy <- function(
