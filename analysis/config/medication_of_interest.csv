@@ -1,2 +1,2 @@
-name,codelist_path
-statins,codelists/bristol-statins-dmd.csv
+name,codelist_path,expanded_codelist_path
+statins,codelists/bristol-statins-dmd.csv,codelists/expanded_moi_codelists/statins-dmd-expanded.csv
