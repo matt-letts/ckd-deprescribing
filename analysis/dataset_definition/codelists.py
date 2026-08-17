@@ -107,19 +107,17 @@ ethnicity_snomed = codelist_from_csv(
 
 # All the paths to medications_of_interest codelists are defined
 # in analysis/config/medication_of_interest.csv (this is the central source of truth)
-# Below code loops over csv rows and builds a dict with each medicine/codelist in it. i.e:
+# Below code loops over csv rows and builds a dict with each medicine/codelist in it:
+
 # {
 #    "statin": <codelist>
 #    "other": <codelist>
 # }
-# Uses codelists/expanded_moi_codelists/ codelists which contain dmd codes mapped from BNF 
-# using OpenCodelists with additional dmd codes mapped from BNF using NHSBSA mapping file 
-# found in docs/
 
 with open("analysis/config/medication_of_interest.csv") as f:
     medication_of_interest_codelists = {}
     for row in csv.DictReader(f):
         medication_of_interest_codelists[row["name"]] = codelist_from_csv(
-            row["expanded_codelist_path"],
+            row["codelist_path"],
             column="code"
         )
