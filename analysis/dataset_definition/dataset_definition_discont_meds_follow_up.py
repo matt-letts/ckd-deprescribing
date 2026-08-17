@@ -4,25 +4,16 @@
 # 2. Defines medication_of_interest parameter which defines the dataset
 #    to be pulled in and the dmd_codelist to use
 # 3. Filters the population to patients in dataset_{medication}_at_baseline
-# 3. Calls add_followup_prescription_columns() 
-
-# To add more medications:
-# - build a new dmd codelist and add to codelists/ 
-# - use local_processing/build_expanded_moi_codelists.r to add
-#   a new row to config/medications_of_interest.csv. This automatically
-#     - adds to the python codelist dict being made in codelists.py
-#     - adds to build_moi_dataset_at_baseline.r loop
-# - add a new output line to build_moi_datasets_at_baseline
-# - add a new parameterised generate_dataset_followup_meds_ action to project.yaml
+# 3. Calls add_moi_followup_prescription_columns() 
 #
-# Output: dataset_followup_meds.arrow 
-#         (see yaml: generate_dataset_followup_meds_{medication})
-# Test: test_dataset_definition_followup_meds.py
+# Output: dataset_discont_[medication]_followup.arrow
+#         (see yaml: generate_dataset_discont_meds_followup_{medication})
+# Test: test_dataset_definition_discont_meds_followup.py
 ##########################################################################
 
 from ehrql import create_dataset, table_from_file, get_parameter
 from codelists import medication_of_interest_codelists
-from fn_followup_meds_variables import add_followup_prescription_columns
+from fn_discont_meds_variables import add_followup_moi_prescription_columns
 import json
 
 # define the project-relevant dates
@@ -47,4 +38,9 @@ dataset_moi_at_baseline = table_from_file(
 dataset = create_dataset()
 dataset.define_population(dataset_moi_at_baseline.exists_for_patient())
 
-add_followup_prescription_columns(dataset, index_date, end_date, dmd_codelist, max_meds=20)
+dataset.add_column(
+    f"med_{medication}_num_days_last_before_index",
+    dataset_moi_at_baseline.days_before_index_most_recent_prescription,
+)
+
+add_followup_moi_prescription_columns(dataset, index_date, end_date, dmd_codelist, max_meds=90)
