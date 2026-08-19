@@ -11,28 +11,30 @@ No clinical, policy or safety conclusions must be drawn from the contents of thi
 
 # About this study
 
-This study analyses deprescribing patterns in patients with chronic kidney disease (CKD) stage 4–5 who are not on kidney replacement therapy (KRT). Medications are viewed at baseline (1st March 2022) and then tracked over the following 4 years.
+This study analyses prescribing and medication discontinuation patterns in people living with chronic kidney disease (CKD) stage 4–5 who are not on kidney replacement therapy (KRT). Medications are viewed up to a baseline date (1st March 2022) and then tracked over the following 4 years.
 
 # Pipeline overview
 
-The analysis pipeline is defined in `project.yaml` and runs as a series of dependent actions:
+The analytical pipeline is defined in `project.yaml` and runs as a series of dependent actions:
 See [project_pipeline.md](./project_pipeline.md) for a diagram of the analysis flow.
 
 # Repository structure
 
 ```
 analysis/
-  config/                   # Config file to set study-wide parameters
+  config/                   # Files containing study-wide parameters
   dataset_analysis/         # Data analysis scripts (R)
   dataset_definition/       # Scripts for data extraction (ehrQL and python)
   dataset_processing/       # Data cleaning and processing scripts (R)
-  r_functions/              # R functions sourced by processing scripts
+  discontinuation/          # Subfolder for discontinuation analyses
+  r_functions/              # R functions sourced by other scripts
 codelists/                  # Codelists sourced from https://www.opencodelists.org/
 docs/                       # Reference files and pipeline diagram
 dummy_tables/               # Tables used for local testing only
 local_processing/ 
   generate_dummy_tables/    # Functions to create dummy tables - local testing only
   medication_lookup_tables/ # Scripts and lookups used for medication mapping
+  discontinuation/          # Local scripts for outputs used in discontinuation work 
 protocols/                  # Study protocol
 ```
 
