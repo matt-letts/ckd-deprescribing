@@ -90,17 +90,33 @@ actions:
       highly_sensitive:
         dataset_discont_meds_baseline_statins: output/dataset_discont_meds_baseline_statins.arrow
 
+
+  generate_dataset_discont_meds_baseline_ppis:
+    run: >
+      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_discont_meds_baseline.py
+      --dummy-tables dummy_tables/
+      --output output/dataset_discont_meds_baseline_ppis.arrow
+      --
+      --medication ppis
+    needs: [study_dates, dataset_cleaning_inex]
+    outputs:
+      highly_sensitive:
+        dataset_discont_meds_baseline_ppis: output/dataset_discont_meds_baseline_ppis.arrow
   # add another parameterised action to pull data up to index date for each moi
+
 
   dataset_process_moi_at_baseline:
     run: r:v2 analysis/discontinuation/dataset_processing/dataset_process_moi_at_baseline.r
-    needs: [generate_dataset_discont_meds_baseline_statins, study_dates]
+    needs: [generate_dataset_discont_meds_baseline_statins, generate_dataset_discont_meds_baseline_ppis, study_dates]
     outputs:
       highly_sensitive:
         dataset_statins_at_baseline_processed: output/data/dataset_statins_at_baseline_processed.arrow
         dataset_statins_at_baseline_data_descriptions: output/data_descriptions/process_moi_at_baseline_statins/*.txt
+        dataset_ppis_at_baseline_processed: output/data/dataset_ppis_at_baseline_processed.arrow
+        dataset_ppis_at_baseline_data_descriptions: output/data_descriptions/process_moi_at_baseline_ppis/*.txt
       moderately_sensitive:
         statins_at_baseline_data_flow: output/data_descriptions/process_moi_at_baseline_statins/data_flow.csv
+        ppis_at_baseline_data_flow: output/data_descriptions/process_moi_at_baseline_ppis/data_flow.csv
         # add more needs/outputs for each medication of interest
 
 
@@ -115,5 +131,17 @@ actions:
     outputs:
       highly_sensitive:
         dataset_discont_meds_follow_up_statins: output/dataset_discont_meds_follow_up_statins.arrow
-  
-  # add another parameterised action to pull followup data for each moi
+
+
+  generate_dataset_discont_meds_follow_up_ppis:
+    run: >
+      ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_discont_meds_follow_up.py
+      --dummy-tables dummy_tables/
+      --output output/dataset_discont_meds_follow_up_ppis.arrow
+      --
+      --medication ppis
+    needs: [study_dates, dataset_process_moi_at_baseline]
+    outputs:
+      highly_sensitive:
+        dataset_discont_meds_follow_up_ppis: output/dataset_discont_meds_follow_up_ppis.arrow
+    # add another parameterised action to pull followup data for each moi

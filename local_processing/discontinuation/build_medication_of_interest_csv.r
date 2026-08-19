@@ -13,7 +13,8 @@ library(tidyverse)
 # codelist_path must exist in codelists/
 
 medication_of_interest_list <- c(
-  statins = "codelists/bristol-statins-dmd.csv"
+  statins = "codelists/bristol-statins-dmd.csv",
+  ppis = "codelists/bristol-proton-pump-inhibitors-dmd.csv"
 )
 
 # Build csv that contains central references of medications of interest ----------

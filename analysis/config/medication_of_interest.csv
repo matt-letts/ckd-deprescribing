@@ -1,2 +1,3 @@
 name,codelist_path
 statins,codelists/bristol-statins-dmd.csv
+ppis,codelists/bristol-proton-pump-inhibitors-dmd.csv
