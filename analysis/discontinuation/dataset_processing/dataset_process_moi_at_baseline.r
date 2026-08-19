@@ -43,6 +43,10 @@ source(here::here(
   "fn_summarise_chronic_meds.r"
 ))
 
+# Create output folders ----------------------------------------------------
+message("Create output folders")
+dir_create(here::here("output", "data"))
+
 # Import dates --------------------------------------------------------------
 message("Import dates")
 study_dates <- lapply(study_dates, function(x) as.Date(x))
