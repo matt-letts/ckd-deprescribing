@@ -28,7 +28,7 @@ dmd_codelist = medication_of_interest_codelists[medication]
 
 # load dataset of individuals prescribed medication_of_interest at baseline
 dataset_moi_at_baseline = table_from_file(
-    f"output/data/dataset_{medication}_at_baseline.arrow",
+    f"output/data/dataset_{medication}_at_baseline_processed.arrow",
     columns={
         "days_before_index_most_recent_prescription": int
         },
