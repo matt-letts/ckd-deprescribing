@@ -130,6 +130,34 @@ for (i in seq_len(nrow(medications_of_interest))) {
       by = "dmd_code"
     )
 
+  # There are some dmd_codes in the OpenCodelists that are not in the dmd_lookup
+  # These seem to represent old/superseded codes. As dmd_lookup$route_cat is
+  # complete, all non-mapped codes will have route_cat == NA. Diagnostics:
+  not_mapped_n_px <- dataset_process_moi_at_baseline_4_long |>
+    filter(is.na(route_cat))
+  not_mapped_n_pt <- not_mapped_n_px |>
+    distinct(patient_id)
+  not_mapped_n_codes <- not_mapped_n_px |>
+    distinct(dmd_code)
+
+  message(sprintf(
+    "--- %d %s prescriptions with dmd_codes present in codelist but not dmd_lookup",
+    nrow(not_mapped_n_px),
+    name
+  ))
+
+  message(sprintf(
+    "--- %d patients with 1+ %s dmd_codes present in codelist but not dmd_lookup",
+    nrow(not_mapped_n_pt),
+    name
+  ))
+
+  message(sprintf(
+    "--- %d unique %s dmd_codes present in codelist but not dmd_lookup",
+    nrow(not_mapped_n_codes),
+    name
+  ))
+
   # Filter just oral medicines and give each row a bnf_substance_code label
   # e.g. statins - this is to ensure fn_flag_chronic_meds works, and that
   # all medications are treated as being part of the same substance class
@@ -162,6 +190,20 @@ for (i in seq_len(nrow(medications_of_interest))) {
   flow <- fn_describe_and_flow(
     project_stage = stage
   )
+
+  flow <- flow |>
+    mutate(
+      n_rows = case_when(
+        stage == "long" ~ fn_apply_sdc(n_distinct(
+          dataset_process_moi_at_baseline_4_long$patient_id
+        )),
+        stage == "oral" ~ fn_apply_sdc(n_distinct(
+          dataset_process_moi_at_baseline_5_oral$patient_id
+        )),
+        TRUE ~ n_rows
+      )
+    )
+
   write_csv(
     flow,
     here::here(
