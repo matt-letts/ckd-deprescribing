@@ -51,6 +51,8 @@ exclude_bnf_chapters <- list(
 )
 
 # How to define whether a medicine is chronically prescribed -------------
+# make sure that lookback_days are <= the number of days of prescription information
+# obtained from the OpenSAFELY backend
 chronic_med_definitions <- list(
   base = list(
     min_prescriptions = 2,

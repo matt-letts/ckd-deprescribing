@@ -149,138 +149,14 @@ fn_build_dmd_bnf_lookup <- function(
 }
 
 #######################################################################################
-# fn_classify_med_route()
-#######################################################################################
-# Adds route of administration to the dmd_lookup table, using the
-# DM+D product description (dmd_name). Categories are checked in priority order
-# (most specific first) so that e.g. "eye drops" is classified as
-# eye rather than triggering oral "drops" pattern.
-#
-# route_uncertain is TRUE when no pattern matched
-#
-# Arguments:
-#   dmd_lookup : from fn_build_dmd_bnf_lookup()
-#   project_stage : string label used to name the diagnostic output file
-#
-# Returns:
-#   dmd_lookup with route_cat (factor) and route_uncertain (logical) added
-#   two diagnostic CSVs are also output to local_processing/outputs/:
-#     *route_by_bnf_chapter.csv : route classification by BNF chapter
-#     *route_unclassified_detail.csv : details of unclassified products
-#######################################################################################
-
-fn_classify_med_route <- function(
-  dmd_lookup,
-  project_stage
-) {
-  require(tidyverse)
-
-  message("Running fn_classify_med_route")
-
-  if (!"dmd_name" %in% names(dmd_lookup)) {
-    stop("dmd_lookup must contain a dmd_name column")
-  }
-
-  route_levels <- c(
-    "parenteral",
-    "eye_ear_nasal",
-    "rectal_vaginal",
-    "transdermal",
-    "inhaled",
-    "oromucosal",
-    "topical",
-    "oral",
-    "other/unclassified"
-  )
-
-  # Patterns checked in priority order — most specific first.
-  # These regex patterns were created iteratively by sampling unmapped products and
-  # refining patterns to capture common terms while avoiding false positives.
-  # They are not exhaustive, but cover the most common forms and routes of administration.
-  route_patterns <- list(
-    parenteral = "\\b(injection|infusion|intravenous|intramuscular|subcutaneous)\\b",
-    eye_ear_nasal = "\\b(eye|ear|nasal)\\s+(drops?|spray|ointment|gel)|\\bear/eye/nose\\b|\\beye/ear/nose\\b",
-    rectal_vaginal = "\\b(suppositor(y|ies)|enemas?|pessar(y|ies)|rectal|vaginal)\\b",
-    transdermal = "\\b(patch(|es)|transdermal)\\b",
-    inhaled = "\\b(inhalers?|inhalation|nebulisers?|nebules?|respules?|turbohaler|accuhaler|evohaler|autohaler|clickhaler|twisthaler|diskhaler|aerohaler|aerocaps|rotacaps|cyclocaps|genuair|spincaps|inhalator)\\b|powder for inhalation",
-    oromucosal = "\\b(sublingual|buccal|oromucosal|mouthwash)\\b",
-    topical = "\\b(creams?|ointments?|gels?|lotions?|shampoos?|scalp|cutaneous|foam|lacquers?|paste|paints?)\\b",
-    oral = "\\b(tablets?|capsules?|sachets?|powders?|oral|drops?|syrup|caplets?|lozenges?|pastilles?|granules?|orodispersible|linctus|elixir|chewing gum)\\b"
-  )
-  # note solution and liquid are ambiguous and not included in regex, most are captured by other patterns
-
-  result <- dmd_lookup |>
-    mutate(
-      .desc = str_to_lower(dmd_name), # temp column for pattern matching
-      route_cat = case_when(
-        is.na(.desc) ~ "other/unclassified",
-        str_detect(.desc, route_patterns$parenteral) ~ "parenteral",
-        str_detect(.desc, route_patterns$eye_ear_nasal) ~ "eye_ear_nasal",
-        str_detect(.desc, route_patterns$rectal_vaginal) ~ "rectal_vaginal",
-        str_detect(.desc, route_patterns$transdermal) ~ "transdermal",
-        str_detect(.desc, route_patterns$inhaled) ~ "inhaled",
-        str_detect(.desc, route_patterns$oromucosal) ~ "oromucosal",
-        str_detect(.desc, route_patterns$topical) ~ "topical",
-        str_detect(.desc, route_patterns$oral) ~ "oral",
-        TRUE ~ "other/unclassified"
-      ),
-      route_uncertain = route_cat == "other/unclassified",
-      route_cat = factor(route_cat, levels = route_levels)
-    ) |>
-    select(-.desc)
-
-  n_uncertain <- sum(result$route_uncertain, na.rm = TRUE)
-  message(sprintf(
-    "--- Route classification complete: %d dm+d products | %d (%.1f%%) unclassified (most of these are devices)",
-    nrow(result),
-    n_uncertain,
-    100 * n_uncertain / nrow(result)
-  ))
-
-  # Route breakdown within each BNF chapter.
-  bnf_chapter_route_summary <- result |>
-    filter(!is.na(bnf_code)) |>
-    mutate(bnf_chapter = substr(bnf_code, 1, 2)) |>
-    count(bnf_chapter, route_cat) |>
-    arrange(bnf_chapter, route_cat)
-
-  write_csv(
-    bnf_chapter_route_summary,
-    here::here(
-      "local_processing",
-      "outputs",
-      paste0(project_stage, "-dmd_lookup_route_by_bnf_chapter_summary.csv")
-    )
-  )
-
-  # Detail of unclassified products, for manual inspection / regex improvement.
-  unclassified_detail <- result |>
-    filter(route_uncertain, !is.na(bnf_code)) |>
-    mutate(bnf_chapter = substr(bnf_code, 1, 2)) |>
-    select(bnf_chapter, dmd_name) |>
-    arrange(bnf_chapter, dmd_name)
-
-  write_csv(
-    unclassified_detail,
-    here::here(
-      "local_processing",
-      "outputs",
-      paste0(project_stage, "-dmd_lookup_route_unclassified_detail.csv")
-    )
-  )
-
-  return(result)
-}
-
-
-#######################################################################################
 # fn_build_bnf_hierarchy()
 #######################################################################################
 # Reads the BNF Code Information file, downloadable from:
 # https://opendata.nhsbsa.net/dataset/bnf-code-information-current-year
 # Returns a clean lookup of BNF substance codes to their readable names,
 # plus higher-level hierarchy names (chapter, section, paragraph, subparagraph).
-# Using February 2026 version 90.
+# Using February 2026 version 90. To update to a newer release: add the new
+# file to docs/ and change bnf_hierarchy_path below.
 #######################################################################################
 
 fn_build_bnf_hierarchy <- function(

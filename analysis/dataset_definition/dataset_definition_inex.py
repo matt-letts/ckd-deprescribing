@@ -21,7 +21,7 @@ index_date = study_dates["index_date"]
 
 # initialise the dataset
 dataset = create_dataset()
-dataset.configure_dummy_data(population_size=10000)
+dataset.configure_dummy_data(population_size=1000)
 dataset.define_population(patients.date_of_birth.is_not_null())
 
 # add demographic, CKD/KRT and QA variables to the dataset

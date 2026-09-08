@@ -2,7 +2,7 @@
 # https://github.com/opensafely/polypharmacy-deprescribing-dementia/blob/dummy_data_changes/generate_dummy_tables/fn-generate_patients.R
 
 generate_patients <- function(
-  n_patients = 40000,
+  n_patients = 10000,
 
   ## Age distribution (in years)
   min_age = 0,
@@ -126,7 +126,7 @@ generate_patients <- function(
   patients
 }
 
-patients <- generate_patients(seed = 123)
+patients <- generate_patients(n_patients = 1000, seed = 123)
 
 write.csv(
   patients,

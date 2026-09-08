@@ -37,6 +37,8 @@ dir_create(here::here("local_processing", "outputs"))
 dmd_lookup <- fn_build_dmd_bnf_lookup(impute_bnf_from_vtm = TRUE)
 dmd_lookup <- fn_classify_route_from_trud(
   dmd_lookup = dmd_lookup,
+  # Using TRUD dm+d release 3.4.0 (2026-03-30). To update to a newer release:
+  # add the new folder to docs/ and change trud_folder_path below.
   trud_folder_path = here::here("docs", "nhsbsa_dmd_3.4.0_20260330000001"),
   project_stage = "building_med_tables",
   route_cat_map_path = here::here("docs", "dmd_route_cat_map.csv")
