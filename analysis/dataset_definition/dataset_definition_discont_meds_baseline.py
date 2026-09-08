@@ -52,4 +52,4 @@ dataset.define_population(dataset_inex_cleaned.exists_for_patient())
 # medication of interest's codelist
 add_baseline_moi_prescription_columns(
     dataset, index_date, dmd_codelist, max_meds=30, days_before_index=200
-)
+) # days_before_index must be >= analysis/config/config.r chronic_med_definitions$base$lookback_days
