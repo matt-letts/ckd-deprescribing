@@ -59,9 +59,14 @@ def add_moi_prescriptions(remaining, max_meds, direction="backward"):
 # add_moi_prescription_columns
 #############################################################################
 # adds the columns from add_moi_prescriptions() to the dataset.
+# and a single column that is the crude count_for_patient() number of meds 
+# this is for latter diagnostics, and will not de-duplicate rows.
 #############################################################################
 
-def add_moi_prescription_columns(dataset, remaining, max_meds, direction="backward"):
+def add_moi_prescription_columns(dataset, remaining, max_meds, direction="backward", count_column_name="med_num_crude_count"):
+    
+    dataset.add_column(count_column_name, remaining.count_for_patient())
+
     for name, expr in add_moi_prescriptions(remaining, max_meds, direction=direction).items():
         dataset.add_column(name, expr)
 
@@ -86,7 +91,7 @@ def add_baseline_moi_prescription_columns(dataset, index_date, dmd_codelist, max
         medications.dmd_code,
     )
 
-    add_moi_prescription_columns(dataset, remaining, max_meds, direction="backward")
+    add_moi_prescription_columns(dataset, remaining, max_meds, direction="backward", count_column_name="med_num_crude_count_baseline")
 
 
 ####################################################################################
@@ -107,4 +112,4 @@ def add_followup_moi_prescription_columns(dataset, index_date, end_date, dmd_cod
         medications.dmd_code,
     )
 
-    add_moi_prescription_columns(dataset, remaining, max_meds, direction="forward")
+    add_moi_prescription_columns(dataset, remaining, max_meds, direction="forward", count_column_name="med_num_crude_count_followup")
