@@ -4,7 +4,7 @@
 # 2. Defines medication_of_interest parameter which defines the dataset
 #    to be pulled in and the dmd_codelist to use
 # 3. Filters the population to patients in dataset_{medication}_at_baseline
-# 3. Calls add_moi_followup_prescription_columns() 
+# 4. Calls add_moi_followup_prescription_columns() 
 #
 # Output: dataset_discont_[medication]_followup.arrow
 #         (see yaml: generate_dataset_discont_meds_followup_{medication})
